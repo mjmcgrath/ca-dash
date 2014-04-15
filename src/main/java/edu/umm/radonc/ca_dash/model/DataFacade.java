@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.umm.radonc.ca.dash.model;
+package edu.umm.radonc.ca_dash.model;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;

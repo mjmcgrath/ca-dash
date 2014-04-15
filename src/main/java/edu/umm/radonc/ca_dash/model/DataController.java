@@ -1,7 +1,7 @@
-package edu.umm.radonc.ca.dash.model;
+package edu.umm.radonc.ca_dash.model;
 
-import edu.umm.radonc.ca.dash.model.util.JsfUtil;
-import edu.umm.radonc.ca.dash.model.util.JsfUtil.PersistAction;
+import edu.umm.radonc.ca_dash.model.util.JsfUtil;
+import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,7 +22,7 @@ import javax.faces.convert.FacesConverter;
 public class DataController implements Serializable {
 
     @EJB
-    private edu.umm.radonc.ca.dash.model.DataFacade ejbFacade;
+    private edu.umm.radonc.ca_dash.model.DataFacade ejbFacade;
     private List<Data> items = null;
     private Data selected;
 

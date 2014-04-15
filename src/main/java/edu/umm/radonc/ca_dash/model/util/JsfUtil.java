@@ -1,4 +1,4 @@
-package edu.umm.radonc.ca.dash.model.util;
+package edu.umm.radonc.ca_dash.model.util;
 
 import java.util.List;
 import javax.faces.application.FacesMessage;

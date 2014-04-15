@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package edu.umm.radonc.ca.dash.model;
+package edu.umm.radonc.ca_dash.model;
 
 import java.io.Serializable;
 import javax.persistence.Basic;
@@ -97,7 +97,7 @@ public class Data implements Serializable {
 
     @Override
     public String toString() {
-        return "edu.umm.radonc.ca.dash.model.Data[ id=" + id + " ]";
+        return "edu.umm.radonc.ca_dash.model.Data[ id=" + id + " ]";
     }
     
 }
