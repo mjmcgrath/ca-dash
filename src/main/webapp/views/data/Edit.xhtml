@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="DataEditDlg" widgetVar="DataEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.EditDataTitle}">
+            <h:form id="DataEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{dataController.selected != null}">
+                        <p:outputLabel value="#{bundle.EditDataLabel_number}" for="number" />
+                        <p:inputText id="number" value="#{dataController.selected.number}" title="#{bundle.EditDataTitle_number}" />
+                        <p:outputLabel value="#{bundle.EditDataLabel_id}" for="id" />
+                        <p:inputText id="id" value="#{dataController.selected.id}" title="#{bundle.EditDataTitle_id}" required="true" requiredMessage="#{bundle.EditDataRequiredMessage_id}"/>
+                        <p:outputLabel value="#{bundle.EditDataLabel_stuff}" for="stuff" />
+                        <p:inputText id="stuff" value="#{dataController.selected.stuff}" title="#{bundle.EditDataTitle_stuff}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{dataController.update}" value="#{bundle.Save}" update="display,:DataListForm:datalist,:growl" oncomplete="handleSubmit(args, 'DataEditDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="DataEditDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
