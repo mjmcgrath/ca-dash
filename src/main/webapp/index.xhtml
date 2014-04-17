@@ -7,11 +7,11 @@
         <h:outputStylesheet name="css/jsfcrud.css"/>
     </h:head>
     <h:body>
-        Hello from Facelets
+        <h:outputText value="#{beanTester.stuff}"></h:outputText>
         <br />
         <h:link outcome="welcomePrimefaces" value="Primefaces welcome page" />
         <br />
-        <h:link outcome="/views/data/List" value="Show All Data Items"/>
+        
     </h:body>
 
 </html>
