@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.ViewActivityTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{bundle.ViewActivityLabel_actinstproccodeser}"/>
+                    <h:outputText value="#{activityController.selected.actinstproccodeser}" title="#{bundle.ViewActivityTitle_actinstproccodeser}"/>
+                    <h:outputText value="#{bundle.ViewActivityLabel_completeddatetime}"/>
+                    <h:outputText value="#{activityController.selected.completeddatetime}" title="#{bundle.ViewActivityTitle_completeddatetime}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewActivityLabel_fromdateofservice}"/>
+                    <h:outputText value="#{activityController.selected.fromdateofservice}" title="#{bundle.ViewActivityTitle_fromdateofservice}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewActivityLabel_todateofservice}"/>
+                    <h:outputText value="#{activityController.selected.todateofservice}" title="#{bundle.ViewActivityTitle_todateofservice}">
+                        <f:convertDateTime pattern="MM/dd/yyyy" />
+                    </h:outputText>
+                    <h:outputText value="#{bundle.ViewActivityLabel_departmentser}"/>
+                    <h:outputText value="#{activityController.selected.departmentser}" title="#{bundle.ViewActivityTitle_departmentser}"/>
+                    <h:outputText value="#{bundle.ViewActivityLabel_procedurecodeser}"/>
+                    <h:outputText value="#{activityController.selected.procedurecodeser}" title="#{bundle.ViewActivityTitle_procedurecodeser}"/>
+                    <h:outputText value="#{bundle.ViewActivityLabel_activityList}"/>
+                    <h:outputText value="#{activityController.selected.activityList}" title="#{bundle.ViewActivityTitle_activityList}"/>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{activityController.destroyAndView}" value="#{bundle.ViewActivityDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{bundle.ViewActivityEditLink}"/>
+                <br />
+                <h:commandLink action="#{activityController.prepareCreate}" value="#{bundle.ViewActivityCreateLink}" />
+                <br />
+                <h:commandLink action="#{activityController.prepareList}" value="#{bundle.ViewActivityShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.ViewActivityIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

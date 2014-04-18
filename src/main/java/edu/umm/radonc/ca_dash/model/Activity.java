@@ -112,6 +112,11 @@ public class Activity implements Serializable {
     public void setProcedurecodeser(Procedure procedurecodeser) {
         this.procedurecodeser = procedurecodeser;
     }
+    
+    public void getActivityList() {
+        
+        
+    }
 
     @Override
     public int hashCode() {

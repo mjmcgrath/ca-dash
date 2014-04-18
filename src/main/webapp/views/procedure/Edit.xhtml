@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{bundle.EditProcedureTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{bundle.EditProcedureLabel_procedurecodeser}" for="procedurecodeser" />
+                    <h:inputText id="procedurecodeser" value="#{procedureController.selected.procedurecodeser}" title="#{bundle.EditProcedureTitle_procedurecodeser}" required="true" requiredMessage="#{bundle.EditProcedureRequiredMessage_procedurecodeser}"/>
+                    <h:outputLabel value="#{bundle.EditProcedureLabel_codetype}" for="codetype" />
+                    <h:inputText id="codetype" value="#{procedureController.selected.codetype}" title="#{bundle.EditProcedureTitle_codetype}" />
+                    <h:outputLabel value="#{bundle.EditProcedureLabel_procedurecode}" for="procedurecode" />
+                    <h:inputText id="procedurecode" value="#{procedureController.selected.procedurecode}" title="#{bundle.EditProcedureTitle_procedurecode}" />
+                    <h:outputLabel value="#{bundle.EditProcedureLabel_shortcomment}" for="shortcomment" />
+                    <h:inputText id="shortcomment" value="#{procedureController.selected.shortcomment}" title="#{bundle.EditProcedureTitle_shortcomment}" />
+                </h:panelGrid>
+                <h:commandLink action="#{procedureController.update}" value="#{bundle.EditProcedureSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{bundle.EditProcedureViewLink}"/>
+                <br />
+                <h:commandLink action="#{procedureController.prepareList}" value="#{bundle.EditProcedureShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{bundle.EditProcedureIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

@@ -12,16 +12,25 @@
                 <title>PrimeFaces</title>
             </f:facet>
             <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+            <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css' />
+            <h:outputStylesheet name="css/style.css"/>
         </h:head>
 
         <h:body>
 
             <p:layout fullPage="true">
 
-                <p:layoutUnit position="north" size="100" resizable="true" closable="true" collapsible="true">
-                    Header
+                <p:layoutUnit position="north" size="100" resizable="false" closable="true" collapsible="true">
+                    <h:graphicImage style="float: left;" value="resources/images/um-pms.png" />
+                    <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
+                    <p:menubar>
+                        <p:submenu label="Reports">
+                            <p:menuitem value="Daily Census" url="#" />
+                            <p:menuitem value="Monthly Census" url="#" />
+                        </p:submenu> 
+                        <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
+                    </p:menubar>
                 </p:layoutUnit>
-
                 <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
                     Footer
                 </p:layoutUnit>

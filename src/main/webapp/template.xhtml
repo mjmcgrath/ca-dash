@@ -9,6 +9,7 @@
         <title><ui:insert name="title">Default Title</ui:insert></title>
         <h:outputStylesheet library="css" name="jsfcrud.css"/>
         <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css' />
         <h:outputStylesheet library="css" name="style.css"/>
         <h:outputScript library="js" name="jsfcrud.js"/>
     </h:head>
@@ -23,7 +24,7 @@
                     <p:menubar>
                         <p:menuitem value="#{bundle.Home}" outcome="/index" icon="ui-icon-home"/>
                         <p:submenu label="#{bundle.Maintenance}">
-                            <p:menuitem value="Data" outcome="/views/data/List.xhtml" />
+                            <p:menuitem value="Data" outcome="/views/activity/List.xhtml" />
                         </p:submenu>
                     </p:menubar>
                 </h:form>
