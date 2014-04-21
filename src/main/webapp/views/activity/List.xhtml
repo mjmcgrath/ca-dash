@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
     <ui:composition template="/template.xhtml">
         <ui:define name="title">
@@ -21,64 +22,63 @@
                                  rowsPerPageTemplate="10,20,30,40,50"
                                  >
 
-                        <p:ajax event="rowSelect"   update="createButton viewButton editButton deleteButton"/>
-                        <p:ajax event="rowUnselect" update="createButton viewButton editButton deleteButton"/>
+
 
                         <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_actinstproccodeser}"/>
                             </f:facet>
                             <h:outputText value="#{item.actinstproccodeser}"/>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_completeddatetime}"/>
                             </f:facet>
                             <h:outputText value="#{item.completeddatetime}">
                                 <f:convertDateTime pattern="MM/dd/yyyy" />
                             </h:outputText>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_fromdateofservice}"/>
                             </f:facet>
                             <h:outputText value="#{item.fromdateofservice}">
                                 <f:convertDateTime pattern="MM/dd/yyyy" />
                             </h:outputText>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_todateofservice}"/>
                             </f:facet>
                             <h:outputText value="#{item.todateofservice}">
                                 <f:convertDateTime pattern="MM/dd/yyyy" />
                             </h:outputText>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_departmentser}"/>
                             </f:facet>
                             <h:outputText value="#{item.departmentser.departmentname}"/>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="Hospital"/>
                             </f:facet>
                             <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
                             </f:facet>
                             <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
                             </f:facet>
                             <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
-                        </h:column>
-                        <h:column>
+                        </p:column>
+                        <p:column>
                             <f:facet name="header">
                                 <h:outputText value="&nbsp;"/>
                             </f:facet>
@@ -87,9 +87,9 @@
                             <h:commandLink action="#{activityController.prepareEdit}" value="#{bundle.ListActivityEditLink}"/>
                             <h:outputText value=" "/>
                             <h:commandLink action="#{activityController.destroy}" value="#{bundle.ListActivityDestroyLink}"/>
-                        </h:column>
-                    </h:dataTable>
-                </h:panelGroup>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
                 <br />
                 <h:commandLink action="#{activityController.prepareCreate}" value="#{bundle.ListActivityCreateLink}"/>
                 <br />
