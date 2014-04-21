@@ -24,7 +24,11 @@ public class ActivityController implements Serializable {
     private DataModel items = null;
     @EJB
     private edu.umm.radonc.ca_dash.model.ActivityFacade ejbFacade;
-    private PaginationHelper pagination;
+
+    private List<Activity> items = null;
+    private LazyDataModel<Activity> lazyItems = null;
+    private Activity selected;
+    //private PaginationHelper pagination;
     private int selectedItemIndex;
 
     public ActivityController() {
@@ -156,6 +160,22 @@ public class ActivityController implements Serializable {
             items = getPagination().createPageDataModel();
         }
         return items;
+    }
+    
+    public LazyDataModel<Activity> getLazyItems() {
+        if (lazyItems == null) {
+            this.lazyItems = new LazyDataModel<Activity>(){
+                private static final long serialVersionUID    = 1L;
+                @Override
+                public List<Activity> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters) {
+                    int[] range = {first, first + pageSize};
+                    List<Activity> result = getFacade().findRange(range);
+                    lazyItems.setRowCount(getFacade().count());
+                    return result;
+                }
+            };
+        }
+        return lazyItems;
     }
 
     private void recreateModel() {
