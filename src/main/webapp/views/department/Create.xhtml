@@ -3,37 +3,31 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.CreateDepartmentTitle}"></h:outputText>
-        </ui:define>
-        <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.CreateDepartmentLabel_departmentser}" for="departmentser" />
-                    <h:inputText id="departmentser" value="#{departmentController.selected.departmentser}" title="#{bundle.CreateDepartmentTitle_departmentser}" required="true" requiredMessage="#{bundle.CreateDepartmentRequiredMessage_departmentser}"/>
-                    <h:outputLabel value="#{bundle.CreateDepartmentLabel_departmentname}" for="departmentname" />
-                    <h:inputText id="departmentname" value="#{departmentController.selected.departmentname}" title="#{bundle.CreateDepartmentTitle_departmentname}" />
-                    <h:outputLabel value="#{bundle.CreateDepartmentLabel_hospitalser}" for="hospitalser" />
-                    <h:selectOneMenu id="hospitalser" value="#{departmentController.selected.hospitalser}" title="#{bundle.CreateDepartmentTitle_hospitalser}" >
-                        <f:selectItems value="#{hospitalController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
-                </h:panelGrid>
-                <br />
-                <h:commandLink action="#{departmentController.create}" value="#{bundle.CreateDepartmentSaveLink}" />
-                <br />
-                <br />
-                <h:commandLink action="#{departmentController.prepareList}" value="#{bundle.CreateDepartmentShowAllLink}" immediate="true"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.CreateDepartmentIndexLink}"/>
+    <ui:composition>
+
+        <p:dialog id="DepartmentCreateDlg" widgetVar="DepartmentCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateDepartmentTitle}">
+            <h:form id="DepartmentCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{departmentController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateDepartmentLabel_departmentser}" for="departmentser" />
+                        <p:inputText id="departmentser" value="#{departmentController.selected.departmentser}" title="#{bundle.CreateDepartmentTitle_departmentser}" required="true" requiredMessage="#{bundle.CreateDepartmentRequiredMessage_departmentser}"/>
+                        <p:outputLabel value="#{bundle.CreateDepartmentLabel_departmentname}" for="departmentname" />
+                        <p:inputText id="departmentname" value="#{departmentController.selected.departmentname}" title="#{bundle.CreateDepartmentTitle_departmentname}" />
+                        <p:outputLabel value="#{bundle.CreateDepartmentLabel_hospitalser}" for="hospitalser" />
+                        <p:selectOneMenu id="hospitalser" value="#{departmentController.selected.hospitalser}" >
+                            <f:selectItems value="#{hospitalController.itemsAvailableSelectOne}"
+                                           var="hospitalserItem"
+                                           itemValue="#{hospitalserItem}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{departmentController.create}" value="#{bundle.Save}" update="display,:DepartmentListForm:datalist,:growl" oncomplete="handleSubmit(args,'DepartmentCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="DepartmentCreateDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
-        </ui:define>
-    </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

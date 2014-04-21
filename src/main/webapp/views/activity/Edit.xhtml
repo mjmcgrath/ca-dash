@@ -3,54 +3,45 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.EditActivityTitle}"></h:outputText>
-        </ui:define>
-        <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.EditActivityLabel_actinstproccodeser}" for="actinstproccodeser" />
-                    <h:inputText id="actinstproccodeser" value="#{activityController.selected.actinstproccodeser}" title="#{bundle.EditActivityTitle_actinstproccodeser}" required="true" requiredMessage="#{bundle.EditActivityRequiredMessage_actinstproccodeser}"/>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_completeddatetime}" for="completeddatetime" />
-                    <h:inputText id="completeddatetime" value="#{activityController.selected.completeddatetime}" title="#{bundle.EditActivityTitle_completeddatetime}" >
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:inputText>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_fromdateofservice}" for="fromdateofservice" />
-                    <h:inputText id="fromdateofservice" value="#{activityController.selected.fromdateofservice}" title="#{bundle.EditActivityTitle_fromdateofservice}" >
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:inputText>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_todateofservice}" for="todateofservice" />
-                    <h:inputText id="todateofservice" value="#{activityController.selected.todateofservice}" title="#{bundle.EditActivityTitle_todateofservice}" >
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:inputText>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_departmentser}" for="departmentser" />
-                    <h:selectOneMenu id="departmentser" value="#{activityController.selected.departmentser}" title="#{bundle.EditActivityTitle_departmentser}" >
-                        <f:selectItems value="#{departmentController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_procedurecodeser}" for="procedurecodeser" />
-                    <h:selectOneMenu id="procedurecodeser" value="#{activityController.selected.procedurecodeser}" title="#{bundle.EditActivityTitle_procedurecodeser}" >
-                        <f:selectItems value="#{procedureController.itemsAvailableSelectOne}"/>
-                    </h:selectOneMenu>
-                    <h:outputLabel value="#{bundle.EditActivityLabel_activityList}" for="activityList" />
-                    <h:inputText id="activityList" value="#{activityController.selected.activityList}" title="#{bundle.EditActivityTitle_activityList}" />
-                </h:panelGrid>
-                <h:commandLink action="#{activityController.update}" value="#{bundle.EditActivitySaveLink}"/>
-                <br />
-                <br />
-                <h:link outcome="View" value="#{bundle.EditActivityViewLink}"/>
-                <br />
-                <h:commandLink action="#{activityController.prepareList}" value="#{bundle.EditActivityShowAllLink}" immediate="true"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.EditActivityIndexLink}" />
+    <ui:composition>
+
+        <p:dialog id="ActivityEditDlg" widgetVar="ActivityEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.EditActivityTitle}">
+            <h:form id="ActivityEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{activityController.selected != null}">
+                        <p:outputLabel value="#{bundle.EditActivityLabel_actinstproccodeser}" for="actinstproccodeser" />
+                        <p:inputText id="actinstproccodeser" value="#{activityController.selected.actinstproccodeser}" title="#{bundle.EditActivityTitle_actinstproccodeser}" required="true" requiredMessage="#{bundle.EditActivityRequiredMessage_actinstproccodeser}"/>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_completeddatetime}" for="completeddatetime" />
+                        <p:calendar id="completeddatetime" pattern="MM/dd/yyyy" value="#{activityController.selected.completeddatetime}" title="#{bundle.EditActivityTitle_completeddatetime}"  showOn="button"/>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_fromdateofservice}" for="fromdateofservice" />
+                        <p:calendar id="fromdateofservice" pattern="MM/dd/yyyy" value="#{activityController.selected.fromdateofservice}" title="#{bundle.EditActivityTitle_fromdateofservice}"  showOn="button"/>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_todateofservice}" for="todateofservice" />
+                        <p:calendar id="todateofservice" pattern="MM/dd/yyyy" value="#{activityController.selected.todateofservice}" title="#{bundle.EditActivityTitle_todateofservice}"  showOn="button"/>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_departmentser}" for="departmentser" />
+                        <p:selectOneMenu id="departmentser" value="#{activityController.selected.departmentser}" >
+                            <f:selectItem itemLabel="#{bundle.SelectOneMessage}"/>
+                            <f:selectItems value="#{departmentController.itemsAvailableSelectOne}"
+                                           var="departmentserItem"
+                                           itemValue="#{departmentserItem}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_procedurecodeser}" for="procedurecodeser" />
+                        <p:selectOneMenu id="procedurecodeser" value="#{activityController.selected.procedurecodeser}" >
+                            <f:selectItem itemLabel="#{bundle.SelectOneMessage}"/>
+                            <f:selectItems value="#{procedureController.itemsAvailableSelectOne}"
+                                           var="procedurecodeserItem"
+                                           itemValue="#{procedurecodeserItem}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="#{bundle.EditActivityLabel_activityList}" for="activityList" />
+                        <p:inputText id="activityList" value="#{activityController.selected.activityList}" title="#{bundle.EditActivityTitle_activityList}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{activityController.update}" value="#{bundle.Save}" update="display,:ActivityListForm:datalist,:growl" oncomplete="handleSubmit(args, 'ActivityEditDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="ActivityEditDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
-        </ui:define>
-    </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

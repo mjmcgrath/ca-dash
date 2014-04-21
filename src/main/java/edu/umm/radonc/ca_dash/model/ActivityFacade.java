@@ -6,14 +6,13 @@
 
 package edu.umm.radonc.ca_dash.model;
 
-import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 /**
  *
- * @author mmcgrath
+ * @author michaelmcgrath
  */
 @Stateless
 public class ActivityFacade extends AbstractFacade<Activity> {
@@ -24,14 +23,9 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     protected EntityManager getEntityManager() {
         return em;
     }
-    
+
     public ActivityFacade() {
         super(Activity.class);
-    }
-    
-    public List<Object> getActivities() {
-        em.createQuery("SELECT d from Activity d");
-        return null;
-    }
+    } 
     
 }
