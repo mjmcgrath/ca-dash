@@ -3,34 +3,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.EditHospitalTitle}"></h:outputText>
-        </ui:define>
-        <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.EditHospitalLabel_hospitalser}" for="hospitalser" />
-                    <h:inputText id="hospitalser" value="#{hospitalController.selected.hospitalser}" title="#{bundle.EditHospitalTitle_hospitalser}" required="true" requiredMessage="#{bundle.EditHospitalRequiredMessage_hospitalser}"/>
-                    <h:outputLabel value="#{bundle.EditHospitalLabel_hospitalname}" for="hospitalname" />
-                    <h:inputText id="hospitalname" value="#{hospitalController.selected.hospitalname}" title="#{bundle.EditHospitalTitle_hospitalname}" />
-                </h:panelGrid>
-                <h:commandLink action="#{hospitalController.update}" value="#{bundle.EditHospitalSaveLink}"/>
-                <br />
-                <br />
-                <h:link outcome="View" value="#{bundle.EditHospitalViewLink}"/>
-                <br />
-                <h:commandLink action="#{hospitalController.prepareList}" value="#{bundle.EditHospitalShowAllLink}" immediate="true"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.EditHospitalIndexLink}" />
+    <ui:composition>
+
+        <p:dialog id="HospitalEditDlg" widgetVar="HospitalEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.EditHospitalTitle}">
+            <h:form id="HospitalEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{hospitalController.selected != null}">
+                        <p:outputLabel value="#{bundle.EditHospitalLabel_hospitalser}" for="hospitalser" />
+                        <p:inputText id="hospitalser" value="#{hospitalController.selected.hospitalser}" title="#{bundle.EditHospitalTitle_hospitalser}" required="true" requiredMessage="#{bundle.EditHospitalRequiredMessage_hospitalser}"/>
+                        <p:outputLabel value="#{bundle.EditHospitalLabel_hospitalname}" for="hospitalname" />
+                        <p:inputText id="hospitalname" value="#{hospitalController.selected.hospitalname}" title="#{bundle.EditHospitalTitle_hospitalname}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{hospitalController.update}" value="#{bundle.Save}" update="display,:HospitalListForm:datalist,:growl" oncomplete="handleSubmit(args, 'HospitalEditDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="HospitalEditDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
-        </ui:define>
-    </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

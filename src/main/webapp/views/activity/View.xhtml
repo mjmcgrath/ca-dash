@@ -3,54 +3,40 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.ViewActivityTitle}"></h:outputText>
-        </ui:define>
-        <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputText value="#{bundle.ViewActivityLabel_actinstproccodeser}"/>
-                    <h:outputText value="#{activityController.selected.actinstproccodeser}" title="#{bundle.ViewActivityTitle_actinstproccodeser}"/>
-                    <h:outputText value="#{bundle.ViewActivityLabel_completeddatetime}"/>
-                    <h:outputText value="#{activityController.selected.completeddatetime}" title="#{bundle.ViewActivityTitle_completeddatetime}">
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:outputText>
-                    <h:outputText value="#{bundle.ViewActivityLabel_fromdateofservice}"/>
-                    <h:outputText value="#{activityController.selected.fromdateofservice}" title="#{bundle.ViewActivityTitle_fromdateofservice}">
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:outputText>
-                    <h:outputText value="#{bundle.ViewActivityLabel_todateofservice}"/>
-                    <h:outputText value="#{activityController.selected.todateofservice}" title="#{bundle.ViewActivityTitle_todateofservice}">
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:outputText>
-                    <h:outputText value="#{bundle.ViewActivityLabel_departmentser}"/>
-                    <h:outputText value="#{activityController.selected.departmentser}" title="#{bundle.ViewActivityTitle_departmentser}"/>
-                    <h:outputText value="#{bundle.ViewActivityLabel_procedurecodeser}"/>
-                    <h:outputText value="#{activityController.selected.procedurecodeser}" title="#{bundle.ViewActivityTitle_procedurecodeser}"/>
-                    <h:outputText value="#{bundle.ViewActivityLabel_activityList}"/>
-                    <h:outputText value="#{activityController.selected.activityList}" title="#{bundle.ViewActivityTitle_activityList}"/>
-                </h:panelGrid>
-                <br />
-                <h:commandLink action="#{activityController.destroyAndView}" value="#{bundle.ViewActivityDestroyLink}"/>
-                <br />
-                <br />
-                <h:link outcome="Edit" value="#{bundle.ViewActivityEditLink}"/>
-                <br />
-                <h:commandLink action="#{activityController.prepareCreate}" value="#{bundle.ViewActivityCreateLink}" />
-                <br />
-                <h:commandLink action="#{activityController.prepareList}" value="#{bundle.ViewActivityShowAllLink}"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.ViewActivityIndexLink}"/>
+    <ui:composition>
 
+        <p:dialog id="ActivityViewDlg" widgetVar="ActivityViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.ViewActivityTitle}">
+            <h:form id="ActivityViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{activityController.selected != null}">
+                        <h:outputText value="#{bundle.ViewActivityLabel_actinstproccodeser}"/>
+                        <h:outputText value="#{activityController.selected.actinstproccodeser}" title="#{bundle.ViewActivityTitle_actinstproccodeser}"/>
+                        <h:outputText value="#{bundle.ViewActivityLabel_completeddatetime}"/>
+                        <h:outputText value="#{activityController.selected.completeddatetime}" title="#{bundle.ViewActivityTitle_completeddatetime}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                        <h:outputText value="#{bundle.ViewActivityLabel_fromdateofservice}"/>
+                        <h:outputText value="#{activityController.selected.fromdateofservice}" title="#{bundle.ViewActivityTitle_fromdateofservice}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                        <h:outputText value="#{bundle.ViewActivityLabel_todateofservice}"/>
+                        <h:outputText value="#{activityController.selected.todateofservice}" title="#{bundle.ViewActivityTitle_todateofservice}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                        <h:outputText value="#{bundle.ViewActivityLabel_departmentser}"/>
+                        <h:outputText value="#{activityController.selected.departmentser}" title="#{bundle.ViewActivityTitle_departmentser}"/>
+                        <h:outputText value="#{bundle.ViewActivityLabel_procedurecodeser}"/>
+                        <h:outputText value="#{activityController.selected.procedurecodeser}" title="#{bundle.ViewActivityTitle_procedurecodeser}"/>
+                        <h:outputText value="#{bundle.ViewActivityLabel_activityList}"/>
+                        <h:outputText value="#{activityController.selected.activityList}" title="#{bundle.ViewActivityTitle_activityList}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundle.Close}" onclick="ActivityViewDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
-        </ui:define>
-    </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

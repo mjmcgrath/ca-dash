@@ -3,33 +3,25 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core">
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
 
-    <ui:composition template="/template.xhtml">
-        <ui:define name="title">
-            <h:outputText value="#{bundle.CreateHospitalTitle}"></h:outputText>
-        </ui:define>
-        <ui:define name="body">
-            <h:panelGroup id="messagePanel" layout="block">
-                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
-            </h:panelGroup>
-            <h:form>
-                <h:panelGrid columns="2">
-                    <h:outputLabel value="#{bundle.CreateHospitalLabel_hospitalser}" for="hospitalser" />
-                    <h:inputText id="hospitalser" value="#{hospitalController.selected.hospitalser}" title="#{bundle.CreateHospitalTitle_hospitalser}" required="true" requiredMessage="#{bundle.CreateHospitalRequiredMessage_hospitalser}"/>
-                    <h:outputLabel value="#{bundle.CreateHospitalLabel_hospitalname}" for="hospitalname" />
-                    <h:inputText id="hospitalname" value="#{hospitalController.selected.hospitalname}" title="#{bundle.CreateHospitalTitle_hospitalname}" />
-                </h:panelGrid>
-                <br />
-                <h:commandLink action="#{hospitalController.create}" value="#{bundle.CreateHospitalSaveLink}" />
-                <br />
-                <br />
-                <h:commandLink action="#{hospitalController.prepareList}" value="#{bundle.CreateHospitalShowAllLink}" immediate="true"/>
-                <br />
-                <br />
-                <h:link outcome="/index" value="#{bundle.CreateHospitalIndexLink}"/>
+    <ui:composition>
+
+        <p:dialog id="HospitalCreateDlg" widgetVar="HospitalCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateHospitalTitle}">
+            <h:form id="HospitalCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{hospitalController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateHospitalLabel_hospitalser}" for="hospitalser" />
+                        <p:inputText id="hospitalser" value="#{hospitalController.selected.hospitalser}" title="#{bundle.CreateHospitalTitle_hospitalser}" required="true" requiredMessage="#{bundle.CreateHospitalRequiredMessage_hospitalser}"/>
+                        <p:outputLabel value="#{bundle.CreateHospitalLabel_hospitalname}" for="hospitalname" />
+                        <p:inputText id="hospitalname" value="#{hospitalController.selected.hospitalname}" title="#{bundle.CreateHospitalTitle_hospitalname}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{hospitalController.create}" value="#{bundle.Save}" update="display,:HospitalListForm:datalist,:growl" oncomplete="handleSubmit(args,'HospitalCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="HospitalCreateDialog.hide()"/>
+                </h:panelGroup>
             </h:form>
-        </ui:define>
-    </ui:composition>
+        </p:dialog>
 
+    </ui:composition>
 </html>

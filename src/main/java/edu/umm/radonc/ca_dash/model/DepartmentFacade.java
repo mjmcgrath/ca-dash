@@ -12,7 +12,7 @@ import javax.persistence.PersistenceContext;
 
 /**
  *
- * @author mmcgrath
+ * @author michaelmcgrath
  */
 @Stateless
 public class DepartmentFacade extends AbstractFacade<Department> {

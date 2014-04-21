@@ -5,13 +5,12 @@
  */
 
 package edu.umm.radonc.ca_dash.model;
-
 import java.util.List;
 import javax.persistence.EntityManager;
 
 /**
  *
- * @author mmcgrath
+ * @author michaelmcgrath
  */
 public abstract class AbstractFacade<T> {
     private Class<T> entityClass;
