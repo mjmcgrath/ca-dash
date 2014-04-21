@@ -22,7 +22,7 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 
 @Named("activityController")
-@ViewScoped
+@SessionScoped
 public class ActivityController implements Serializable {
 
     @EJB
