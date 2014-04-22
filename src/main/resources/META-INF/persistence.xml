@@ -7,7 +7,11 @@
   </persistence-unit>
   <persistence-unit name="clinicalActivityPU" transaction-type="JTA">
     <jta-data-source>jdbc/clinicalactivity</jta-data-source>
-    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <class>edu.umm.radonc.ca_dash.model.Activity</class>
+    <class>edu.umm.radonc.ca_dash.model.Department</class>
+    <class>edu.umm.radonc.ca_dash.model.Hospital</class>
+    <class>edu.umm.radonc.ca_dash.model.Procedure</class>
+    <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties/>
   </persistence-unit>
 </persistence>

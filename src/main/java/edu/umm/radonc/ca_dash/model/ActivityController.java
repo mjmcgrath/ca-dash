@@ -3,6 +3,7 @@ package edu.umm.radonc.ca_dash.model;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -30,6 +31,8 @@ public class ActivityController implements Serializable {
     private List<Activity> items = null;
     private LazyDataModel<Activity> lazyItems = null;
     private Activity selected;
+    private Date startDate;
+    private Date endDate;
 
     public ActivityController() {
     }
@@ -139,6 +142,27 @@ public class ActivityController implements Serializable {
     public List<Activity> getItemsAvailableSelectOne() {
         return getFacade().findAll();
     }
+    
+    public List<Object> getDailyCounts() {
+        return getFacade().getDailyCounts(null, null);
+    }
+    
+    public void setStartDate(Date startDate) {
+        System.out.println(startDate.toString());
+        this.startDate = startDate;
+    }
+    
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
+    
+    public Date getStartDate() {
+        return this.startDate;
+    }
+    
+    public Date getEndDate() {
+        return this.endDate;
+    }
 
     @FacesConverter(forClass = Activity.class)
     public static class ActivityControllerConverter implements Converter {
@@ -164,7 +188,7 @@ public class ActivityController implements Serializable {
             sb.append(value);
             return sb.toString();
         }
-
+        
         @Override
         public String getAsString(FacesContext facesContext, UIComponent component, Object object) {
             if (object == null) {

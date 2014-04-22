@@ -49,7 +49,12 @@
                 </p:layoutUnit>
 
                 <p:layoutUnit position="center">
-                    Welcome to PrimeFaces
+                            <h:form id="filters">
+            <h3>Cal</h3>  
+            <p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
+            <p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
+            <p:commandButton value="Enter" update=":foo"/> 
+        </h:form>
                 </p:layoutUnit>
 
             </p:layout>

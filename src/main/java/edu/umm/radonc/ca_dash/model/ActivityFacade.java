@@ -6,9 +6,12 @@
 
 package edu.umm.radonc.ca_dash.model;
 
+import java.util.Date;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.CriteriaQuery;
 
 /**
  *
@@ -26,6 +29,20 @@ public class ActivityFacade extends AbstractFacade<Activity> {
 
     public ActivityFacade() {
         super(Activity.class);
-    } 
+    }
+    
+    public List<Object> getDailyCounts(Date start, Date end) {
+        //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
+        //cq.select(cq.from(Activity.class));cast result list
+        
+        javax.persistence.Query q = getEntityManager()
+                .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
+                        " FROM Activity a " + 
+                        "WHERE a.fromdateofservice IS NOT NULL " + 
+                        "GROUP BY a.fromdateofservice " + 
+                        "ORDER BY a.fromdateofservice ASC");
+        List<Object> retval = q.getResultList();
+        return retval;
+    }
     
 }
