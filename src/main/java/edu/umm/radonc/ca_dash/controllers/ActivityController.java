@@ -1,8 +1,12 @@
-package edu.umm.radonc.ca_dash.model;
+package edu.umm.radonc.ca_dash.controllers;
 
+import edu.umm.radonc.ca_dash.model.Activity;
+import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +25,8 @@ import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
+import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.ChartSeries;
 
 @Named("activityController")
 @SessionScoped
@@ -30,11 +36,27 @@ public class ActivityController implements Serializable {
     private edu.umm.radonc.ca_dash.model.ActivityFacade ejbFacade;
     private List<Activity> items = null;
     private LazyDataModel<Activity> lazyItems = null;
+    private CartesianChartModel dailyChart;
+    private CartesianChartModel weeklyChart;
+    private CartesianChartModel monthlyChart;
     private Activity selected;
     private Date startDate;
     private Date endDate;
+    private DateFormat df;
 
     public ActivityController() {
+        df = new SimpleDateFormat("yyyy-MM-dd");
+        endDate = new Date();
+        try {
+            startDate = df.parse("2013-01-01");
+        }
+        catch (Exception e) {
+            System.out.println("Parse failed");
+        }
+        dailyChart = new CartesianChartModel();
+        weeklyChart = new CartesianChartModel();
+        monthlyChart = new CartesianChartModel();
+        //draw();
     }
 
     public Activity getSelected() {
@@ -102,7 +124,7 @@ public class ActivityController implements Serializable {
         }
         return lazyItems;
     }
-
+    
     private void persist(PersistAction persistAction, String successMessage) {
         if (selected != null) {
             setEmbeddableKeys();
@@ -143,8 +165,12 @@ public class ActivityController implements Serializable {
         return getFacade().findAll();
     }
     
-    public List<Object> getDailyCounts() {
-        return getFacade().getDailyCounts(null, null);
+    public List<Object[]> getDailyCounts() {
+        return getFacade().getDailyCounts(startDate, endDate);
+    }
+    
+    public List<Object> getMonthlyCounts() {
+        return getFacade().getMonthlyCounts(null, null);
     }
     
     public void setStartDate(Date startDate) {
@@ -162,6 +188,25 @@ public class ActivityController implements Serializable {
     
     public Date getEndDate() {
         return this.endDate;
+    }
+    
+    public CartesianChartModel getDailyBarChart() {
+        return this.dailyChart;
+    }
+    
+    public void draw(){
+        List<Object[]> events = getFacade().getDailyCounts(startDate, endDate);
+        this.dailyChart = new CartesianChartModel();
+        //decide whether or not to display totals or by location
+        //iterate over lists
+        ChartSeries series = new ChartSeries();
+        series.setLabel("All");
+        for (Object[] event : events) {
+            String xval = df.format((Date)event[0]);
+            Long yval = (Long)event[1];
+            series.set(xval, yval);
+        }
+        dailyChart.addSeries(series);
     }
 
     @FacesConverter(forClass = Activity.class)

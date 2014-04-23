@@ -49,12 +49,97 @@
                 </p:layoutUnit>
 
                 <p:layoutUnit position="center">
-                            <h:form id="filters">
-            <h3>Cal</h3>  
-            <p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
-            <p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
-            <p:commandButton value="Enter" update=":foo"/> 
-        </h:form>
+                    <p:fieldset legend="Filters" toggleable="true" toggleSpeed="500">
+                    <h:form id="filters">
+                        <label>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
+                        <label>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
+                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts:dailyBarChart"/> 
+                        </h:form>
+                    </p:fieldset>
+                    <p:tabView id="charts" orientation="bottom">
+                        <p:tab title="Daily">
+                            <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
+                                title="Daily Activities" min="0" xaxisAngle="90" shadow="false" style="height:350px"/>
+                        </p:tab>
+                        <p:tab title="Weekly">
+                            <!-- Chart goes here -->
+                        </p:tab>
+                        <p:tab title="Monthly">
+                            <!-- Chart goes here -->
+                        </p:tab>
+                        <p:tab title="Raw Data">
+                            <p:dataTable id="datalist" value="#{activityController.lazyItems}" var="item"
+                                 selectionMode="single" selection="#{activityController.selected}"
+                                 paginator="true"
+                                 lazy="true" 
+                                 rowKey="#{item.actinstproccodeser}"
+                                 rows="10"
+                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 >
+                        
+                        <p:ajax event="rowSelect"   update="viewButton"/>
+                        <p:ajax event="rowUnselect" update="viewButton"/>
+
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_actinstproccodeser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.actinstproccodeser}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_completeddatetime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.completeddatetime}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_fromdateofservice}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.fromdateofservice}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_todateofservice}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.todateofservice}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_departmentser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.departmentser.departmentname}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="Hospital"/>
+                            </f:facet>
+                            <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
+                        </p:column>
+                        <f:facet name="footer">
+                            <p:commandButton id="viewButton"   icon="ui-icon-search" value="#{bundle.View}" oncomplete="PF('ActivityViewDialog').show()" disabled="#{empty activityController.selected}"/>
+                        </f:facet>
+                    </p:dataTable>
+                        </p:tab>
+                    </p:tabView>
                 </p:layoutUnit>
 
             </p:layout>

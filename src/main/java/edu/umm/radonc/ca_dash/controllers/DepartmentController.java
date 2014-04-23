@@ -1,5 +1,7 @@
-package edu.umm.radonc.ca_dash.model;
+package edu.umm.radonc.ca_dash.controllers;
 
+import edu.umm.radonc.ca_dash.model.Department;
+import edu.umm.radonc.ca_dash.model.DepartmentFacade;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 
@@ -17,23 +19,23 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-@Named("hospitalController")
+@Named("departmentController")
 @SessionScoped
-public class HospitalController implements Serializable {
+public class DepartmentController implements Serializable {
 
     @EJB
-    private edu.umm.radonc.ca_dash.model.HospitalFacade ejbFacade;
-    private List<Hospital> items = null;
-    private Hospital selected;
+    private edu.umm.radonc.ca_dash.model.DepartmentFacade ejbFacade;
+    private List<Department> items = null;
+    private Department selected;
 
-    public HospitalController() {
+    public DepartmentController() {
     }
 
-    public Hospital getSelected() {
+    public Department getSelected() {
         return selected;
     }
 
-    public void setSelected(Hospital selected) {
+    public void setSelected(Department selected) {
         this.selected = selected;
     }
 
@@ -43,36 +45,36 @@ public class HospitalController implements Serializable {
     protected void initializeEmbeddableKey() {
     }
 
-    private HospitalFacade getFacade() {
+    private DepartmentFacade getFacade() {
         return ejbFacade;
     }
 
-    public Hospital prepareCreate() {
-        selected = new Hospital();
+    public Department prepareCreate() {
+        selected = new Department();
         initializeEmbeddableKey();
         return selected;
     }
 
     public void create() {
-        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("HospitalCreated"));
+        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("DepartmentCreated"));
         if (!JsfUtil.isValidationFailed()) {
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
     public void update() {
-        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("HospitalUpdated"));
+        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("DepartmentUpdated"));
     }
 
     public void destroy() {
-        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("HospitalDeleted"));
+        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("DepartmentDeleted"));
         if (!JsfUtil.isValidationFailed()) {
             selected = null; // Remove selection
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
-    public List<Hospital> getItems() {
+    public List<Department> getItems() {
         if (items == null) {
             items = getFacade().findAll();
         }
@@ -107,29 +109,29 @@ public class HospitalController implements Serializable {
         }
     }
 
-    public Hospital getHospital(java.lang.Integer id) {
+    public Department getDepartment(java.lang.Integer id) {
         return getFacade().find(id);
     }
 
-    public List<Hospital> getItemsAvailableSelectMany() {
+    public List<Department> getItemsAvailableSelectMany() {
         return getFacade().findAll();
     }
 
-    public List<Hospital> getItemsAvailableSelectOne() {
+    public List<Department> getItemsAvailableSelectOne() {
         return getFacade().findAll();
     }
 
-    @FacesConverter(forClass = Hospital.class)
-    public static class HospitalControllerConverter implements Converter {
+    @FacesConverter(forClass = Department.class)
+    public static class DepartmentControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            HospitalController controller = (HospitalController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "hospitalController");
-            return controller.getHospital(getKey(value));
+            DepartmentController controller = (DepartmentController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "departmentController");
+            return controller.getDepartment(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {
@@ -149,11 +151,11 @@ public class HospitalController implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Hospital) {
-                Hospital o = (Hospital) object;
-                return getStringKey(o.getHospitalser());
+            if (object instanceof Department) {
+                Department o = (Department) object;
+                return getStringKey(o.getDepartmentser());
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Hospital.class.getName()});
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Department.class.getName()});
                 return null;
             }
         }

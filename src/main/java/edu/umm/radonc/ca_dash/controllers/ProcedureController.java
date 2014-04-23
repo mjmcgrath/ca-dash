@@ -1,5 +1,7 @@
-package edu.umm.radonc.ca_dash.model;
+package edu.umm.radonc.ca_dash.controllers;
 
+import edu.umm.radonc.ca_dash.model.Procedure;
+import edu.umm.radonc.ca_dash.model.ProcedureFacade;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 

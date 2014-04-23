@@ -17,3 +17,7 @@ h1 {
     font-family: 'Montserrat';
     font-weight: 400;
 }
+
+.ui-widget {
+    font-size: .85em;
+}
