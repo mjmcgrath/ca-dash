@@ -70,6 +70,16 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
     }
     
+    public List<Object[]> getDailyActivities(Date day){
+        Query q = getEntityManager().createNativeQuery("SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) " + 
+                "FROM actinstproccode a, procedurecode p " + 
+                "WHERE p.procedurecodeser = a.procedurecodeser AND a.fromdateofservice = ? " +
+                "AND p.procedurecode <> '00000'" +
+                "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC")
+                .setParameter(1, day);
+        
+        return q.getResultList();
+    }
     
     
     //TODO: Add parameters to query

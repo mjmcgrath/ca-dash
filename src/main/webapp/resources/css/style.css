@@ -21,3 +21,10 @@ h1 {
 .ui-widget {
     font-size: .85em;
 }
+
+#charts\:dailyDialog .ui-dialog-content 
+{
+    max-width: 400px;
+    max-height: 400px;
+    overflow-y: scroll;
+}

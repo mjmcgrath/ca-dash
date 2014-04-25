@@ -6,6 +6,7 @@ import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -25,6 +26,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
+import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import org.primefaces.model.chart.CartesianChartModel;
@@ -41,6 +43,7 @@ public class ActivityController implements Serializable {
     private CartesianChartModel dailyChart;
     private CartesianChartModel weeklyChart;
     private CartesianChartModel monthlyChart;
+    private List<Object[]> dailyActivities;
     private Activity selected;
     private Date startDate;
     private Date endDate;
@@ -176,6 +179,10 @@ public class ActivityController implements Serializable {
         return getFacade().find(id);
     }
 
+    public List<Object[]> getDailyActivities() {
+        return dailyActivities;
+    }
+
     public List<Activity> getItemsAvailableSelectMany() {
         return getFacade().findAll();
     }
@@ -212,6 +219,26 @@ public class ActivityController implements Serializable {
     public CartesianChartModel getDailyBarChart() {
         return this.dailyChart;
     }
+    
+    public void itemSelect(ItemSelectEvent event) { 
+       int series = event.getSeriesIndex();
+       int item = event.getItemIndex();
+       
+       String dateRaw = (dailyChart.getSeries().get(series).getData().keySet().toArray()[item].toString());
+       
+       Date date = null;
+       
+       try {
+            date = df.parse(dateRaw);
+       }
+       catch (ParseException ex) {
+           //Log parse failure
+       }
+       
+       dailyActivities = getFacade().getDailyActivities(date);
+       
+    }
+    
     
     public void draw(){
         List<Object[]> events;
