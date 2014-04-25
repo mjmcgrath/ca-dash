@@ -11,6 +11,8 @@ and open the template in the editor.
 
 body {
     font-family: 'Open Sans', sans-serif;
+    width: 950px;
+    margin: auto;
 }
 
 h1 {
@@ -27,4 +29,14 @@ h1 {
     max-width: 400px;
     max-height: 400px;
     overflow-y: scroll;
+}
+
+#layoutHeader {
+    background-color: #4683ea;
+}
+
+#layoutHeader .ui-widget-content {
+    text-align: center;
+    color: #FFF;
+    background: #555;
 }
