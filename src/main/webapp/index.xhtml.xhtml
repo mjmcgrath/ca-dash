@@ -23,28 +23,14 @@
                 <p:layoutUnit position="north" size="100" resizable="false" closable="true" collapsible="true">
                     <h:graphicImage style="float: left;" value="resources/images/um-pms.png" />
                     <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
-                    <p:menubar>
-                        <p:submenu label="Reports">
-                            <p:menuitem value="Daily Census" url="#" />
-                            <p:menuitem value="Monthly Census" url="#" />
-                        </p:submenu> 
-                        <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
-                    </p:menubar>
                 </p:layoutUnit>
-                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
-                    Footer
+                <p:layoutUnit position="south" size="50" closable="true" collapsible="true">
+                    &copy; 2014 University of Maryland Medical System, All Rights Reserved
                 </p:layoutUnit>
 
-                <p:layoutUnit position="west" size="175" header="Left" collapsible="true">
+                <p:layoutUnit position="west" size="175" header="Actions" collapsible="true">
                     <p:menu>
-                        <p:submenu label="Resources">
-                            <p:menuitem value="Demo" url="http://www.primefaces.org/showcase-labs/ui/home.jsf" />
-                            <p:menuitem value="Documentation" url="http://www.primefaces.org/documentation.html" />
-                            <p:menuitem value="Forum" url="http://forum.primefaces.org/" />
-                            <p:menuitem value="Themes" url="http://www.primefaces.org/themes.html" />
-
-                        </p:submenu>
-
+                        <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
                     </p:menu>
                 </p:layoutUnit>
 
@@ -53,13 +39,14 @@
                     <h:form id="filters">
                         <label>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
                         <label>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
-                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts:dailyBarChart"/> 
+                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts:dailyBarChart" /> 
                         </h:form>
                     </p:fieldset>
                     <p:tabView id="charts" orientation="bottom">
                         <p:tab title="Daily">
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
-                                title="Daily Activities" min="0" xaxisAngle="90" shadow="false" style="height:350px"/>
+                                title="Daily Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29" style="height:350px"/>
                         </p:tab>
                         <p:tab title="Weekly">
                             <!-- Chart goes here -->
@@ -79,12 +66,17 @@
                         
                         <p:ajax event="rowSelect"   update="viewButton"/>
                         <p:ajax event="rowUnselect" update="viewButton"/>
-
                         <p:column>
                             <f:facet name="header">
-                                <h:outputText value="#{bundle.ListActivityTitle_actinstproccodeser}"/>
+                                <h:outputText value="#{bundle.ListProcedureTitle_shortcomment}"/>
                             </f:facet>
-                            <h:outputText value="#{item.actinstproccodeser}"/>
+                            <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListProcedureTitle_procedurecode}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
                         </p:column>
                         <p:column>
                             <f:facet name="header">
@@ -112,27 +104,15 @@
                         </p:column>
                         <p:column>
                             <f:facet name="header">
-                                <h:outputText value="#{bundle.ListActivityTitle_departmentser}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.departmentser.departmentname}"/>
-                        </p:column>
-                        <p:column>
-                            <f:facet name="header">
                                 <h:outputText value="Hospital"/>
                             </f:facet>
                             <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
                         </p:column>
                         <p:column>
                             <f:facet name="header">
-                                <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
+                                <h:outputText value="#{bundle.ListDepartmentTitle_departmentname}"/>
                             </f:facet>
-                            <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
-                        </p:column>
-                        <p:column>
-                            <f:facet name="header">
-                                <h:outputText value="#{bundle.ListActivityTitle_procedurecodeser}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
+                            <h:outputText value="#{item.departmentser.departmentname}"/>
                         </p:column>
                         <f:facet name="footer">
                             <p:commandButton id="viewButton"   icon="ui-icon-search" value="#{bundle.View}" oncomplete="PF('ActivityViewDialog').show()" disabled="#{empty activityController.selected}"/>

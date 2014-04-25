@@ -7,7 +7,9 @@ import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -46,13 +48,11 @@ public class ActivityController implements Serializable {
 
     public ActivityController() {
         df = new SimpleDateFormat("yyyy-MM-dd");
+        GregorianCalendar gc = new GregorianCalendar();
         endDate = new Date();
-        try {
-            startDate = df.parse("2013-01-01");
-        }
-        catch (Exception e) {
-            System.out.println("Parse failed");
-        }
+        gc.setTime(endDate);
+        gc.add(Calendar.MONTH, -1);
+        startDate = gc.getTime();
         dailyChart = new CartesianChartModel();
         weeklyChart = new CartesianChartModel();
         monthlyChart = new CartesianChartModel();

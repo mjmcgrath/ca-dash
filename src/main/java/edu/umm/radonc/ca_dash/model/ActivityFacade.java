@@ -45,6 +45,8 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         );
         cq.orderBy(cb.asc(rt.get(Activity_.fromdateofservice)));
         Query q = em.createQuery(cq);
+        q.setMaxResults(range[1] - range[0] + 1);
+        q.setFirstResult(range[0]);
         return q.getResultList();
         
     }
