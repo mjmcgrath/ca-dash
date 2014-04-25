@@ -11,8 +11,9 @@ import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.SqlResultSetMapping;
-import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.*;
 
 /**
  *
@@ -31,6 +32,41 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     public ActivityFacade() {
         super(Activity.class);
     }
+    
+    public List<Activity> itemsDateRange(Date start, Date end, int[] range) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery(Activity.class);
+        Root<Activity> rt = cq.from(Activity.class);
+        cq.where(
+                cb.and(
+                        rt.get(Activity_.fromdateofservice).isNotNull(),
+                        cb.between(rt.get(Activity_.fromdateofservice), start, end)
+                )
+        );
+        cq.orderBy(cb.asc(rt.get(Activity_.fromdateofservice)));
+        Query q = em.createQuery(cq);
+        return q.getResultList();
+        
+    }
+    
+    public int itemsDateRangeCount(Date start, Date end) {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery(Activity.class);
+        Root<Activity> rt = cq.from(Activity.class);
+        cq.select(cb.count(rt.get(Activity_.actinstproccodeser)));
+        cq.where(
+                cb.and(
+                        rt.get(Activity_.fromdateofservice).isNotNull(),
+                        cb.between(rt.get(Activity_.fromdateofservice), start, end)
+                )
+        );
+ 
+        Query q = em.createQuery(cq);
+        return ((Long)(q.getSingleResult())).intValue();
+        
+    }
+    
+    
     
     //TODO: Add parameters to query
     public List<Object[]> getDailyCounts(Date start, Date end) {

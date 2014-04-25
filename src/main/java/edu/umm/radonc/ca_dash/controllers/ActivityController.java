@@ -116,8 +116,8 @@ public class ActivityController implements Serializable {
                 @Override
                 public List<Activity> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters) {
                     int[] range = {first, first + pageSize};
-                    List<Activity> result = getFacade().findRange(range);
-                    lazyItems.setRowCount(getFacade().count());
+                    List<Activity> result = getFacade().itemsDateRange(startDate, endDate, range);
+                    lazyItems.setRowCount(getFacade().itemsDateRangeCount(startDate, endDate));
                     return result;
                 }
             };
