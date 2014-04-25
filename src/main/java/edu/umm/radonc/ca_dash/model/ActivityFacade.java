@@ -38,10 +38,11 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         CriteriaQuery cq = cb.createQuery(Activity.class);
         Root<Activity> rt = cq.from(Activity.class);
         cq.where(
+                cb.and(rt.get(Activity_.fromdateofservice).isNotNull(),
                 cb.and(
-                        rt.get(Activity_.fromdateofservice).isNotNull(),
+                        cb.notEqual(rt.get(Activity_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
                         cb.between(rt.get(Activity_.fromdateofservice), start, end)
-                )
+                ))
         );
         cq.orderBy(cb.asc(rt.get(Activity_.fromdateofservice)));
         Query q = em.createQuery(cq);
@@ -57,10 +58,11 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         Root<Activity> rt = cq.from(Activity.class);
         cq.select(cb.count(rt.get(Activity_.actinstproccodeser)));
         cq.where(
+                cb.and(rt.get(Activity_.fromdateofservice).isNotNull(),
                 cb.and(
-                        rt.get(Activity_.fromdateofservice).isNotNull(),
+                        cb.notEqual(rt.get(Activity_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
                         cb.between(rt.get(Activity_.fromdateofservice), start, end)
-                )
+                ))
         );
  
         Query q = em.createQuery(cq);
@@ -75,11 +77,14 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
+        //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
+        
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
                         " FROM Activity a " + 
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
+                        "AND a.procedurecodeser.procedurecode != '00000' " +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
                 .setParameter("start", start)

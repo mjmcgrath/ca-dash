@@ -45,6 +45,9 @@ public class ActivityController implements Serializable {
     private Date startDate;
     private Date endDate;
     private DateFormat df;
+    private List<String> selectedFacilities;
+    private List<String> selectedTimeIntervals;
+    
 
     public ActivityController() {
         df = new SimpleDateFormat("yyyy-MM-dd");
@@ -61,6 +64,22 @@ public class ActivityController implements Serializable {
 
     public Activity getSelected() {
         return selected;
+    }
+    
+    public List<String> getSelectedFacilities() {
+        return selectedFacilities;
+    }
+
+    public void setSelectedFacilities(List<String> selectedFacilities) {
+        this.selectedFacilities = selectedFacilities;
+    }
+
+    public List<String> getSelectedTimeIntervals() {
+        return selectedTimeIntervals;
+    }
+
+    public void setSelectedTimeIntervals(List<String> selectedTimeSpans) {
+        this.selectedTimeIntervals = selectedTimeSpans;
     }
 
     public void setSelected(Activity selected) {
@@ -195,7 +214,8 @@ public class ActivityController implements Serializable {
     }
     
     public void draw(){
-        List<Object[]> events = getFacade().getDailyCounts(startDate, endDate);
+        List<Object[]> events;
+        events = getFacade().getDailyCounts(startDate, endDate);
         this.dailyChart = new CartesianChartModel();
         //decide whether or not to display totals or by location
         //iterate over lists

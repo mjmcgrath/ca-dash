@@ -4,7 +4,9 @@
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui">
-
+    
+    <f:event listener="#{activityController.draw()}" type="preRenderView" />
+    
     <f:view contentType="text/html">
         <h:head>
             <f:facet name="first">
@@ -39,10 +41,25 @@
                     <h:form id="filters">
                         <label>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
                         <label>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
-                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts:dailyBarChart" /> 
+                        <label for="facility">Facility: </label>
+                        <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}">
+                            <f:selectItem itemLabel="Aggregate" itemValue="Aggregate" />
+                            <f:selectItem itemLabel="UMMC" itemValue="UMMC" />
+                            <f:selectItem itemLabel="UCHS" itemValue="UCHS" />
+                            <f:selectItem itemLabel="CMRO" itemValue="CMRO" />
+                            <f:selectItem itemLabel="BWMC" itemValue="BWMC" />
+                        </p:selectManyCheckbox>
+                        <label for="timeInterval">Granularity: </label>
+                        <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}">
+                            <f:selectItem itemLabel="Daily" itemValue="Daily" />
+                            <f:selectItem itemLabel="Weekly" itemValue="Weekly" />
+                            <f:selectItem itemLabel="Monthly" itemValue="Yearly" />
+                            <f:selectItem itemLabel="Yearly" itemValue="Monthly" />
+                        </p:selectManyCheckbox>
+                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts" /> 
                         </h:form>
                     </p:fieldset>
-                    <p:tabView id="charts" orientation="bottom">
+                    <p:tabView id="charts" orientation="bottom" dynamic="true">
                         <p:tab title="Daily">
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
                                 title="Daily Activities" min="0" xaxisAngle="45" 
