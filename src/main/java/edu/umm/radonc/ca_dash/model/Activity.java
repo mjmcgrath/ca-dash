@@ -10,17 +10,22 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+
 
 /**
  *
@@ -35,6 +40,25 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Activity.findByCompleteddatetime", query = "SELECT a FROM Activity a WHERE a.completeddatetime = :completeddatetime"),
     @NamedQuery(name = "Activity.findByFromdateofservice", query = "SELECT a FROM Activity a WHERE a.fromdateofservice = :fromdateofservice"),
     @NamedQuery(name = "Activity.findByTodateofservice", query = "SELECT a FROM Activity a WHERE a.todateofservice = :todateofservice")})
+/*@NamedNativeQuery(name = "Activity.getDailyActivities", query = "SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) AS activityCount" + 
+                "FROM actinstproccode a, procedurecode p " + 
+                "WHERE p.procedurecodeser = a.procedurecodeser AND a.fromdateofservice = ? " +
+                "AND p.procedurecode <> '00000'" +
+                "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC")*/
+
+@SqlResultSetMapping(name="dailyActivities",
+        classes={
+            @ConstructorResult(
+                    targetClass=edu.umm.radonc.ca_dash.model.ActivityCount.class,
+                    columns={
+                        @ColumnResult(name="shortcomment", type=String.class),
+                        @ColumnResult(name="procedurecode", type=String.class),
+                        @ColumnResult(name="activityCount", type=Long.class),
+                    }
+            )
+                
+        })
+
 public class Activity implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id

@@ -12,7 +12,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.SqlResultSetMapping;
 import javax.persistence.criteria.*;
 
 /**
@@ -70,13 +69,19 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
     }
     
-    public List<Object[]> getDailyActivities(Date day){
-        Query q = getEntityManager().createNativeQuery("SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) " + 
+    public List<ActivityCount> getDailyActivities(Date day){
+        Query q = getEntityManager().createNativeQuery("SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) as activityCount " + 
                 "FROM actinstproccode a, procedurecode p " + 
                 "WHERE p.procedurecodeser = a.procedurecodeser AND a.fromdateofservice = ? " +
                 "AND p.procedurecode <> '00000'" +
-                "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC")
+                "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC", "dailyActivities")
                 .setParameter(1, day);
+        
+        
+        //CriteriaBuilder cb = em.getCriteriaBuilder();
+        //CriteriaQuery cq = cb.createQuery(Activity.class);
+        //Query q = getEntityManager().. .createNamedQuery("Activity.getDailyActivities","dailyActivities").setParameter(1, day);
+        
         
         return q.getResultList();
     }
@@ -91,7 +96,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
-                        " FROM Activity a " + 
+                        " FROM Activity a " +
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
                         "AND a.procedurecodeser.procedurecode != '00000' " +
@@ -102,6 +107,28 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         List<Object[]> retval = q.getResultList();
         return retval;
     }
+        public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer) {
+        //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
+        //cq.select(cq.from(Activity.class));cast result list
+        
+        //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
+        
+        javax.persistence.Query q = getEntityManager()
+                .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
+                        " FROM Activity a " + 
+                        "WHERE a.fromdateofservice IS NOT NULL " +
+                        "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
+                        "AND a.departmentser.hospitalser.hospitalser = :hosp " +
+                        "AND a.procedurecodeser.procedurecode != '00000' " +
+                        "GROUP BY a.fromdateofservice " + 
+                        "ORDER BY a.fromdateofservice ASC") 
+                .setParameter("start", start)
+                .setParameter("end", end)
+                .setParameter("hosp", hospitalSer);
+        List<Object[]> retval = q.getResultList();
+        return retval;
+    }
+    
     
     //TODO: Fix query
     public List<Object> getWeeklyCounts(Date start, Date end) {

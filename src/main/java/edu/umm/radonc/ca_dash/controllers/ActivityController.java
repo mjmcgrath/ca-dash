@@ -1,13 +1,16 @@
 package edu.umm.radonc.ca_dash.controllers;
 
 import edu.umm.radonc.ca_dash.model.Activity;
+import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
+import edu.umm.radonc.ca_dash.model.Hospital;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,22 +41,27 @@ public class ActivityController implements Serializable {
 
     @EJB
     private edu.umm.radonc.ca_dash.model.ActivityFacade ejbFacade;
+    
+    @EJB
+    private edu.umm.radonc.ca_dash.model.HospitalFacade hFacade;
+    
     private List<Activity> items = null;
     private LazyDataModel<Activity> lazyItems = null;
     private CartesianChartModel dailyChart;
     private CartesianChartModel weeklyChart;
     private CartesianChartModel monthlyChart;
-    private List<Object[]> dailyActivities;
+    private List<ActivityCount> dailyActivities;
     private Activity selected;
     private Date startDate;
     private Date endDate;
     private DateFormat df;
-    private List<String> selectedFacilities;
+    private List<Integer> selectedFacilities;
     private List<String> selectedTimeIntervals;
+    private Date selectedDate;
     
 
     public ActivityController() {
-        df = new SimpleDateFormat("yyyy-MM-dd");
+        df = new SimpleDateFormat("E, dd MMM yyyy");
         GregorianCalendar gc = new GregorianCalendar();
         endDate = new Date();
         gc.setTime(endDate);
@@ -62,6 +70,8 @@ public class ActivityController implements Serializable {
         dailyChart = new CartesianChartModel();
         weeklyChart = new CartesianChartModel();
         monthlyChart = new CartesianChartModel();
+        selectedFacilities = new ArrayList<Integer>();
+        selectedFacilities.add(-1);
         //draw();
     }
 
@@ -69,12 +79,24 @@ public class ActivityController implements Serializable {
         return selected;
     }
     
-    public List<String> getSelectedFacilities() {
+    public List<Integer> getSelectedFacilities() {
         return selectedFacilities;
     }
 
+    public String getSelectedDate() {
+        if (selectedDate != null) {
+            return df.format(selectedDate);
+        } else {
+            return "";
+        }
+    }
+    
+
     public void setSelectedFacilities(List<String> selectedFacilities) {
-        this.selectedFacilities = selectedFacilities;
+        this.selectedFacilities = new ArrayList<>();
+        for(String fac : selectedFacilities) {
+            this.selectedFacilities.add(Integer.parseInt(fac));
+        }
     }
 
     public List<String> getSelectedTimeIntervals() {
@@ -179,7 +201,7 @@ public class ActivityController implements Serializable {
         return getFacade().find(id);
     }
 
-    public List<Object[]> getDailyActivities() {
+    public List<ActivityCount> getDailyActivities() {
         return dailyActivities;
     }
 
@@ -191,8 +213,40 @@ public class ActivityController implements Serializable {
         return getFacade().findAll();
     }
     
-    public List<Object[]> getDailyCounts() {
-        return getFacade().getDailyCounts(startDate, endDate);
+    public List<Object[]> getDailyCounts(int index) {
+        ArrayList<Date> allDates = new ArrayList<>();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(startDate);
+        while(gc.getTime().compareTo(endDate) < 0) {
+            allDates.add(gc.getTime());
+            gc.add(Calendar.DATE, 1);
+        }
+        
+        List<Object[]> items;
+        List<Object[]> itemsMerged = new ArrayList<>();
+        if(index < 0) {
+            items = getFacade().getDailyCounts(startDate, endDate);
+        } else {
+            items = getFacade().getDailyCounts(startDate, endDate, new Long(index));
+        }
+        
+        int i;
+        outer:
+        for(Date d : allDates) {
+            i = 0;
+            while(i < items.size()) {
+                if(df.format(d).equals(df.format((Date)items.get(i)[0]))) {
+                    itemsMerged.add(items.get(i));
+                    continue outer;
+                }
+                i++;
+            }
+            ArrayList<Object> o = new  ArrayList<>();
+            o.add(d);
+            o.add(new Long(0));
+            itemsMerged.add(o.toArray());
+        }
+        return itemsMerged;
     }
     
     public List<Object> getMonthlyCounts() {
@@ -226,34 +280,51 @@ public class ActivityController implements Serializable {
        
        String dateRaw = (dailyChart.getSeries().get(series).getData().keySet().toArray()[item].toString());
        
-       Date date = null;
-       
        try {
-            date = df.parse(dateRaw);
+            this.selectedDate = df.parse(dateRaw);
        }
        catch (ParseException ex) {
            //Log parse failure
        }
        
-       dailyActivities = getFacade().getDailyActivities(date);
+       dailyActivities = getFacade().getDailyActivities(this.selectedDate);
        
     }
     
     
     public void draw(){
         List<Object[]> events;
-        events = getFacade().getDailyCounts(startDate, endDate);
         this.dailyChart = new CartesianChartModel();
         //decide whether or not to display totals or by location
         //iterate over lists
-        ChartSeries series = new ChartSeries();
-        series.setLabel("All");
-        for (Object[] event : events) {
-            String xval = df.format((Date)event[0]);
-            Long yval = (Long)event[1];
-            series.set(xval, yval);
+        if(selectedFacilities.contains(-1)) {
+            events = getDailyCounts(-1);
+            ChartSeries series = new ChartSeries();
+            series.setLabel("All");
+            for (Object[] event : events) {
+                String xval = df.format((Date)event[0]);
+                Long yval = (Long)event[1];
+                series.set(xval, yval);
+            }
+            dailyChart.addSeries(series);
         }
-        dailyChart.addSeries(series);
+        
+        for (Integer fac: selectedFacilities) {
+            if( fac > 0) {
+                Hospital h =  hFacade.find(fac);
+                ChartSeries series = new ChartSeries();
+                series.setLabel(h.getHospitalname());
+                events = getDailyCounts(fac);
+                for (Object[] event : events) {
+                    String xval = df.format((Date)event[0]);
+                    Long yval = (Long)event[1];
+                    series.set(xval, yval);
+                }
+                dailyChart.addSeries(series);
+            }
+        }
+        
+        
     }
 
     @FacesConverter(forClass = Activity.class)

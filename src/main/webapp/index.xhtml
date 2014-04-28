@@ -3,7 +3,7 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:f="http://java.sun.com/jsf/core"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     
     <f:event listener="#{activityController.draw()}" type="preRenderView" />
     <!-- Comment -->
@@ -40,11 +40,10 @@
                         <label>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
                         <label for="facility">Facility: </label>
                         <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}">
-                            <f:selectItem itemLabel="Aggregate" itemValue="Aggregate" />
-                            <f:selectItem itemLabel="UMMC" itemValue="UMMC" />
-                            <f:selectItem itemLabel="UCHS" itemValue="UCHS" />
-                            <f:selectItem itemLabel="CMRO" itemValue="CMRO" />
-                            <f:selectItem itemLabel="BWMC" itemValue="BWMC" />
+                            <f:selectItem itemLabel="Aggregate" itemValue="-1" />
+                            <c:forEach items="${hospitalController.items}" var="hospital">
+                                <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
+                            </c:forEach>
                         </p:selectManyCheckbox>
                         <label for="timeInterval">Granularity: </label>
                         <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}">
@@ -63,32 +62,34 @@
                         <p:tab title="Daily">
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
                                 title="Daily Activities" min="0" xaxisAngle="45" 
-                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29" style="height:450px;">
-                                <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dailyDetail" onsuccess="PF('dailyDlg').show()" />
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29" style="height:450px;" stacked="true">
+                                <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail" onsuccess="PF('dailyDlg').show()" />
                             </p:barChart>
-                            <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 450px;">  
+                            <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 450px;">                                
+                                <h3><h:outputText id="dlgDate" value ="#{activityController.selectedDate}" /></h3>
+                                <hr/>
                                 <p:dataTable
                                     id="dailyDetail"
                                     value="#{activityController.dailyActivities}"
                                     var="item"
                                 >
-                                <p:column>
+                                <p:column sortBy="shortcomment">
                                     <f:facet name="header">
                                         <h:outputText value="Procedure"/>
                                     </f:facet>
-                                    <h:outputText value="#{item[0]}"/>
+                                    <h:outputText value="#{item.shortcomment}"/>
                                 </p:column>
-                                <p:column>
+                                    <p:column sortBy="procedurecode">
                                     <f:facet name="header">
                                         <h:outputText value="ICD-9"/>
                                     </f:facet>
-                                    <h:outputText value="#{item[1]}"/>
+                                        <h:outputText value="#{item.procedurecode}"/>
                                 </p:column>
-                                <p:column>
+                                <p:column  sortBy="activityCount">
                                     <f:facet name="header">
                                         <h:outputText value="Count"/>
                                     </f:facet>
-                                    <h:outputText value="#{item[2]}"/>
+                                    <h:outputText value="#{item.activityCount}"/>
                                 </p:column>  
                                 </p:dataTable>
                             </p:dialog>
@@ -106,7 +107,7 @@
                                  lazy="true" 
                                  rowKey="#{item.actinstproccodeser}"
                                  rows="20"
-                                 rowsPerPageTemplate="10,20,30,40,50"
+                                 rowsPerPageTemplate="10,20,30,40,50" 
                                  >
                         <p:column>
                             <f:facet name="header">
@@ -144,13 +145,13 @@
                                 <f:convertDateTime pattern="MM/dd/yyyy" />
                             </h:outputText>
                         </p:column>
-                        <p:column>
+                        <p:column filterBy="#{item.departmentser.hospitalser.hospitalname}">
                             <f:facet name="header">
                                 <h:outputText value="Hospital"/>
                             </f:facet>
                             <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
                         </p:column>
-                        <p:column>
+                        <p:column filterBy="#{item.departmentser.departmentname}" filterMatchMode="contains">
                             <f:facet name="header">
                                 <h:outputText value="#{bundle.ListDepartmentTitle_departmentname}"/>
                             </f:facet>
