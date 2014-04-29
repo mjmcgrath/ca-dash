@@ -20,11 +20,9 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -61,7 +59,14 @@ public class ActivityController implements Serializable {
     private Date selectedDate;
     private HashMap<Integer,Integer> hospitalChartSeriesMapping;
     private boolean imrtOnly;
-
+    private boolean hideDailyTab;
+    private boolean hideWeeklyTab;
+    private boolean hideMonthlyTab;
+    private boolean disableDailyCheckbox;
+    private boolean disableWeeklyCheckbox;
+    private boolean disableMonthlyCheckbox;
+    private boolean disableYearlyCheckbox;
+    
     public ActivityController() {
         df = new SimpleDateFormat("E, dd MMM yyyy");
         GregorianCalendar gc = new GregorianCalendar();
@@ -74,9 +79,17 @@ public class ActivityController implements Serializable {
         monthlyChart = new CartesianChartModel();
         selectedFacilities = new ArrayList<Integer>();
         selectedFacilities.add(-1);
+        selectedTimeIntervals = new ArrayList<>();
+        selectedTimeIntervals.add("Daily");
         hospitalChartSeriesMapping = new HashMap<>();
         imrtOnly = false;
-        //draw();
+        hideDailyTab = false;
+        hideWeeklyTab = true;
+        hideMonthlyTab = true;
+        disableDailyCheckbox = false;
+        disableWeeklyCheckbox = true;
+        disableMonthlyCheckbox = true;
+        disableYearlyCheckbox = true;
     }
 
     public Activity getSelected() {
@@ -123,6 +136,62 @@ public class ActivityController implements Serializable {
         this.imrtOnly = imrtOnly;
     } 
 
+    public boolean isHideDailyTab() {
+        return hideDailyTab;
+    }
+
+    public void setHideDailyTab(boolean hideDailyTab) {
+        this.hideDailyTab = hideDailyTab;
+    }
+
+    public boolean isHideWeeklyTab() {
+        return hideWeeklyTab;
+    }
+
+    public void setHideWeeklyTab(boolean hideWeeklyTab) {
+        this.hideWeeklyTab = hideWeeklyTab;
+    }
+
+    public boolean isHideMonthlyTab() {
+        return hideMonthlyTab;
+    }
+
+    public void setHideMonthlyTab(boolean hideMonthlyTab) {
+        this.hideMonthlyTab = hideMonthlyTab;
+    }
+
+    public boolean isDisableDailyCheckbox() {
+        return disableDailyCheckbox;
+    }
+
+    public void setDisableDailyCheckbox(boolean disableDailyCheckbox) {
+        this.disableDailyCheckbox = disableDailyCheckbox;
+    }
+
+    public boolean isDisableWeeklyCheckbox() {
+        return disableWeeklyCheckbox;
+    }
+
+    public void setDisableWeeklyCheckbox(boolean disableWeeklyCheckbox) {
+        this.disableWeeklyCheckbox = disableWeeklyCheckbox;
+    }
+
+    public boolean isDisableMonthlyCheckbox() {
+        return disableMonthlyCheckbox;
+    }
+
+    public void setDisableMonthlyCheckbox(boolean disableMonthlyCheckbox) {
+        this.disableMonthlyCheckbox = disableMonthlyCheckbox;
+    }
+
+    public boolean isDisableYearlyCheckbox() {
+        return disableYearlyCheckbox;
+    }
+
+    public void setDisableYearlyCheckbox(boolean disableYearlyCheckbox) {
+        this.disableYearlyCheckbox = disableYearlyCheckbox;
+    }
+
     protected void setEmbeddableKeys() {
     }
 
@@ -163,6 +232,18 @@ public class ActivityController implements Serializable {
             items = getFacade().findAll();
         }
         return items;
+    }
+    
+    public void handleDateSelect() {
+        long diff = endDate.getTime() - startDate.getTime();
+        long diffDays = diff / (24 * 60 * 60 * 1000);
+        
+        System.out.println(diffDays);
+        
+        this.disableDailyCheckbox = (diffDays < 1);
+        this.disableWeeklyCheckbox = (diffDays < 7);
+        this.disableMonthlyCheckbox = (diffDays < 28);
+        this.disableYearlyCheckbox = (diffDays < 365);
     }
     
     public LazyDataModel<Activity> getLazyItems() {
@@ -261,6 +342,41 @@ public class ActivityController implements Serializable {
         return itemsMerged;
     }
     
+    public List<Object[]> getWeeklyCounts(Long index) {
+        ArrayList<Date> allDates = new ArrayList<>();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(startDate);
+        while(gc.getTime().compareTo(endDate) < 0) {
+            allDates.add(gc.getTime());
+            gc.add(Calendar.WEEK_OF_YEAR, 1);
+        }
+        
+        List<Object[]> items;
+        List<Object[]> itemsMerged = new ArrayList<>();
+      
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly);
+        //FIXME FIXME FIXME
+        DateFormat wdf = new SimpleDateFormat("yyyy ww");
+        int i;
+        outer:
+        for(Date d : allDates) {
+            i = 0;
+            while(i < items.size()) {
+                String yrAndWk = items.get(i)[0] + " " + items.get(i)[1];
+                if(wdf.format(d).equals(yrAndWk)) {
+                    itemsMerged.add(items.get(i));
+                    continue outer;
+                }
+                i++;
+            }
+            ArrayList<Object> o = new  ArrayList<>();
+            o.add(d);
+            o.add(0);
+            itemsMerged.add(o.toArray());
+        }
+        return itemsMerged;
+    }
+    
     public List<Object> getMonthlyCounts() {
         return getFacade().getMonthlyCounts(null, null);
     }
@@ -295,10 +411,9 @@ public class ActivityController implements Serializable {
             this.selectedDate = df.parse(dateRaw);
        }
        catch (ParseException ex) {
-           //Log parse failure
+           //TODO: Log parse failure
        }
        
-       //TODO: Map series to hospital
        Integer hospitalID = hospitalChartSeriesMapping.get(series);
        if( hospitalID < 0) {
             dailyActivities = getFacade().getDailyActivities(this.selectedDate, imrtOnly);
@@ -307,7 +422,6 @@ public class ActivityController implements Serializable {
        }
        
     }
-    
     
     public void draw(){
         int curSeries = 0;
@@ -326,6 +440,8 @@ public class ActivityController implements Serializable {
                 series.set(xval, yval);
             }
             dailyChart.addSeries(series);
+            //TODO: weekly
+            //TODO: monthly
             hospitalChartSeriesMapping.put(curSeries,-1);
             curSeries++;
         }
@@ -344,6 +460,8 @@ public class ActivityController implements Serializable {
                 hospitalChartSeriesMapping.put(curSeries,fac);
                 curSeries++;
                 dailyChart.addSeries(series);
+                //TODO: weekly
+                //TODO: monthly
             }
         }
         

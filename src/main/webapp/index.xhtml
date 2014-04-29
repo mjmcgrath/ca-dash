@@ -36,8 +36,16 @@
                     </p:menu-->
                     <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
                     <h:form id="filters">
-                        <label class='hdr'>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
-                        <label class='hdr'>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/><br/>
+                        <label class='hdr'>Start Date: </label>
+                        <p:calendar value="#{activityController.startDate}" id="startCal">
+                            <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                        </p:calendar>
+                        <br/>
+                        <label class='hdr'>End Date: </label>
+                        <p:calendar value="#{activityController.endDate}" id="endCal">
+                            <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                        </p:calendar>
+                        <br/><br/>
                         <label class='hdr' for="facility">Facility: </label>
                         <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
                             <f:selectItem itemLabel="Aggregate" itemValue="-1" />
@@ -48,10 +56,10 @@
                         <br/>
                         <label class='hdr' for="timeInterval">Granularity: </label>
                         <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
-                            <f:selectItem itemLabel="Daily" itemValue="Daily" />
-                            <f:selectItem itemLabel="Weekly" itemValue="Weekly" />
-                            <f:selectItem itemLabel="Monthly" itemValue="Yearly" />
-                            <f:selectItem itemLabel="Yearly" itemValue="Monthly" />
+                            <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{activityController.disableDailyCheckbox}"/>
+                            <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{activityController.disableWeeklyCheckbox}"/>
+                            <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{activityController.disableMonthlyCheckbox}"/>
+                            <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
                         </p:selectManyCheckbox><br/>
                         <label class="hdr">Other: </label><br/>
                         <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/><br/>
@@ -62,7 +70,7 @@
 
                 <p:layoutUnit position="center">
                     <p:tabView id="charts" orientation="bottom" dynamic="true">
-                        <p:tab title="Daily">
+                        <p:tab title="Daily" disabled="#{activityController.hideDailyTab}">
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
                                 title="Daily Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="true">
@@ -97,10 +105,10 @@
                                 </p:dataTable>
                             </p:dialog>
                         </p:tab>
-                        <p:tab title="Weekly">
+                        <p:tab title="Weekly" disabled="#{activityController.hideWeeklyTab}">
                             <!-- Chart goes here -->
                         </p:tab>
-                        <p:tab title="Monthly">
+                        <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
                             <!-- Chart goes here -->
                         </p:tab>
                         <p:tab title="Raw Data">

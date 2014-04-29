@@ -114,7 +114,6 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return q.getResultList();
     }
     
-    //TODO: Add parameters to query
     public List<Object[]> getDailyCounts(Date start, Date end, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
@@ -139,13 +138,16 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         List<Object[]> retval = q.getResultList();
         return retval;
     }
-        public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly) {
+    
+    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
         String imrtString = "";
-        if(imrtOnly) { imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";} 
+        if(imrtOnly) { 
+            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
+        } 
             
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
@@ -165,21 +167,43 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     
     
     //TODO: Fix query
-    public List<Object> getWeeklyCounts(Date start, Date end) {
+    public List<Object[]> getWeeklyCounts(Date start, Date end, Long hospital, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
+        String imrtString = "";
+        String imrtSel = "";
+        String hospString = "";
+        String hospSel = "";
+        if(imrtOnly) {
+            imrtSel = ", procedurecode p ";
+            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
+        }
         
-        javax.persistence.Query q = getEntityManager()
-                .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
-                        " FROM Activity a " + 
-                        "WHERE a.fromdateofservice IS NOT NULL " + 
-                        "GROUP BY a.fromdateofservice " + 
-                        "ORDER BY a.fromdateofservice ASC");
-        List<Object> retval = q.getResultList();
+        if(hospital != null && hospital > 0) {
+            hospSel = ", department d ";
+            hospString =  "AND a.departmentser = d.departmentser AND d.hospitalser = ? ";
+        }
+        
+        javax.persistence.Query q = getEntityManager().createNativeQuery(
+                "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('week', a.fromdateofservice) AS wk, count(a.actinstproccodeser) " +
+                "FROM actinstproccode a " + imrtSel + hospSel +
+                "WHERE a.fromdateofservice IS NOT NULL " +
+                "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
+                "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + hospString +
+                "GROUP BY yr, wk ORDER BY yr,wk ASC;")
+                .setParameter(1, start)
+                .setParameter(2, end);
+        
+        if(hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
+        
+        
+        List<Object[]> retval = q.getResultList();
         return retval;
     }
     
-    //TODO: Fix query -- accept parameters & probably someday don't use native query
+    //TODO: Fix query -- don't use native query
     public List<Object> getMonthlyCounts(Date start, Date end) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
