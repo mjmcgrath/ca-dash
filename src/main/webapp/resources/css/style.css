@@ -32,11 +32,16 @@ h1 {
 }
 
 #layoutHeader {
-    background-color: #4683ea;
+    background-color: #696a6d;
 }
 
 #layoutHeader .ui-widget-content {
     text-align: center;
     color: #FFF;
-    background: #555;
+    background: #696a6d;
+}
+
+label.hdr {
+    font-family: 'Montserrat';
+    font-weight: 400;
 }

@@ -69,11 +69,13 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
     }
     
-    public List<ActivityCount> getDailyActivities(Date day){
+    public List<ActivityCount> getDailyActivities(Date day, boolean imrtOnly){
+        String imrtString = "";
+        if(imrtOnly) { imrtString = "AND p.shortcomment LIKE '%IMRT%' ";}
         Query q = getEntityManager().createNativeQuery("SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) as activityCount " + 
                 "FROM actinstproccode a, procedurecode p " + 
                 "WHERE p.procedurecodeser = a.procedurecodeser AND a.fromdateofservice = ? " +
-                "AND p.procedurecode <> '00000'" +
+                "AND p.procedurecode <> '00000' " + imrtString +
                 "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC", "dailyActivities")
                 .setParameter(1, day);
         
@@ -87,19 +89,49 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     }
     
     
+        public List<ActivityCount> getDailyActivities(Date day, Long hospitalser, boolean imrtOnly){
+        String imrtString = "";
+        if(imrtOnly) { imrtString = "AND p.shortcomment LIKE '%IMRT%' ";}
+        
+        String qString =  "SELECT p.shortcomment, p.procedurecode, COUNT (p.procedurecode) as activityCount " + 
+                "FROM actinstproccode a, procedurecode p, department d " + 
+                "WHERE p.procedurecodeser = a.procedurecodeser AND a.fromdateofservice = ? " +
+                "AND a.departmentser = d.departmentser " + 
+                "AND d.hospitalser = ? " +
+                "AND p.procedurecode <> '00000' " + imrtString +
+                "GROUP BY p.procedurecode, p.shortcomment ORDER BY p.procedurecode ASC"; 
+            
+        Query q = getEntityManager().createNativeQuery(qString, "dailyActivities")
+                .setParameter(1, day)
+                .setParameter(2, hospitalser);
+        
+        
+        //CriteriaBuilder cb = em.getCriteriaBuilder();
+        //CriteriaQuery cq = cb.createQuery(Activity.class);
+        //Query q = getEntityManager().. .createNamedQuery("Activity.getDailyActivities","dailyActivities").setParameter(1, day);
+        
+        
+        return q.getResultList();
+    }
+    
     //TODO: Add parameters to query
-    public List<Object[]> getDailyCounts(Date start, Date end) {
+    public List<Object[]> getDailyCounts(Date start, Date end, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
+        
+        String imrtString = "";
+        if(imrtOnly) { 
+            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
+        }
         
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
                         " FROM Activity a " +
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
-                        "AND a.procedurecodeser.procedurecode != '00000' " +
+                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
                 .setParameter("start", start)
@@ -107,19 +139,21 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         List<Object[]> retval = q.getResultList();
         return retval;
     }
-        public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer) {
+        public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
-        
+        String imrtString = "";
+        if(imrtOnly) { imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";} 
+            
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
                         " FROM Activity a " + 
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
                         "AND a.departmentser.hospitalser.hospitalser = :hosp " +
-                        "AND a.procedurecodeser.procedurecode != '00000' " +
+                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
                 .setParameter("start", start)

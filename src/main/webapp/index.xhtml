@@ -22,39 +22,42 @@
 
             <p:layout fullPage="true">
 
-                <p:layoutUnit position="north" size="100" resizable="false" closable="true" collapsible="true" style="background-color: #4683ea;" id="layoutHeader">
+                <p:layoutUnit position="north" size="75" resizable="false" closable="true" collapsible="true" id="layoutHeader">
                     <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
                 </p:layoutUnit>
-                <p:layoutUnit position="south" size="50" closable="true" collapsible="true">
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
                     <h:graphicImage value="resources/images/um-pms.png" />
                     &copy; 2014 University of Maryland Medical System, All Rights Reserved
                 </p:layoutUnit>
 
-                <p:layoutUnit position="west" size="175" header="Actions" collapsible="true">
-                    <p:menu>
+                <p:layoutUnit position="west" header="Filter" collapsible="true" size="200">
+                    <!--p:menu>
                         <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
-                    </p:menu>
-                    <p:fieldset legend="Filters" toggleable="false" toggleSpeed="500">
+                    </p:menu-->
+                    <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
                     <h:form id="filters">
-                        <label>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
-                        <label>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/>
-                        <label for="facility">Facility: </label>
-                        <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}">
+                        <label class='hdr'>Start Date: </label><p:calendar value="#{activityController.startDate}" id="startCal" /><br/>
+                        <label class='hdr'>End Date: </label><p:calendar value="#{activityController.endDate}" id="endCal" /><br/><br/>
+                        <label class='hdr' for="facility">Facility: </label>
+                        <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
                             <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                             <c:forEach items="${hospitalController.items}" var="hospital">
                                 <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
                             </c:forEach>
                         </p:selectManyCheckbox>
-                        <label for="timeInterval">Granularity: </label>
-                        <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}">
+                        <br/>
+                        <label class='hdr' for="timeInterval">Granularity: </label>
+                        <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
                             <f:selectItem itemLabel="Daily" itemValue="Daily" />
                             <f:selectItem itemLabel="Weekly" itemValue="Weekly" />
                             <f:selectItem itemLabel="Monthly" itemValue="Yearly" />
                             <f:selectItem itemLabel="Yearly" itemValue="Monthly" />
-                        </p:selectManyCheckbox>
+                        </p:selectManyCheckbox><br/>
+                        <label class="hdr">Other: </label><br/>
+                        <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/><br/>
                         <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts" /> 
                         </h:form>
-                    </p:fieldset>
+                    <!--/p:fieldset-->
                 </p:layoutUnit>
 
                 <p:layoutUnit position="center">
@@ -62,10 +65,10 @@
                         <p:tab title="Daily">
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
                                 title="Daily Activities" min="0" xaxisAngle="45" 
-                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29" style="height:450px;" stacked="true">
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="true">
                                 <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail" onsuccess="PF('dailyDlg').show()" />
                             </p:barChart>
-                            <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 450px;">                                
+                            <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
                                 <h3><h:outputText id="dlgDate" value ="#{activityController.selectedDate}" /></h3>
                                 <hr/>
                                 <p:dataTable

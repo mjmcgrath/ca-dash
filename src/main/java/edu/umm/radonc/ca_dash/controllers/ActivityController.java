@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -58,7 +59,8 @@ public class ActivityController implements Serializable {
     private List<Integer> selectedFacilities;
     private List<String> selectedTimeIntervals;
     private Date selectedDate;
-    
+    private HashMap<Integer,Integer> hospitalChartSeriesMapping;
+    private boolean imrtOnly;
 
     public ActivityController() {
         df = new SimpleDateFormat("E, dd MMM yyyy");
@@ -72,6 +74,8 @@ public class ActivityController implements Serializable {
         monthlyChart = new CartesianChartModel();
         selectedFacilities = new ArrayList<Integer>();
         selectedFacilities.add(-1);
+        hospitalChartSeriesMapping = new HashMap<>();
+        imrtOnly = false;
         //draw();
     }
 
@@ -110,6 +114,14 @@ public class ActivityController implements Serializable {
     public void setSelected(Activity selected) {
         this.selected = selected;
     }
+
+    public boolean isImrtOnly() {
+        return imrtOnly;
+    }
+
+    public void setImrtOnly(boolean imrtOnly) {
+        this.imrtOnly = imrtOnly;
+    } 
 
     protected void setEmbeddableKeys() {
     }
@@ -225,9 +237,9 @@ public class ActivityController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
         if(index < 0) {
-            items = getFacade().getDailyCounts(startDate, endDate);
+            items = getFacade().getDailyCounts(startDate, endDate, imrtOnly);
         } else {
-            items = getFacade().getDailyCounts(startDate, endDate, new Long(index));
+            items = getFacade().getDailyCounts(startDate, endDate, new Long(index), imrtOnly);
         }
         
         int i;
@@ -254,7 +266,6 @@ public class ActivityController implements Serializable {
     }
     
     public void setStartDate(Date startDate) {
-        System.out.println(startDate.toString());
         this.startDate = startDate;
     }
     
@@ -287,13 +298,21 @@ public class ActivityController implements Serializable {
            //Log parse failure
        }
        
-       dailyActivities = getFacade().getDailyActivities(this.selectedDate);
+       //TODO: Map series to hospital
+       Integer hospitalID = hospitalChartSeriesMapping.get(series);
+       if( hospitalID < 0) {
+            dailyActivities = getFacade().getDailyActivities(this.selectedDate, imrtOnly);
+       } else {
+           dailyActivities = getFacade().getDailyActivities(this.selectedDate, hospitalID.longValue(), imrtOnly);
+       }
        
     }
     
     
     public void draw(){
+        int curSeries = 0;
         List<Object[]> events;
+        this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
         //decide whether or not to display totals or by location
         //iterate over lists
@@ -307,6 +326,8 @@ public class ActivityController implements Serializable {
                 series.set(xval, yval);
             }
             dailyChart.addSeries(series);
+            hospitalChartSeriesMapping.put(curSeries,-1);
+            curSeries++;
         }
         
         for (Integer fac: selectedFacilities) {
@@ -320,6 +341,8 @@ public class ActivityController implements Serializable {
                     Long yval = (Long)event[1];
                     series.set(xval, yval);
                 }
+                hospitalChartSeriesMapping.put(curSeries,fac);
+                curSeries++;
                 dailyChart.addSeries(series);
             }
         }
