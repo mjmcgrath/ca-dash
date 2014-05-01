@@ -71,10 +71,14 @@
                 <p:layoutUnit position="center">
                     <p:tabView id="charts" orientation="bottom" dynamic="true">
                         <p:tab title="Daily" disabled="#{activityController.hideDailyTab}">
+                            <p:panel id="stats">
+                                Mean: <h:outputText value="#{activityController.dailySummary.mean}"/>
+                                Stddev: <h:outputText value="#{activityController.dailySummary.standardDeviation}"/>
+                            </p:panel>
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne"  
                                 title="Daily Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="true">
-                                <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail" onsuccess="PF('dailyDlg').show()" />
+                                <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
                             </p:barChart>
                             <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
                                 <h3><h:outputText id="dlgDate" value ="#{activityController.selectedDate}" /></h3>

@@ -13,6 +13,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.criteria.*;
+import org.apache.commons.math.stat.descriptive.*;
 
 /**
  *
@@ -113,24 +114,47 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         return q.getResultList();
     }
+        
+    public SynchronizedSummaryStatistics getDailyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends){
+        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+        List<Object[]> counts = getDailyCounts(start, end, imrtOnly, includeWeekends);
+        for(Object[] item : counts) {
+            stats.addValue(((Long)item[1]).doubleValue());
+        }
+        return stats;
+    }
     
-    public List<Object[]> getDailyCounts(Date start, Date end, boolean imrtOnly) {
+    public SynchronizedSummaryStatistics getWeeklyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
+        //TODO: implement me
+        return null;
+    }
+    
+    public SynchronizedSummaryStatistics getMonthlyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
+        //TODO: implement me
+        return null;
+    }
+    
+    public List<Object[]> getDailyCounts(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
         
         String imrtString = "";
+        String weekendString = "";
+        
         if(imrtOnly) { 
             imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
         }
+        
+        if(!includeWeekends) {}
         
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
                         " FROM Activity a " +
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
-                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString +
+                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + weekendString +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
                 .setParameter("start", start)
@@ -139,7 +163,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return retval;
     }
     
-    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly) {
+    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly, boolean includeWeekends) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
@@ -165,8 +189,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return retval;
     }
     
-    
-    //TODO: Fix query
+     //TODO: Fix query
     public List<Object[]> getWeeklyCounts(Date start, Date end, Long hospital, boolean imrtOnly) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list

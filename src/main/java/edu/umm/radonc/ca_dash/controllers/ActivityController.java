@@ -28,6 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
+import org.apache.commons.math.stat.descriptive.SynchronizedSummaryStatistics;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
@@ -58,6 +59,7 @@ public class ActivityController implements Serializable {
     private List<String> selectedTimeIntervals;
     private Date selectedDate;
     private HashMap<Integer,Integer> hospitalChartSeriesMapping;
+    private SynchronizedSummaryStatistics stats;
     private boolean imrtOnly;
     private boolean hideDailyTab;
     private boolean hideWeeklyTab;
@@ -233,6 +235,17 @@ public class ActivityController implements Serializable {
         }
         return items;
     }
+
+    public SynchronizedSummaryStatistics getStats() {
+        return stats;
+    }
+    
+    private void recalcStats(List<Object[]> values, int valIndex) {
+        stats.clear();
+        for(Object[] item : values) {
+            stats.addValue(((Long)item[valIndex]).doubleValue());
+        }
+    }
     
     public void handleDateSelect() {
         long diff = endDate.getTime() - startDate.getTime();
@@ -318,9 +331,10 @@ public class ActivityController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
         if(index < 0) {
-            items = getFacade().getDailyCounts(startDate, endDate, imrtOnly);
+            //FIXME: change last parameter to checkbox value
+            items = getFacade().getDailyCounts(startDate, endDate, imrtOnly, true);
         } else {
-            items = getFacade().getDailyCounts(startDate, endDate, new Long(index), imrtOnly);
+            items = getFacade().getDailyCounts(startDate, endDate, new Long(index), imrtOnly, true);
         }
         
         int i;
@@ -340,6 +354,10 @@ public class ActivityController implements Serializable {
             itemsMerged.add(o.toArray());
         }
         return itemsMerged;
+    }
+    
+    public SynchronizedSummaryStatistics getDailySummary(){
+        return getFacade().getDailyStats(startDate, endDate, imrtOnly, false);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -417,6 +435,7 @@ public class ActivityController implements Serializable {
        Integer hospitalID = hospitalChartSeriesMapping.get(series);
        if( hospitalID < 0) {
             dailyActivities = getFacade().getDailyActivities(this.selectedDate, imrtOnly);
+            //recalcStats(dailyCounts,1);
        } else {
            dailyActivities = getFacade().getDailyActivities(this.selectedDate, hospitalID.longValue(), imrtOnly);
        }
