@@ -147,7 +147,9 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
         }
         
-        if(!includeWeekends) {}
+        if(!includeWeekends) {
+            weekendString = "AND FUNC('date_part', 'dow', a.fromdateofservice) <> 0 AND FUNC('date_part', 'dow', a.fromdateofservice) <> 6 ";
+        }
         
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
@@ -169,9 +171,14 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
         String imrtString = "";
+        String weekendString = "";
         if(imrtOnly) { 
             imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
-        } 
+        }
+        
+        if(!includeWeekends) {
+           weekendString = "AND FUNC('date_part', 'dow', a.fromdateofservice) <> 0 AND FUNC('date_part', 'dow', a.fromdateofservice) <> 6 ";
+        }
             
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
@@ -179,7 +186,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
                         "AND a.departmentser.hospitalser.hospitalser = :hosp " +
-                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString +
+                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + weekendString +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
                 .setParameter("start", start)
