@@ -110,7 +110,14 @@
                             </p:dialog>
                         </p:tab>
                         <p:tab title="Weekly" disabled="#{activityController.hideWeeklyTab}">
-                            <!-- Chart goes here -->
+                            <p:panel id="statsWeekly">
+                                <c:forEach items="${activityController.weeklySummary}" var="entry"  varStatus="status">
+                                    <h:outputText value="${entry.key}"/> Mean: <h:outputText value="${entry.value.mean}"/> 2&sigma;: <h:outputText value="${2 * entry.value.standardDeviation}"/> <br/>
+                                </c:forEach>
+                            </p:panel>
+                            <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
+                                title="Weekly Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="true" />
                         </p:tab>
                         <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
                             <!-- Chart goes here -->

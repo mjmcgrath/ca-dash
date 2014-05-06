@@ -6,8 +6,15 @@
 
 package edu.umm.radonc.ca_dash.model;
 
+import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeMap;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -124,9 +131,47 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return stats;
     }
     
-    public SynchronizedSummaryStatistics getWeeklyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
-        //TODO: implement me
-        return null;
+    public SynchronizedSummaryStatistics getWeeklyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+        List<Object[]> counts = getWeeklyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
+        for(Object[] item : counts) {
+            stats.addValue(((Long)item[2]).doubleValue());
+        }
+        return stats;
+    }
+    
+    public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
+        Calendar cal = new GregorianCalendar();
+        TreeMap<String,SynchronizedSummaryStatistics> retval = new TreeMap<>();
+        List<Object[]> events = getDailyCounts(start, end, imrtOnly, includeWeekends);
+        cal.setTime(start);
+        int wk = cal.get(Calendar.WEEK_OF_YEAR);
+        String currYrWk = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
+        String prevYrWk = "";
+        SynchronizedSummaryStatistics currStats = new SynchronizedSummaryStatistics();
+        int i = 0;
+        while(cal.getTime().before(end) && i < events.size()) {
+            
+            Object[] event = events.get(i);
+            Date d = (Date)event[0];
+            Long count = (Long)event[1];
+            
+            prevYrWk = currYrWk;
+            cal.setTime(d);
+            currYrWk = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
+
+            
+            if( !(prevYrWk.equals(currYrWk)) ) {
+                retval.put(prevYrWk, currStats);
+                currStats = new SynchronizedSummaryStatistics();
+            }
+            
+            currStats.addValue(count);
+            i++;
+        }
+        retval.put(prevYrWk, currStats);
+
+        return retval;
     }
     
     public SynchronizedSummaryStatistics getMonthlyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
@@ -197,7 +242,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     }
     
      //TODO: Fix query
-    public List<Object[]> getWeeklyCounts(Date start, Date end, Long hospital, boolean imrtOnly) {
+    public List<Object[]> getWeeklyCounts(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         String imrtString = "";
@@ -205,8 +250,8 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         String hospString = "";
         String hospSel = "";
         if(imrtOnly) {
-            imrtSel = ", procedurecode p ";
-            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
+            imrtSel = "";
+            imrtString = "AND p.shortcomment LIKE '%IMRT%' ";
         }
         
         if(hospital != null && hospital > 0) {
@@ -216,10 +261,11 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('week', a.fromdateofservice) AS wk, count(a.actinstproccodeser) " +
-                "FROM actinstproccode a " + imrtSel + hospSel +
+                "FROM actinstproccode a, procedurecode p " + hospSel +
                 "WHERE a.fromdateofservice IS NOT NULL " +
                 "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
-                "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + hospString +
+                "AND a.procedurecodeser = p.procedurecodeser " +
+                "AND p.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, wk ORDER BY yr,wk ASC;")
                 .setParameter(1, start)
                 .setParameter(2, end);

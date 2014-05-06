@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
@@ -360,6 +361,10 @@ public class ActivityController implements Serializable {
         return getFacade().getDailyStats(startDate, endDate, imrtOnly, false);
     }
     
+    public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummary(){
+        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(-1), imrtOnly, true);
+    }
+    
     public List<Object[]> getWeeklyCounts(Long index) {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
@@ -372,24 +377,27 @@ public class ActivityController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly, true);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
-        outer:
+        //outer:
         for(Date d : allDates) {
             i = 0;
+            Long val = new Long(0); 
             while(i < items.size()) {
-                String yrAndWk = items.get(i)[0] + " " + items.get(i)[1];
-                if(wdf.format(d).equals(yrAndWk)) {
-                    itemsMerged.add(items.get(i));
-                    continue outer;
+                String yrAndWk = ((Double)items.get(i)[0]).intValue() + " " + String.format("%02d", ((Double)items.get(i)[1]).intValue());
+                String thisWk = wdf.format(d);
+                if(thisWk.equals(yrAndWk)) {
+                    val = (Long)items.get(i)[2];
+                    //continue outer;
+                    break;
                 }
                 i++;
             }
             ArrayList<Object> o = new  ArrayList<>();
             o.add(d);
-            o.add(0);
+            o.add(val);
             itemsMerged.add(o.toArray());
         }
         return itemsMerged;
@@ -418,7 +426,11 @@ public class ActivityController implements Serializable {
     public CartesianChartModel getDailyBarChart() {
         return this.dailyChart;
     }
-    
+
+    public CartesianChartModel getWeeklyBarChart() {
+        return weeklyChart;
+    }
+   
     public void itemSelect(ItemSelectEvent event) { 
        int series = event.getSeriesIndex();
        int item = event.getItemIndex();
@@ -447,9 +459,29 @@ public class ActivityController implements Serializable {
         List<Object[]> events;
         this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
+        DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
+        
+        if(this.selectedTimeIntervals.contains("Weekly")){
+            this.weeklyChart = new CartesianChartModel();
+            if(selectedFacilities.contains(-1)) {
+                events = getWeeklyCounts(new Long(-1));
+                ChartSeries series = new ChartSeries();
+                series.setLabel("All");
+                for (Object[] event : events) {
+                    String xval = wdf.format((Date)event[0]); // + " " + event[1]; //df.format((Date)event[0]);
+                    Long yval = (Long)event[1];
+                    series.set(xval, yval);
+                }
+                weeklyChart.addSeries(series);
+                hideWeeklyTab = false;
+            }
+        } else {
+          hideWeeklyTab = true;  
+        }
+        
         //decide whether or not to display totals or by location
         //iterate over lists
-        if(selectedFacilities.contains(-1)) {
+        if(this.selectedTimeIntervals.contains("Daily") && selectedFacilities.contains(-1)) {
             events = getDailyCounts(-1);
             ChartSeries series = new ChartSeries();
             series.setLabel("All");
@@ -459,28 +491,61 @@ public class ActivityController implements Serializable {
                 series.set(xval, yval);
             }
             dailyChart.addSeries(series);
-            //TODO: weekly
             //TODO: monthly
             hospitalChartSeriesMapping.put(curSeries,-1);
             curSeries++;
+            hideDailyTab = false;
+        } else if ( !(this.selectedTimeIntervals.contains("Daily")) ) {
+            hideDailyTab = true;
         }
         
         for (Integer fac: selectedFacilities) {
             if( fac > 0) {
                 Hospital h =  hFacade.find(fac);
-                ChartSeries series = new ChartSeries();
-                series.setLabel(h.getHospitalname());
-                events = getDailyCounts(fac);
-                for (Object[] event : events) {
-                    String xval = df.format((Date)event[0]);
-                    Long yval = (Long)event[1];
-                    series.set(xval, yval);
+                
+                if(this.selectedTimeIntervals.contains("Daily")) {
+                    ChartSeries series = new ChartSeries();
+                    series.setLabel(h.getHospitalname());
+                    events = getDailyCounts(fac);
+                    for (Object[] event : events) {
+                        String xval = df.format((Date)event[0]);
+                        Long yval = (Long)event[1];
+                        series.set(xval, yval);
+                    }
+                    hospitalChartSeriesMapping.put(curSeries,fac);
+                    
+                    hideDailyTab = false;
+                    dailyChart.addSeries(series);
                 }
-                hospitalChartSeriesMapping.put(curSeries,fac);
-                curSeries++;
-                dailyChart.addSeries(series);
+                
                 //TODO: weekly
+                if (this.selectedTimeIntervals.contains("Weekly")) {
+                    ChartSeries wSeries = new ChartSeries();
+                    wSeries.setLabel(h.getHospitalname());
+                    events = this.getWeeklyCounts(new Long(fac));
+                    for (Object[] event : events) {
+                        String xval = wdf.format((Date)event[0]);
+                        Long yval = (Long)event[1];
+                        wSeries.set(xval, yval);
+                    }
+                    hideWeeklyTab = false;
+                    weeklyChart.addSeries(wSeries);
+                }
+                
                 //TODO: monthly
+                if (this.selectedTimeIntervals.contains("Weekly")) {
+                    ChartSeries mSeries = new ChartSeries();
+                    mSeries.setLabel(h.getHospitalname());
+                    /*events = this.getWeeklyCounts(new Long(fac));
+                    for (Object[] event : events) {
+                        String xval = df.format((Date)event[0]);
+                        Long yval = (Long)event[1];
+                        wSeries.set(xval, yval);
+                    }*/
+                    monthlyChart.addSeries(mSeries);
+                }
+                
+                curSeries++;
             }
         }
         
