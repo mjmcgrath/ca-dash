@@ -36,6 +36,7 @@ import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
 import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
+import org.json.*;
 
 @Named("activityController")
 @SessionScoped
@@ -538,10 +539,19 @@ public class ActivityController implements Serializable {
                     ChartSeries wSumSeries = new ChartSeries();
                     wSumSeries.setLabel("Mean Weekly Treatments All Facilities");
                     Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
+                    JSONArray errorData = new JSONArray();
                     for(String key : wSumStats.keySet()) {
                         String xval = key;
                         Double yval = wSumStats.get(key).getMean();
-                        stddevs.add(wSumStats.get(key).getStandardDeviation());
+                        Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
+                        JSONObject errorItem = new JSONObject();
+                        try {
+                            errorItem.append("min", twoSigma);
+                            errorItem.append("max", twoSigma);
+                            errorData.put(errorItem);
+                        } catch (Exception e) {
+                        }
+                        
                         wSumSeries.set(xval,yval);
                     }
                 }

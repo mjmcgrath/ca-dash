@@ -47,7 +47,7 @@
         // error bar properties
         this.errorBarWidth = 6;
         // error bar data points array
-        this.errorData = [];
+        this.errorData = [{max:0.5, min:0.5}];
         // error bar color
         this.errorBarColor = "#000000";
         // font of the text to display above the error bars
@@ -608,7 +608,6 @@
     
     //draw the error bars
     $.jqplot.BarRenderer.prototype.drawErrorBars = function(ctx, startPoint, endPoint, errorText, vertAlign, horizAlign) { 
-        
         //set the style properties
         ctx.lineWidth = this.errorBarWidth;
         ctx.strokeStyle = this.errorBarColor;
