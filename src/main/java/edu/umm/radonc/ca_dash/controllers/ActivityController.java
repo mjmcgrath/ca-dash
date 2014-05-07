@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
+import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math.stat.descriptive.SynchronizedSummaryStatistics;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
@@ -530,6 +531,19 @@ public class ActivityController implements Serializable {
                     }
                     hideWeeklyTab = false;
                     weeklyChart.addSeries(wSeries);
+                }
+                
+                if(false) {
+                    ArrayList<Double> stddevs = new ArrayList<>();
+                    ChartSeries wSumSeries = new ChartSeries();
+                    wSumSeries.setLabel("Mean Weekly Treatments All Facilities");
+                    Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
+                    for(String key : wSumStats.keySet()) {
+                        String xval = key;
+                        Double yval = wSumStats.get(key).getMean();
+                        stddevs.add(wSumStats.get(key).getStandardDeviation());
+                        wSumSeries.set(xval,yval);
+                    }
                 }
                 
                 //TODO: monthly
