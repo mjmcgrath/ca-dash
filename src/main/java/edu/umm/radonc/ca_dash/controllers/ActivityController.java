@@ -71,6 +71,8 @@ public class ActivityController implements Serializable {
     private boolean disableWeeklyCheckbox;
     private boolean disableMonthlyCheckbox;
     private boolean disableYearlyCheckbox;
+    private JSONArray errorBars;
+    private JSONArray errorLabels;
     
     public ActivityController() {
         df = new SimpleDateFormat("E, dd MMM yyyy");
@@ -124,6 +126,16 @@ public class ActivityController implements Serializable {
     public List<String> getSelectedTimeIntervals() {
         return selectedTimeIntervals;
     }
+
+    public String getErrorBars() {
+        return errorBars.toString();
+    }
+
+    public JSONArray getErrorLabels() {
+        return errorLabels;
+    }
+    
+    
 
     public void setSelectedTimeIntervals(List<String> selectedTimeSpans) {
         this.selectedTimeIntervals = selectedTimeSpans;
