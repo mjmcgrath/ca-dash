@@ -106,13 +106,6 @@
                             <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne" widgetVar="barChartD"
                                 title="Daily Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
-                                extender="function(){
-                                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
-                                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
-                                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
-                                        this.cfg.seriesDefaults.rendererOptions.errorData = [[{min: Math.random() / 2,max: Math.random() / 2},{min: Math.random() / 2,max: Math.random() / 2}]];
-                                        this.cfg.seriesDefaults.rendererOptions.errorTextData = [['2\u03C3','2\u03C3']];
-                                }" 
                                 stacked="true">
                                 <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
                             </p:barChart>
@@ -146,14 +139,16 @@
                             </p:dialog>
                         </p:tab>
                         <p:tab title="Weekly" disabled="#{activityController.hideWeeklyTab}">
-                            <p:panel id="statsWeekly">
-                                <c:forEach items="${activityController.weeklySummary}" var="entry"  varStatus="status">
-                                    <h:outputText value="${entry.key}"/> Mean: <h:outputText value="${entry.value.mean}"/> 2&sigma;: <h:outputText value="${2 * entry.value.standardDeviation}"/> <br/>
-                                </c:forEach>
-                            </p:panel>
                             <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
                                 title="Weekly Activities" min="0" xaxisAngle="45" 
-                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="true" />
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
+                                extender="function(){
+                                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
+                                        this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.errorBars};
+                                        this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.errorLabels};
+                                }" />
                         </p:tab>
                         <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
                             <!-- Chart goes here -->

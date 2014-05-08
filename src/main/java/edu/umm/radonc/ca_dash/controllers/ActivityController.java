@@ -131,8 +131,8 @@ public class ActivityController implements Serializable {
         return errorBars.toString();
     }
 
-    public JSONArray getErrorLabels() {
-        return errorLabels;
+    public String getErrorLabels() {
+        return errorLabels.toString();
     }
     
     
@@ -486,12 +486,42 @@ public class ActivityController implements Serializable {
                     Long yval = (Long)event[1];
                     series.set(xval, yval);
                 }
-                weeklyChart.addSeries(series);
+                //weeklyChart.addSeries(series);
                 hideWeeklyTab = false;
             }
         } else {
           hideWeeklyTab = true;  
         }
+         
+        if(this.selectedTimeIntervals.contains("Weekly")) {
+                    ArrayList<Double> stddevs = new ArrayList<>();
+                    ChartSeries wSumSeries = new ChartSeries();
+                    wSumSeries.setLabel("Mean Weekly Treatments All Facilities");
+                    Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
+                    JSONArray errorData = new JSONArray();
+                    JSONArray errorTextData = new JSONArray();
+
+                    for(String key : wSumStats.keySet()) {
+                        String xval = key;
+                        Double yval = wSumStats.get(key).getMean();
+                        Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
+                        JSONObject errorItem = new JSONObject();
+                        try {
+                            errorItem.put("min", twoSigma);
+                            errorItem.put("max", twoSigma);
+                            errorData.put(errorItem);
+                            errorTextData.put("");
+                        } catch (Exception e) {
+                        }
+                        
+                        wSumSeries.set(xval,yval);
+                    }
+                    this.errorBars = new JSONArray();
+                    this.errorBars.put(errorData);
+                    this.errorLabels = new JSONArray();
+                    this.errorLabels.put(errorTextData);
+                    weeklyChart.addSeries(wSumSeries);
+                }
         
         //decide whether or not to display totals or by location
         //iterate over lists
@@ -546,27 +576,6 @@ public class ActivityController implements Serializable {
                     weeklyChart.addSeries(wSeries);
                 }
                 
-                if(false) {
-                    ArrayList<Double> stddevs = new ArrayList<>();
-                    ChartSeries wSumSeries = new ChartSeries();
-                    wSumSeries.setLabel("Mean Weekly Treatments All Facilities");
-                    Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
-                    JSONArray errorData = new JSONArray();
-                    for(String key : wSumStats.keySet()) {
-                        String xval = key;
-                        Double yval = wSumStats.get(key).getMean();
-                        Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
-                        JSONObject errorItem = new JSONObject();
-                        try {
-                            errorItem.append("min", twoSigma);
-                            errorItem.append("max", twoSigma);
-                            errorData.put(errorItem);
-                        } catch (Exception e) {
-                        }
-                        
-                        wSumSeries.set(xval,yval);
-                    }
-                }
                 
                 //TODO: monthly
                 if (this.selectedTimeIntervals.contains("Weekly")) {
