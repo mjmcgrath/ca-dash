@@ -73,6 +73,7 @@ public class ActivityController implements Serializable {
     private boolean disableYearlyCheckbox;
     private JSONArray errorBars;
     private JSONArray errorLabels;
+    private String weeklyDisplayMode;
     
     public ActivityController() {
         df = new SimpleDateFormat("E, dd MMM yyyy");
@@ -97,6 +98,7 @@ public class ActivityController implements Serializable {
         disableWeeklyCheckbox = true;
         disableMonthlyCheckbox = true;
         disableYearlyCheckbox = true;
+        weeklyDisplayMode = "Summary";
     }
 
     public Activity getSelected() {
@@ -114,7 +116,14 @@ public class ActivityController implements Serializable {
             return "";
         }
     }
-    
+
+    public String getWeeklyDisplayMode() {
+        return weeklyDisplayMode;
+    }
+
+    public void setWeeklyDisplayMode(String weeklyDisplayMode) {
+        this.weeklyDisplayMode = weeklyDisplayMode;
+    }
 
     public void setSelectedFacilities(List<String> selectedFacilities) {
         this.selectedFacilities = new ArrayList<>();
@@ -473,9 +482,10 @@ public class ActivityController implements Serializable {
         List<Object[]> events;
         this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
+
         DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
         
-        if(this.selectedTimeIntervals.contains("Weekly")){
+        if(this.selectedTimeIntervals.contains("Weekly") && (this.weeklyDisplayMode.equals("Raw"))){
             this.weeklyChart = new CartesianChartModel();
             if(selectedFacilities.contains(-1)) {
                 events = getWeeklyCounts(new Long(-1));
@@ -486,15 +496,15 @@ public class ActivityController implements Serializable {
                     Long yval = (Long)event[1];
                     series.set(xval, yval);
                 }
-                //weeklyChart.addSeries(series);
+                weeklyChart.addSeries(series);
                 hideWeeklyTab = false;
             }
         } else {
-          hideWeeklyTab = true;  
+          //hideWeeklyTab = true;  
         }
          
-        if(this.selectedTimeIntervals.contains("Weekly")) {
-                    ArrayList<Double> stddevs = new ArrayList<>();
+        if(this.selectedTimeIntervals.contains("Weekly") && (this.weeklyDisplayMode.equals("Summary"))) {
+                    this.weeklyChart = new CartesianChartModel();
                     ChartSeries wSumSeries = new ChartSeries();
                     wSumSeries.setLabel("Mean Weekly Treatments All Facilities");
                     Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
@@ -521,6 +531,7 @@ public class ActivityController implements Serializable {
                     this.errorLabels = new JSONArray();
                     this.errorLabels.put(errorTextData);
                     weeklyChart.addSeries(wSumSeries);
+                    hideWeeklyTab = false;
                 }
         
         //decide whether or not to display totals or by location
