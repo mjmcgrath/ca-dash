@@ -73,7 +73,6 @@ public class ActivityController implements Serializable {
     private boolean disableYearlyCheckbox;
     private JSONArray errorBars;
     private JSONArray errorLabels;
-    private Double chartMax;
     private String weeklyDisplayMode;
     
     public ActivityController() {
@@ -118,12 +117,6 @@ public class ActivityController implements Serializable {
         }
     }
 
-    public Double getChartMax() {
-        return chartMax;
-    }
-
-    
-    
     public String getWeeklyDisplayMode() {
         return weeklyDisplayMode;
     }
@@ -517,14 +510,11 @@ public class ActivityController implements Serializable {
                     Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary();
                     JSONArray errorData = new JSONArray();
                     JSONArray errorTextData = new JSONArray();
-                    chartMax = 0.0;
+
                     for(String key : wSumStats.keySet()) {
                         String xval = key;
                         Double yval = wSumStats.get(key).getMean();
                         Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
-                        if( yval + yval * twoSigma > chartMax) {
-                            chartMax = yval + yval * twoSigma;
-                        }
                         JSONObject errorItem = new JSONObject();
                         try {
                             errorItem.put("min", twoSigma);
