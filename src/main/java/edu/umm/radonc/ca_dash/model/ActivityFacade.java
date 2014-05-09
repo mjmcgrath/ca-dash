@@ -143,7 +143,14 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
         Calendar cal = new GregorianCalendar();
         TreeMap<String,SynchronizedSummaryStatistics> retval = new TreeMap<>();
-        List<Object[]> events = getDailyCounts(start, end, imrtOnly, includeWeekends);
+        
+        List<Object[]> events ;
+        
+        if(hospitalser < 0) {
+            events = getDailyCounts(start, end, imrtOnly, includeWeekends);
+        } else {
+           events = getDailyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
+        }
         cal.setTime(start);
         int wk = cal.get(Calendar.WEEK_OF_YEAR);
         String currYrWk = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
