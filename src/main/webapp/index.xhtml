@@ -20,34 +20,6 @@
         </h:head>
 
         <h:body>
-            <script id="barChartExtender">
-                function ext() {
-                    this.cfg.title = "asdfgsdg";
-                    this.cfg.grid = {drawGridLines: false, background: "white", shadow: false};
-                    this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
-                    this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
-                    this.cfg.seriesDefaults.rendererOptions.errorBarColor = "black";
-                    this.cfg.seriesDefaults.rendererOptions.errorData = [[{min:0.1,max:0.1},{min:0.2,max:0.7},{min:0.2,max:0.2},{min:0.5,max:0.05}]];
-                    this.cfg.seriesDefaults.rendererOptions.errorTextData = [["2\u03C3","2\u03C3","2\u03C3","2\u03C3"]];
-                    console.log();
-                }
-                
-                function fasf() {
-                    barChartD.extender = function() {
-                        this.cfg.title = "adg";
-                        this.cfg.grid = {drawGridLines: false, background: "white", shadow: false};
-                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
-                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
-                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = "black";
-                        this.cfg.seriesDefaults.rendererOptions.errorData = [[{min: Math.random() / 2,max: Math.random() / 2}],];
-                        this.cfg.seriesDefaults.rendererOptions.errorTextData = [["2\u03C3","2\u03C3","2\u03C3","2\u03C3"]];
-                        console.log(this);
-                    };
-                    var conf = barChartD.cfg;
-                    barChartD.refresh(conf);
-                }
-                
-            </script>
             <p:layout fullPage="true">
 
                 <p:layoutUnit position="north" size="75" resizable="false" closable="true" collapsible="true" id="layoutHeader">
@@ -152,6 +124,7 @@
                             <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
                                 title="Weekly Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
+                                max="#{activityController.chartMax}"
                                 extender="function(){
                                         this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                         this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
