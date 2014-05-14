@@ -116,6 +116,7 @@
                                 <p:selectOneButton value="#{activityController.weeklyDisplayMode}">
                                     <f:selectItem itemLabel="Raw" itemValue="Raw" />
                                     <f:selectItem itemLabel="Summary" itemValue="Summary" />
+                                    <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
                                 </p:selectOneButton>
                                 </h:form>
                                 <p:commandButton value="Save Image" id="wImageSave"
@@ -124,7 +125,7 @@
                             <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
                                 title="Weekly Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
-                                max="#{activityController.chartmax}"
+                                
                                 extender="function(){
                                         this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                         this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
