@@ -62,7 +62,9 @@
                             <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
                         </p:selectManyCheckbox><br/>
                         <label class="hdr">Other: </label><br/>
-                        <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/><br/>
+                        <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
+                        <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
+                        <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
                         <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts" /> 
                         </h:form>
                     <!--/p:fieldset-->

@@ -64,6 +64,7 @@ public class ActivityController implements Serializable {
     private HashMap<Integer,Integer> hospitalChartSeriesMapping;
     private SynchronizedSummaryStatistics stats;
     private boolean imrtOnly;
+    private boolean includeWeekends;
     private boolean hideDailyTab;
     private boolean hideWeeklyTab;
     private boolean hideMonthlyTab;
@@ -92,6 +93,7 @@ public class ActivityController implements Serializable {
         selectedTimeIntervals.add("Daily");
         hospitalChartSeriesMapping = new HashMap<>();
         imrtOnly = false;
+        includeWeekends = false;
         hideDailyTab = false;
         hideWeeklyTab = true;
         hideMonthlyTab = true;
@@ -110,7 +112,14 @@ public class ActivityController implements Serializable {
     public Double getChartmax() {
        return chartmax;
     }
-    
+
+    public boolean isIncludeWeekends() {
+        return includeWeekends;
+    }
+
+    public void setIncludeWeekends(boolean includeWeekends) {
+        this.includeWeekends = includeWeekends;
+    }
     
     public List<Integer> getSelectedFacilities() {
         return selectedFacilities;
@@ -388,11 +397,11 @@ public class ActivityController implements Serializable {
     }
     
     public SynchronizedSummaryStatistics getDailySummary(){
-        return getFacade().getDailyStats(startDate, endDate, imrtOnly, false);
+        return getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
     }
     
     public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummary(int hospital){
-        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, false);
+        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -407,7 +416,7 @@ public class ActivityController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly, true);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly, includeWeekends);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -566,7 +575,7 @@ public class ActivityController implements Serializable {
 
 
             //TODO: monthly
-            if (this.selectedTimeIntervals.contains("Weekly")) {
+            if (this.selectedTimeIntervals.contains("Monthly")) {
                 ChartSeries mSeries = new ChartSeries();
                 mSeries.setLabel(hospital);
                 /*events = this.getWeeklyCounts(new Long(fac));
