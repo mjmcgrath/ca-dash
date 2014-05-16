@@ -408,6 +408,10 @@ public class ActivityController implements Serializable {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(startDate);
+        int dow = gc.get(Calendar.DAY_OF_WEEK);
+        int offset = gc.getFirstDayOfWeek() - dow;
+        gc.add(Calendar.DATE, offset);
+        //gc.setTime(new Date(gc.);
         while(gc.getTime().compareTo(endDate) < 0) {
             allDates.add(gc.getTime());
             gc.add(Calendar.WEEK_OF_YEAR, 1);
@@ -423,15 +427,43 @@ public class ActivityController implements Serializable {
         //outer:
         for(Date d : allDates) {
             i = 0;
-            Long val = new Long(0); 
+            Long val = new Long(0);
+            Double wk;
+            Double yr = 0.0;
+            Double mo = 0.0;
+            int gcy = 0;
+            int gcm = 0;
+            int gcw = 0;
+            Long partialwk = new Long(0);
             while(i < items.size()) {
-                String yrAndWk = ((Double)items.get(i)[0]).intValue() + " " + String.format("%02d", ((Double)items.get(i)[1]).intValue());
-                String thisWk = wdf.format(d);
+;
+                yr = ((Double)items.get(i)[0]);
+                mo = ((Double)items.get(i)[1]);
+                wk = ((Double)items.get(i)[2]);
+                if( wk == 1.0 && mo == 12.0) {
+                    //yr = yr + 1.0;
+                    partialwk = (Long)items.get(i)[3];
+                }
+                String yrAndWk = (yr.intValue()) + " " + String.format("%02d", wk.intValue());
+                
+                gc.setTime(d);
+                gcy = gc.get(Calendar.YEAR);
+                gcm = gc.get(Calendar.MONTH);
+                gcw = gc.get(Calendar.WEEK_OF_YEAR);
+                if (gcm == Calendar.DECEMBER && gcw == 1 ){
+                    gcy = gcy + 1;
+                }
+                String thisWk = gcy + " " +  String.format("%02d", gcw);
                 if(thisWk.equals(yrAndWk)) {
-                    val = (Long)items.get(i)[2];
+                    val = (Long)items.get(i)[3];
+                    if (gc.get(Calendar.MONTH) == Calendar.DECEMBER && gcw == 1) {
+                            val = val + partialwk;
+                            partialwk = new Long(0);
+                    }
                     //continue outer;
                     break;
                 }
+                
                 i++;
             }
             ArrayList<Object> o = new  ArrayList<>();
@@ -525,15 +557,21 @@ public class ActivityController implements Serializable {
                 hideDailyTab = false;
                 dailyChart.addSeries(series);
             }
-
+            GregorianCalendar gc = new GregorianCalendar();
             //TODO: weekly
             if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") ) {
                 this.weeklyChart = new CartesianChartModel();
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
+                
                 for (Object[] event : events) {
-                    String xval = wdf.format((Date)event[0]);
+                    Date d = (Date)event[0];
+                    gc.setTime(d);
+                    String xval = wdf.format(d);
+                    if( gc.get(Calendar.MONTH) == Calendar.DECEMBER && gc.get(Calendar.WEEK_OF_YEAR) == 1){
+                        xval = (gc.get(Calendar.YEAR) + 1) + " Week " + gc.get(Calendar.WEEK_OF_YEAR);
+                    }
                     Long yval = (Long)event[1];
                     wSeries.set(xval, yval);
                 }

@@ -153,7 +153,14 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         }
         cal.setTime(start);
         int wk = cal.get(Calendar.WEEK_OF_YEAR);
-        String currYrWk = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
+        int mo = cal.get(Calendar.MONTH);
+        int yr = cal.get(Calendar.YEAR);
+        if(mo == Calendar.DECEMBER && wk == 1) {
+            yr = yr + 1;
+        } else if (mo == Calendar.JANUARY && wk == 52) {
+            yr = yr - 1;
+        }
+        String currYrWk = yr + "-" + String.format("%02d", wk);
         String prevYrWk = "";
         SynchronizedSummaryStatistics currStats = new SynchronizedSummaryStatistics();
         int i = 0;
@@ -165,7 +172,15 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             
             prevYrWk = currYrWk;
             cal.setTime(d);
-            currYrWk = cal.get(Calendar.YEAR) + "-" + String.format("%02d", cal.get(Calendar.WEEK_OF_YEAR));
+            wk = cal.get(Calendar.WEEK_OF_YEAR);
+            mo = cal.get(Calendar.MONTH);
+            yr = cal.get(Calendar.YEAR);
+            if(mo == Calendar.DECEMBER && wk == 1) {
+                yr = yr + 1;
+            } else if (mo == Calendar.JANUARY && wk == 52) {
+                yr = yr - 1;
+            }
+            currYrWk = yr + "-" + String.format("%02d", wk);
 
             
             if( !(prevYrWk.equals(currYrWk)) ) {
@@ -267,13 +282,13 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         }
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('week', a.fromdateofservice) AS wk, count(a.actinstproccodeser) " +
+                "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('month', a.fromdateofservice) AS mo, date_part('week', a.fromdateofservice) AS wk, count(a.actinstproccodeser) " +
                 "FROM actinstproccode a, procedurecode p " + hospSel +
                 "WHERE a.fromdateofservice IS NOT NULL " +
                 "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
                 "AND a.procedurecodeser = p.procedurecodeser " +
                 "AND p.procedurecode != '00000' " + imrtString + hospString +
-                "GROUP BY yr, wk ORDER BY yr,wk ASC;")
+                "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC;")
                 .setParameter(1, start)
                 .setParameter(2, end);
         
