@@ -29,7 +29,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math.stat.descriptive.SynchronizedSummaryStatistics;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
@@ -560,7 +559,6 @@ public class ActivityController implements Serializable {
             GregorianCalendar gc = new GregorianCalendar();
             //TODO: weekly
             if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") ) {
-                this.weeklyChart = new CartesianChartModel();
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
