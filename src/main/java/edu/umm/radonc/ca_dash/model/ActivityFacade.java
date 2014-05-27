@@ -131,6 +131,36 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return stats;
     }
     
+    public SynchronizedSummaryStatistics getDailyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
+        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+        List<Object[]> counts = getDailyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
+        for(Object[] item : counts) {
+            stats.addValue(((Long)item[1]).doubleValue());
+        }
+        return stats;
+    }
+    
+    public TreeMap<Date,SynchronizedSummaryStatistics> getWeeklyTrailingSummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+        TreeMap<Date,SynchronizedSummaryStatistics> retval = new TreeMap();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(end);
+        Date d = end;
+        SynchronizedSummaryStatistics stats;
+        while(gc.getTime().compareTo(start) > 0) {
+            d = gc.getTime();
+            gc.add(Calendar.DATE, -7);
+            if(hospitalser <= 0) {
+                stats = getDailyStats(gc.getTime(), d, imrtOnly, includeWeekends);
+            } else {
+                stats = getDailyStats(gc.getTime(), d, hospitalser, imrtOnly, includeWeekends);
+            }
+            retval.put(gc.getTime(), stats);
+        }
+       
+        return retval;
+        
+    }
+    
     public SynchronizedSummaryStatistics getWeeklyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
         SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
         List<Object[]> counts = getWeeklyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
@@ -259,6 +289,41 @@ public class ActivityFacade extends AbstractFacade<Activity> {
                 .setParameter("start", start)
                 .setParameter("end", end)
                 .setParameter("hosp", hospitalSer);
+        List<Object[]> retval = q.getResultList();
+        return retval;
+    }
+    
+    public List<Object[]> getWeeklyCountsTrailing(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+        String imrtString = "";
+        String imrtSel = "";
+        String hospString = "";
+        String hospSel = "";
+        if(imrtOnly) {
+            imrtSel = "";
+            imrtString = "AND p.shortcomment LIKE '%IMRT%' ";
+        }
+        
+        if(hospital != null && hospital > 0) {
+            hospSel = ", department d ";
+            hospString =  "AND a.departmentser = d.departmentser AND d.hospitalser = ? ";
+        }
+        
+        javax.persistence.Query q = getEntityManager().createNativeQuery(
+                "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('month', a.fromdateofservice) AS mo, date_part('week', a.fromdateofservice) AS wk, count(a.actinstproccodeser) " +
+                "FROM actinstproccode a, procedurecode p " + hospSel +
+                "WHERE a.fromdateofservice IS NOT NULL " +
+                "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
+                "AND a.procedurecodeser = p.procedurecodeser " +
+                "AND p.procedurecode != '00000' " + imrtString + hospString +
+                "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC;")
+                .setParameter(1, start)
+                .setParameter(2, end);
+        
+        if(hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
+        
+        
         List<Object[]> retval = q.getResultList();
         return retval;
     }

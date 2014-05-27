@@ -74,6 +74,7 @@ public class ActivityController implements Serializable {
     private JSONArray errorBars;
     private JSONArray errorLabels;
     private String weeklyDisplayMode;
+    private String weeklySegmentationMode;
     private Double chartmax;
     
     public ActivityController() {
@@ -101,6 +102,7 @@ public class ActivityController implements Serializable {
         disableMonthlyCheckbox = true;
         disableYearlyCheckbox = true;
         weeklyDisplayMode = "Summary";
+        weeklySegmentationMode = "Absolute";
         chartmax = 0.0;
     }
 
@@ -138,6 +140,14 @@ public class ActivityController implements Serializable {
 
     public void setWeeklyDisplayMode(String weeklyDisplayMode) {
         this.weeklyDisplayMode = weeklyDisplayMode;
+    }
+
+    public String getWeeklySegmentationMode() {
+        return weeklySegmentationMode;
+    }
+
+    public void setWeeklySegmentationMode(String weeklySegmentationMode) {
+        this.weeklySegmentationMode = weeklySegmentationMode;
     }
 
     public void setSelectedFacilities(List<String> selectedFacilities) {
@@ -558,7 +568,7 @@ public class ActivityController implements Serializable {
             }
             GregorianCalendar gc = new GregorianCalendar();
             //TODO: weekly
-            if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") ) {
+            if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
@@ -577,7 +587,7 @@ public class ActivityController implements Serializable {
                 weeklyChart.addSeries(wSeries);
             }
             
-            if(this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Summary")) {
+            if(this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
                 ChartSeries wSumSeries = new ChartSeries();
                 wSumSeries.setLabel("Mean Daily Treatments " + hospital);
                 Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary(fac);
@@ -608,6 +618,45 @@ public class ActivityController implements Serializable {
                 weeklyChart.addSeries(wSumSeries);
                 hideWeeklyTab = false;
             }
+            
+            if(this.selectedTimeIntervals.contains("Weekly") && this.weeklySegmentationMode.equals("Trailing")) {
+                ChartSeries wTrSumSeries = new ChartSeries();
+                Map<Date,SynchronizedSummaryStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
+                JSONArray errorData = new JSONArray();
+                JSONArray errorTextData = new JSONArray();
+                
+                for(Date key : wTrSumStats.keySet()) {
+                    String xval = df.format(key);
+                    Double yval;
+                    if(this.weeklyDisplayMode.equals("Summary")) {
+                        wTrSumSeries.setLabel("Mean Daily Treatments (Trailing) " + hospital);
+                        yval = wTrSumStats.get(key).getMean();
+                        Double twoSigma = (2 * (wTrSumStats.get(key).getStandardDeviation())) / wTrSumStats.get(key).getMean();
+                        if( (yval + (yval * twoSigma)) > chartmax ){
+                            chartmax = Math.floor((Math.ceil(yval + (yval * twoSigma)) + 5.0 / 10.0));
+                        }
+                        JSONObject errorItem = new JSONObject();
+                        try {
+                            errorItem.put("min", twoSigma);
+                            errorItem.put("max", twoSigma);
+                            errorData.put(errorItem);
+                            errorTextData.put("");
+                        } catch (Exception e) {
+                        }
+                    } else {
+                        wTrSumSeries.setLabel("Total Treatments (Trailing) " + hospital);
+                        yval = wTrSumStats.get(key).getSum();
+                    }
+                    wTrSumSeries.set(xval,yval);
+                }
+                
+                this.errorBars.put(errorData);
+                this.errorLabels.put(errorTextData);
+                weeklyChart.addSeries(wTrSumSeries);
+                hideWeeklyTab = false;
+                
+            
+            }
 
 
             //TODO: monthly
@@ -626,6 +675,10 @@ public class ActivityController implements Serializable {
             curSeries++;
 
         }
+    }
+
+    private Map<Date, SynchronizedSummaryStatistics> getTrailingWeeklySummary(Integer hospital) {
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
 
     @FacesConverter(forClass = Activity.class)
