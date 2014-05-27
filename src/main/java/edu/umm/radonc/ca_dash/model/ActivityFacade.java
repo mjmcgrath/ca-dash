@@ -367,24 +367,35 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     }
     
     //TODO: Fix query -- don't use native query
-    public List<Object> getMonthlyCounts(Date start, Date end) {
-        //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
-        //cq.select(cq.from(Activity.class));cast result list
+    public List<Object> getMonthlyCounts(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+        String imrtString = "";
+        String imrtSel = "";
+        String hospString = "";
+        String hospSel = "";
+        if(imrtOnly) {
+            imrtSel = "";
+            imrtString = "AND p.shortcomment LIKE '%IMRT%' ";
+        }
         
-        /*javax.persistence.Query q = getEntityManager().createQuery(
-                "SELECT FUNCTION('date_part', 'year', a.fromdateofservice) AS yr, FUNCTION('date_part', 'month', a.fromdateofservice) AS mn, COUNT(a.actinstproccodeser) " +
-                "FROM Activity a WHERE a.fromdateofservice IS NOT NULL " +
-                "GROUP BY yr, mn " +
-                "ORDER BY yr, mn ASC");*/
+        if(hospital != null && hospital > 0) {
+            hospSel = ", department d ";
+            hospString =  "AND a.departmentser = d.departmentser AND d.hospitalser = ? ";
+        }
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('month', a.fromdateofservice) AS mn, count(a.actinstproccodeser) " +
-                "FROM actinstproccode a " +
+                "FROM actinstproccode a, procedurecode p" + hospSel +
                 "WHERE a.fromdateofservice IS NOT NULL " +
                 "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
+                "AND a.procedurecodeser = p.procedurecodeser " +
+                "AND p.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mn ORDER BY yr,mn ASC;")
                 .setParameter(1, start)
                 .setParameter(2, end);
+        
+        if(hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
         
         List<Object> retval = q.getResultList();
         return retval;

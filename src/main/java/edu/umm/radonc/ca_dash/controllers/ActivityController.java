@@ -483,8 +483,8 @@ public class ActivityController implements Serializable {
         return itemsMerged;
     }
     
-    public List<Object> getMonthlyCounts() {
-        return getFacade().getMonthlyCounts(null, null);
+    public List<Object> getMonthlyCounts(Long index) {
+        return getFacade().getMonthlyCounts(startDate, endDate, index, imrtOnly, includeWeekends);
     }
     
     public void setStartDate(Date startDate) {
