@@ -65,7 +65,7 @@
                         <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
                         <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
                         <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
-                        <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts" /> 
+                        <p:commandButton value="Enter" actionListener="#{activityController.draw()}" update=":charts" /> 
                         </h:form>
                     <!--/p:fieldset-->
                 </p:layoutUnit>
@@ -142,7 +142,27 @@
                                 }" />
                         </p:tab>
                         <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
-                            <!-- Chart goes here -->
+                             <p:panel>
+                                <h:form> 
+                                <p:selectOneButton value="#{activityController.monthlyDisplayMode}">
+                                    <f:selectItem itemLabel="Raw" itemValue="Raw" />
+                                    <f:selectItem itemLabel="Summary" itemValue="Summary" />
+                                    <p:ajax listener="#{activityController.draw}" update=":charts:monthlyBarChart,@(form)"/>
+                                </p:selectOneButton>
+                                </h:form>
+                                <p:commandButton value="Save Image" id="mImageSave"
+                                   icon="ui-icon-disk" />
+                            </p:panel>
+                            <p:barChart id="monthlyBarChart" value="#{activityController.monthlyBarChart}" legendPosition="ne"  
+                                title="Monthly Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
+                                extender="function(){
+                                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
+                                        this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.errorBars};
+                                        this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.errorLabels};
+                                }" />
                         </p:tab>
                         <p:tab title="Raw Data">
                             <p:dataTable id="datalist" value="#{activityController.lazyItems}" var="item"

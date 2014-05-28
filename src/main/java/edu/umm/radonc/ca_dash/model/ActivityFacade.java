@@ -367,7 +367,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     }
     
     //TODO: Fix query -- don't use native query
-    public List<Object> getMonthlyCounts(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+    public List<Object[]> getMonthlyCounts(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
         String imrtString = "";
         String imrtSel = "";
         String hospString = "";
@@ -384,7 +384,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', a.fromdateofservice) AS yr, date_part('month', a.fromdateofservice) AS mn, count(a.actinstproccodeser) " +
-                "FROM actinstproccode a, procedurecode p" + hospSel +
+                "FROM actinstproccode a, procedurecode p " + hospSel +
                 "WHERE a.fromdateofservice IS NOT NULL " +
                 "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
                 "AND a.procedurecodeser = p.procedurecodeser " +
@@ -397,7 +397,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             q.setParameter(3, hospital);
         }
         
-        List<Object> retval = q.getResultList();
+        List<Object[]> retval = q.getResultList();
         return retval;
     }
         
