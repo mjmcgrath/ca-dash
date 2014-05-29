@@ -71,8 +71,10 @@ public class ActivityController implements Serializable {
     private boolean disableWeeklyCheckbox;
     private boolean disableMonthlyCheckbox;
     private boolean disableYearlyCheckbox;
-    private JSONArray errorBars;
-    private JSONArray errorLabels;
+    private JSONArray weeklyErrorBars;
+    private JSONArray weeklyErrorLabels;
+    private JSONArray monthlyErrorBars;
+    private JSONArray monthlyErrorLabels;
     private String weeklyDisplayMode;
     private String weeklySegmentationMode;
     private String monthlyDisplayMode;
@@ -104,6 +106,7 @@ public class ActivityController implements Serializable {
         disableYearlyCheckbox = true;
         weeklyDisplayMode = "Summary";
         weeklySegmentationMode = "Absolute";
+        monthlyDisplayMode = "Raw";
         chartmax = 0.0;
     }
 
@@ -170,15 +173,21 @@ public class ActivityController implements Serializable {
         return selectedTimeIntervals;
     }
 
-    public String getErrorBars() {
-        return errorBars.toString();
+    public String getWeeklyErrorBars() {
+        return weeklyErrorBars.toString();
     }
 
-    public String getErrorLabels() {
-        return errorLabels.toString();
+    public String getWeeklyErrorLabels() {
+        return weeklyErrorLabels.toString();
     }
-    
-    
+
+    public JSONArray getMonthlyErrorBars() {
+        return monthlyErrorBars;
+    }
+
+    public JSONArray getMonthlyErrorLabels() {
+        return monthlyErrorLabels;
+    }
 
     public void setSelectedTimeIntervals(List<String> selectedTimeSpans) {
         this.selectedTimeIntervals = selectedTimeSpans;
@@ -579,8 +588,8 @@ public class ActivityController implements Serializable {
     public void drawWeekly(DateFormat df) {
         this.weeklyChart = new CartesianChartModel();
         this.weeklyChart = new CartesianChartModel();
-        this.errorBars = new JSONArray();
-        this.errorLabels = new JSONArray();
+        this.weeklyErrorBars = new JSONArray();
+        this.weeklyErrorLabels = new JSONArray();
         chartmax = 0.0;
         //int curSeries = 0;
         List<Object[]> events;
@@ -638,8 +647,8 @@ public class ActivityController implements Serializable {
                     wSumSeries.set(xval,yval);
                 }
                 
-                this.errorBars.put(errorData);
-                this.errorLabels.put(errorTextData);
+                this.weeklyErrorBars.put(errorData);
+                this.weeklyErrorLabels.put(errorTextData);
                 weeklyChart.addSeries(wSumSeries);
                 hideWeeklyTab = false;
             }
@@ -649,6 +658,8 @@ public class ActivityController implements Serializable {
                 Map<Date,SynchronizedSummaryStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
+                this.weeklyErrorBars = new JSONArray();
+                this.weeklyErrorBars = new JSONArray();
                 
                 for(Date key : wTrSumStats.keySet()) {
                     String xval = this.df.format(key);
@@ -675,8 +686,8 @@ public class ActivityController implements Serializable {
                     wTrSumSeries.set(xval,yval);
                 }
                 
-                this.errorBars.put(errorData);
-                this.errorLabels.put(errorTextData);
+                this.weeklyErrorBars.put(errorData);
+                this.weeklyErrorLabels.put(errorTextData);
                 weeklyChart.addSeries(wTrSumSeries);
                 hideWeeklyTab = false;
             }
@@ -687,33 +698,50 @@ public class ActivityController implements Serializable {
     
     public void drawMonthly(DateFormat df) {
         this.monthlyChart = new CartesianChartModel();
-        ChartSeries mSeries = new ChartSeries();
+        this.monthlyErrorBars = new JSONArray();
+        this.monthlyErrorLabels = new JSONArray();
+        ChartSeries mSeries;
         List<Object[]> events;
         
-        //if (this.monthlyDisplayMode.equals("Raw") {
-        for (Integer fac: selectedFacilities) {
-            String hospital = "All";
-            if( fac > 0 ) {
-                hospital =  hFacade.find(fac).getHospitalname();
-            }
+        if (this.monthlyDisplayMode.equals("Raw")) {
+            for (Integer fac: selectedFacilities) {
+                mSeries = new ChartSeries();
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
+                }
             
-            //Monthly total
-            events = this.getMonthlyCounts(new Long(fac));
+                //Monthly total
+                events = this.getMonthlyCounts(new Long(fac));
   
-            mSeries.setLabel(hospital);
+                mSeries.setLabel(hospital);
 
-            for (Object[] event : events) {
-                String xval = df.format((Date)event[0]);
-                Long yval = (Long)event[1];
-                 mSeries.set(xval, yval);
+                for (Object[] event : events) {
+                    String xval = ((Double)(event[0])).intValue() + " " + ((Double) event[1]).intValue();
+                    Long yval = (Long)event[2];
+                    mSeries.set(xval, yval);
+                }
+                 
+                monthlyChart.addSeries(mSeries);
             }
-            
-            monthlyChart.addSeries(mSeries);
-            // } else {
+        } else {
             //monthly summary
-            //}
-            hideMonthlyTab = false;
+            ChartSeries mSumSeries = new ChartSeries();
+
+            for (Integer fac: selectedFacilities) {
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
+                }
+                mSumSeries.setLabel("Mean Daily Treatments " + hospital);
+                Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary(fac);
+                //TODO: implement me
+                 
+                monthlyChart.addSeries(mSumSeries);
+            }
+           
        }
+       hideMonthlyTab = false;
     }
     
     public void draw(){
@@ -722,8 +750,10 @@ public class ActivityController implements Serializable {
         this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
         this.weeklyChart = new CartesianChartModel();
-        this.errorBars = new JSONArray();
-        this.errorLabels = new JSONArray();
+        this.weeklyErrorBars = new JSONArray();
+        this.weeklyErrorLabels = new JSONArray();
+        this.monthlyErrorBars = new JSONArray();
+        this.monthlyErrorLabels = new JSONArray();
         chartmax = 0.0;
         
         DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
