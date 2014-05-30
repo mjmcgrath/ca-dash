@@ -400,6 +400,53 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         List<Object[]> retval = q.getResultList();
         return retval;
     }
+
+    public TreeMap<String, SynchronizedSummaryStatistics> getMonthlySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+        Calendar cal = new GregorianCalendar();
+        TreeMap<String,SynchronizedSummaryStatistics> retval = new TreeMap<>();
+        
+        List<Object[]> events ;
+        
+        if(hospitalser < 0) {
+            events = getDailyCounts(start, end, imrtOnly, includeWeekends);
+        } else {
+           events = getDailyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
+        }
+        cal.setTime(start);
+
+        int mo = cal.get(Calendar.MONTH);
+        int yr = cal.get(Calendar.YEAR);
+        
+        String currMoYr = yr + "-" + String.format("%02d", mo + 1);
+        String prevMoYr = "";
+        SynchronizedSummaryStatistics currStats = new SynchronizedSummaryStatistics();
+        int i = 0;
+        while(cal.getTime().before(end) && i < events.size()) {
+            
+            Object[] event = events.get(i);
+            Date d = (Date)event[0];
+            Long count = (Long)event[1];
+            
+            prevMoYr = currMoYr;
+            cal.setTime(d);
+            mo = cal.get(Calendar.MONTH);
+            yr = cal.get(Calendar.YEAR);
+
+            currMoYr = yr + "-" + String.format("%02d", mo + 1);
+
+            
+            if( !(prevMoYr.equals(currMoYr)) ) {
+                retval.put(prevMoYr, currStats);
+                currStats = new SynchronizedSummaryStatistics();
+            }
+            
+            currStats.addValue(count);
+            i++;
+        }
+        retval.put(prevMoYr, currStats);
+
+        return retval;
+    }
         
         
     

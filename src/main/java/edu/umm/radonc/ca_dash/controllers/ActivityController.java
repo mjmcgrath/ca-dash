@@ -431,6 +431,10 @@ public class ActivityController implements Serializable {
         return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
     
+    public TreeMap<String,SynchronizedSummaryStatistics> getMonthlySummary(int hospital){
+        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
+    }
+    
     public List<Object[]> getWeeklyCounts(Long index) {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
@@ -726,18 +730,44 @@ public class ActivityController implements Serializable {
             }
         } else {
             //monthly summary
-            ChartSeries mSumSeries = new ChartSeries();
 
             for (Integer fac: selectedFacilities) {
                 String hospital = "All";
                 if( fac > 0 ) {
                     hospital =  hFacade.find(fac).getHospitalname();
                 }
+                
+                ChartSeries mSumSeries = new ChartSeries();
+                
                 mSumSeries.setLabel("Mean Daily Treatments " + hospital);
-                Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary(fac);
-                //TODO: implement me
-                 
+                Map<String,SynchronizedSummaryStatistics> mSumStats = this.getMonthlySummary(fac);
+                
+                JSONArray errorData = new JSONArray();
+                JSONArray errorTextData = new JSONArray();
+                
+                for(String key : mSumStats.keySet()) {
+                    String xval = key;
+                    Double yval = mSumStats.get(key).getMean();
+                    Double twoSigma = (2 * (mSumStats.get(key).getStandardDeviation())) / mSumStats.get(key).getMean();
+                    if( (yval + (yval * twoSigma)) > chartmax ){
+                        chartmax = Math.floor((Math.ceil(yval + (yval * twoSigma)) + 5.0 / 10.0));
+                    }
+                    JSONObject errorItem = new JSONObject();
+                    try {
+                        errorItem.put("min", twoSigma);
+                        errorItem.put("max", twoSigma);
+                        errorData.put(errorItem);
+                        errorTextData.put("");
+                    } catch (Exception e) {
+                    }
+
+                    mSumSeries.set(xval,yval);
+                }
+                
+                this.monthlyErrorBars.put(errorData);
+                this.monthlyErrorLabels.put(errorTextData);
                 monthlyChart.addSeries(mSumSeries);
+ 
             }
            
        }
