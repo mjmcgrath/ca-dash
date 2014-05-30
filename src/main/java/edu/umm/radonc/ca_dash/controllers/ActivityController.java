@@ -671,7 +671,7 @@ public class ActivityController implements Serializable {
                     if(this.weeklyDisplayMode.equals("Summary")) {
                         wTrSumSeries.setLabel("Mean Daily Treatments (Trailing) " + hospital);
                         yval = wTrSumStats.get(key).getMean();
-                        Double twoSigma = (2 * (wTrSumStats.get(key).getStandardDeviation())) / wTrSumStats.get(key).getMean();
+                        Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
                         if( (yval + (yval * twoSigma)) > chartmax ){
                             chartmax = Math.floor((Math.ceil(yval + (yval * twoSigma)) + 5.0 / 10.0));
                         }
@@ -748,7 +748,7 @@ public class ActivityController implements Serializable {
                 for(String key : mSumStats.keySet()) {
                     String xval = key;
                     Double yval = mSumStats.get(key).getMean();
-                    Double twoSigma = (2 * (mSumStats.get(key).getStandardDeviation())) / mSumStats.get(key).getMean();
+                    Double twoSigma = errorBar(mSumStats.get(key).getStandardDeviation(), mSumStats.get(key).getMean());
                     if( (yval + (yval * twoSigma)) > chartmax ){
                         chartmax = Math.floor((Math.ceil(yval + (yval * twoSigma)) + 5.0 / 10.0));
                     }
@@ -772,6 +772,10 @@ public class ActivityController implements Serializable {
            
        }
        hideMonthlyTab = false;
+    }
+    
+    private Double errorBar(Double stddev, Double mean) {
+        return (2 * stddev) / mean;
     }
     
     public void draw(){
