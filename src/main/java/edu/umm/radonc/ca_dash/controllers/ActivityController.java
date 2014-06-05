@@ -791,7 +791,8 @@ public class ActivityController implements Serializable {
                         errorItem.put("max", twoSigma);
                         errorData.put(errorItem);
                         errorTextData.put("");
-                    } catch (Exception e) {
+                    } catch (JSONException e) {
+                        System.out.println("Error building JSON object containing monthly error bar data");
                     }
 
                     mSumSeries.set(xval,yval);
