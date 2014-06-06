@@ -122,8 +122,8 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return q.getResultList();
     }
         
-    public SynchronizedSummaryStatistics getDailyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends){
-        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+    public SynchronizedDescriptiveStatistics getDailyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends){
+        SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
         List<Object[]> counts = getDailyCounts(start, end, imrtOnly, includeWeekends);
         for(Object[] item : counts) {
             stats.addValue(((Long)item[1]).doubleValue());
@@ -131,8 +131,8 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return stats;
     }
     
-    public SynchronizedSummaryStatistics getDailyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
-        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+    public SynchronizedDescriptiveStatistics getDailyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
+        SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
         List<Object[]> counts = getDailyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
         for(Object[] item : counts) {
             stats.addValue(((Long)item[1]).doubleValue());
@@ -140,12 +140,12 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return stats;
     }
     
-    public TreeMap<Date,SynchronizedSummaryStatistics> getWeeklyTrailingSummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
-        TreeMap<Date,SynchronizedSummaryStatistics> retval = new TreeMap();
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklyTrailingSummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+        TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(end);
         Date d = end;
-        SynchronizedSummaryStatistics stats;
+        SynchronizedDescriptiveStatistics stats;
         while(gc.getTime().compareTo(start) > 0) {
             d = gc.getTime();
             gc.add(Calendar.DATE, -7);
@@ -161,8 +161,8 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
     }
     
-    public SynchronizedSummaryStatistics getWeeklyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
-        SynchronizedSummaryStatistics stats = new SynchronizedSummaryStatistics();
+    public SynchronizedDescriptiveStatistics getWeeklyStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+        SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
         List<Object[]> counts = getWeeklyCounts(start, end, hospitalser, imrtOnly, includeWeekends);
         for(Object[] item : counts) {
             stats.addValue(((Long)item[2]).doubleValue());
@@ -170,9 +170,9 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return stats;
     }
     
-    public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
+    public TreeMap<String,SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends){
         Calendar cal = new GregorianCalendar();
-        TreeMap<String,SynchronizedSummaryStatistics> retval = new TreeMap<>();
+        TreeMap<String,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
         List<Object[]> events ;
         
@@ -192,7 +192,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         }
         String currYrWk = yr + "-" + String.format("%02d", wk);
         String prevYrWk = "";
-        SynchronizedSummaryStatistics currStats = new SynchronizedSummaryStatistics();
+        SynchronizedDescriptiveStatistics currStats = new SynchronizedDescriptiveStatistics();
         int i = 0;
         while(cal.getTime().before(end) && i < events.size()) {
             
@@ -215,7 +215,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             
             if( !(prevYrWk.equals(currYrWk)) ) {
                 retval.put(prevYrWk, currStats);
-                currStats = new SynchronizedSummaryStatistics();
+                currStats = new SynchronizedDescriptiveStatistics();
             }
             
             currStats.addValue(count);
@@ -226,7 +226,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return retval;
     }
     
-    public SynchronizedSummaryStatistics getMonthlyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
+    public SynchronizedDescriptiveStatistics getMonthlyStats(Date start, Date end, boolean imrtOnly, boolean includeWeekends) {
         //TODO: implement me
         return null;
     }
@@ -401,9 +401,9 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return retval;
     }
 
-    public TreeMap<String, SynchronizedSummaryStatistics> getMonthlySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date start, Date end, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
         Calendar cal = new GregorianCalendar();
-        TreeMap<String,SynchronizedSummaryStatistics> retval = new TreeMap<>();
+        TreeMap<String,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
         List<Object[]> events ;
         
@@ -419,7 +419,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         String currMoYr = yr + "-" + String.format("%02d", mo + 1);
         String prevMoYr = "";
-        SynchronizedSummaryStatistics currStats = new SynchronizedSummaryStatistics();
+        SynchronizedDescriptiveStatistics currStats = new SynchronizedDescriptiveStatistics();
         int i = 0;
         while(cal.getTime().before(end) && i < events.size()) {
             
@@ -437,7 +437,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             
             if( !(prevMoYr.equals(currMoYr)) ) {
                 retval.put(prevMoYr, currStats);
-                currStats = new SynchronizedSummaryStatistics();
+                currStats = new SynchronizedDescriptiveStatistics();
             }
             
             currStats.addValue(count);

@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.time.*;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +30,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
-import org.apache.commons.math.stat.descriptive.SynchronizedSummaryStatistics;
+import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
@@ -61,7 +62,7 @@ public class ActivityController implements Serializable {
     private List<String> selectedTimeIntervals;
     private Date selectedDate;
     private HashMap<Integer,Integer> hospitalChartSeriesMapping;
-    private SynchronizedSummaryStatistics stats;
+    private SynchronizedDescriptiveStatistics stats;
     private boolean imrtOnly;
     private boolean includeWeekends;
     private boolean hideDailyTab;
@@ -102,14 +103,12 @@ public class ActivityController implements Serializable {
         hideWeeklyTab = true;
         hideMonthlyTab = true;
         disableDailyCheckbox = false;
-        disableWeeklyCheckbox = true;
-        disableMonthlyCheckbox = true;
-        disableYearlyCheckbox = true;
         weeklyDisplayMode = "Summary";
         weeklySegmentationMode = "Absolute";
         monthlyDisplayMode = "Raw";
         weeklyChartmax = 0;
         monthlyChartmax = 0;
+        handleDateSelect();
     }
 
     public Activity getSelected() {
@@ -309,7 +308,7 @@ public class ActivityController implements Serializable {
         return items;
     }
 
-    public SynchronizedSummaryStatistics getStats() {
+    public SynchronizedDescriptiveStatistics getStats() {
         return stats;
     }
     
@@ -337,7 +336,7 @@ public class ActivityController implements Serializable {
             this.lazyItems = new LazyDataModel<Activity>(){
                 private static final long serialVersionUID    = 1L;
                 @Override
-                public List<Activity> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, String> filters) {
+                public List<Activity> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
                     int[] range = {first, first + pageSize};
                     List<Activity> result = getFacade().itemsDateRange(startDate, endDate, range);
                     lazyItems.setRowCount(getFacade().itemsDateRangeCount(startDate, endDate));
@@ -429,15 +428,15 @@ public class ActivityController implements Serializable {
         return itemsMerged;
     }
     
-    public SynchronizedSummaryStatistics getDailySummary(){
+    public SynchronizedDescriptiveStatistics getDailySummary(){
         return getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
     }
     
-    public TreeMap<String,SynchronizedSummaryStatistics> getWeeklySummary(int hospital){
+    public TreeMap<String,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
         return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
     
-    public TreeMap<String,SynchronizedSummaryStatistics> getMonthlySummary(int hospital){
+    public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
         return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
     
@@ -637,7 +636,7 @@ public class ActivityController implements Serializable {
             if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
                 ChartSeries wSumSeries = new ChartSeries();
                 wSumSeries.setLabel("Mean Daily Treatments " + hospital);
-                Map<String,SynchronizedSummaryStatistics> wSumStats = this.getWeeklySummary(fac);
+                Map<String,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
                 
@@ -656,7 +655,9 @@ public class ActivityController implements Serializable {
                         errorTextData.put("");
                     } catch (Exception e) {
                     }
-
+                    if(Double.isNaN(yval)) {
+                        yval = 0.0;
+                    }
                     wSumSeries.set(xval,yval);
                 }
                 
@@ -668,7 +669,7 @@ public class ActivityController implements Serializable {
             
             if(this.weeklySegmentationMode.equals("Trailing")) {
                 ChartSeries wTrSumSeries = new ChartSeries();
-                Map<Date,SynchronizedSummaryStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
+                Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
                 this.weeklyErrorBars = new JSONArray();
@@ -773,7 +774,7 @@ public class ActivityController implements Serializable {
                 ChartSeries mSumSeries = new ChartSeries();
                 
                 mSumSeries.setLabel("Mean Daily Treatments " + hospital);
-                Map<String,SynchronizedSummaryStatistics> mSumStats = this.getMonthlySummary(fac);
+                Map<String,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
                 
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
@@ -839,11 +840,11 @@ public class ActivityController implements Serializable {
         }
     }
 
-    private Map<Date, SynchronizedSummaryStatistics> getTrailingWeeklySummary(Integer hospital) {
+    private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
         return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
     }
     
-    public SynchronizedSummaryStatistics getMonthlySummary() {
+    public SynchronizedDescriptiveStatistics getMonthlySummary() {
         return getFacade().getMonthlyStats(startDate, endDate, imrtOnly, includeWeekends);
     }
 
