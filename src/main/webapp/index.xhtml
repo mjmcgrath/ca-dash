@@ -126,13 +126,13 @@
                                     <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
                                 </p:selectOneButton>
                                 </h:form>
-                                <p:commandButton value="Save Image" id="wImageSave"
-                                   icon="ui-icon-disk" />
+                                <!--p:commandButton value="Save Image" id="wImageSave"
+                                   icon="ui-icon-disk" /-->
                             </p:panel>
                             <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
                                 title="Weekly Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
-                                max="#{activityController.weeklyChartmax}"
+                                
                                 extender="function(){
                                         this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                         this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
@@ -150,13 +150,13 @@
                                     <p:ajax listener="#{activityController.draw}" update=":charts:monthlyBarChart,@(form)"/>
                                 </p:selectOneButton>
                                 </h:form>
-                                <p:commandButton value="Save Image" id="mImageSave"
-                                   icon="ui-icon-disk" />
+                                <!--p:commandButton value="Save Image" id="mImageSave"
+                                   icon="ui-icon-disk" /-->
                             </p:panel>
                             <p:barChart id="monthlyBarChart" value="#{activityController.monthlyBarChart}" legendPosition="ne"  
                                 title="Monthly Activities" min="0" xaxisAngle="45" 
                                 shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
-                                max="#{activityController.monthlyChartmax}"
+                                
                                 extender="function(){
                                         this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                         this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
