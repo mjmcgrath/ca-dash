@@ -328,6 +328,10 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         return retval;
     }
     
+    public List<Object> getQuarterlyCounts(){
+        return null;
+    }
+    
      //TODO: Fix query
     public List<Object[]> getWeeklyCounts(Date start, Date end, Long hospital, boolean imrtOnly, boolean includeWeekends) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();

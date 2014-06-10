@@ -83,7 +83,7 @@ public class ActivityController implements Serializable {
     private Integer monthlyChartmax;
     
     public ActivityController() {
-        df = new SimpleDateFormat("E, dd MMM yyyy");
+        df = new SimpleDateFormat("MM/dd/yy");
         GregorianCalendar gc = new GregorianCalendar();
         endDate = new Date();
         gc.setTime(endDate);
@@ -428,8 +428,48 @@ public class ActivityController implements Serializable {
         return itemsMerged;
     }
     
-    public SynchronizedDescriptiveStatistics getDailySummary(){
+    public SynchronizedDescriptiveStatistics getDailySummary() {
         return getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+        
+    }
+    
+    public ChartSeries histogram(Long hospital){
+        ChartSeries histo = new ChartSeries();
+        SynchronizedDescriptiveStatistics stats;
+        if( hospital != null && hospital > 0) {
+            stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        }
+        else {
+            stats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+        }
+        double interval = stats.getMax() / 20;
+        double[] sortedValues = stats.getSortedValues();
+        double currIntervalStart = 0.0;
+        double currIntervalEnd = interval;
+        int count = 0;
+        for (int i = 0; i < sortedValues.length; i++) {
+            if(sortedValues[i] < currIntervalEnd) {
+                count++;
+            } else {
+                String intervalString = Math.ceil(currIntervalStart) + "-" +  Math.ceil(currIntervalEnd);
+                histo.set(intervalString, count);
+                currIntervalStart = currIntervalEnd;
+                currIntervalEnd += interval;
+                count = 1;
+            }
+        }
+        return histo;
+    }
+    
+    public Double percentile(Double p, Long hospital) {
+        SynchronizedDescriptiveStatistics stats;
+        if( hospital != null && hospital > 0) {
+            stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        }
+        else {
+            stats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+        }
+        return stats.getPercentile(p);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
@@ -592,6 +632,12 @@ public class ActivityController implements Serializable {
             
             curSeries++;
         }
+    }
+    
+    
+    public void drawHistogram() {
+        this.dailyChart = new CartesianChartModel();
+        dailyChart.addSeries(histogram(new Long(-1)));
     }
     
     public void drawWeekly(DateFormat df) {
@@ -814,7 +860,7 @@ public class ActivityController implements Serializable {
     }
     
     public void draw(){
-        int curSeries = 0;
+        /*int curSeries = 0;
         List<Object[]> events;
         this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
@@ -837,7 +883,7 @@ public class ActivityController implements Serializable {
         }
         if(this.selectedTimeIntervals.contains("Monthly")) {
             drawMonthly(mdf);
-        }
+        }*/
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
