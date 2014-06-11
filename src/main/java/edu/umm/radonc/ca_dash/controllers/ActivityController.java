@@ -442,7 +442,10 @@ public class ActivityController implements Serializable {
         else {
             stats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
         }
-        double interval = stats.getMax() / 20;
+        
+        //Freedman-Diaconis bin width
+        double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
+        
         double[] sortedValues = stats.getSortedValues();
         double currIntervalStart = 0.0;
         double currIntervalEnd = interval;
