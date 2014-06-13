@@ -1,0 +1,67 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <ui:composition template="reportTemplate.xhtml">
+        <ui:define name="supplemental_js">
+            <h:outputScript name="js/jqplot.barRenderer.js" />
+        </ui:define>
+
+        <ui:define name="filters">
+            <h:form id="filters">
+                <label class='hdr'>Start Date: </label>
+                <p:calendar value="#{activityController.startDate}" id="startCal">
+                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                </p:calendar>
+                <br/>
+                <label class='hdr'>End Date: </label>
+                <p:calendar value="#{activityController.endDate}" id="endCal">
+                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                </p:calendar>
+                <br/><br/>
+                <label class='hdr' for="facility">Facility: </label>
+                <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
+                    <f:selectItem itemLabel="Aggregate" itemValue="-1" />
+                    <c:forEach items="${hospitalController.items}" var="hospital">
+                        <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
+                    </c:forEach>
+                </p:selectManyCheckbox>
+                <br/>
+                <label class='hdr' for="timeInterval">Granularity: </label>
+                <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
+                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{activityController.disableDailyCheckbox}"/>
+                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{activityController.disableWeeklyCheckbox}"/>
+                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{activityController.disableMonthlyCheckbox}"/>
+                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
+                </p:selectManyCheckbox><br/>
+                <label class="hdr">Other: </label><br/>
+                <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
+                <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
+                <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                <!--p:inputText id="percentileInput" value="" />
+                <p:slider for="percentileInput">
+                    <p:ajax event="slideEnd" listener="" />
+                </p:slider-->
+                <p:commandButton value="Enter" actionListener="#{activityController.drawHistogram}" update=":charts" /> 
+            </h:form>
+            <!--/p:fieldset-->
+        </ui:define>
+
+        <ui:define name="body">
+            <p:panel id="histoControls">
+                <!-- percentile slider goes here -->
+            </p:panel>
+            <p:barChart id="dailyBarChart" value="#{histogramController.histogram}" legendPosition="ne" widgetVar="barChartD"
+                        title="Daily Activities" min="0" xaxisAngle="45" 
+                        shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
+                        stacked="true">
+                        <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
+            </p:barChart>
+        </ui:define>
+        
+    </ui:composition>
+</html>
+
