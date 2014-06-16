@@ -1,6 +1,6 @@
 package edu.umm.radonc.ca_dash.controllers;
 
-import edu.umm.radonc.ca_dash.model.Activity;
+import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.Hospital;
@@ -48,13 +48,13 @@ public class ActivityController implements Serializable {
     @EJB
     private edu.umm.radonc.ca_dash.model.HospitalFacade hFacade;
     
-    private List<Activity> items = null;
-    private LazyDataModel<Activity> lazyItems = null;
+    private List<ActivityAIPC> items = null;
+    private LazyDataModel<ActivityAIPC> lazyItems = null;
     private CartesianChartModel dailyChart;
     private CartesianChartModel weeklyChart;
     private CartesianChartModel monthlyChart;
     private List<ActivityCount> dailyActivities;
-    private Activity selected;
+    private ActivityAIPC selected;
     private Date startDate;
     private Date endDate;
     private DateFormat df;
@@ -111,7 +111,7 @@ public class ActivityController implements Serializable {
         handleDateSelect();
     }
 
-    public Activity getSelected() {
+    public ActivityAIPC getSelected() {
         return selected;
     }
 
@@ -198,7 +198,7 @@ public class ActivityController implements Serializable {
         this.selectedTimeIntervals = selectedTimeSpans;
     }
 
-    public void setSelected(Activity selected) {
+    public void setSelected(ActivityAIPC selected) {
         this.selected = selected;
     }
 
@@ -276,8 +276,8 @@ public class ActivityController implements Serializable {
         return ejbFacade;
     }
 
-    public Activity prepareCreate() {
-        selected = new Activity();
+    public ActivityAIPC prepareCreate() {
+        selected = new ActivityAIPC();
         initializeEmbeddableKey();
         return selected;
     }
@@ -301,7 +301,7 @@ public class ActivityController implements Serializable {
         }
     }
 
-    public List<Activity> getItems() {
+    public List<ActivityAIPC> getItems() {
         if (items == null) {
             items = getFacade().findAll();
         }
@@ -331,14 +331,14 @@ public class ActivityController implements Serializable {
         this.disableYearlyCheckbox = (diffDays < 365);
     }
     
-    public LazyDataModel<Activity> getLazyItems() {
+    public LazyDataModel<ActivityAIPC> getLazyItems() {
         if (lazyItems == null) {
-            this.lazyItems = new LazyDataModel<Activity>(){
+            this.lazyItems = new LazyDataModel<ActivityAIPC>(){
                 private static final long serialVersionUID    = 1L;
                 @Override
-                public List<Activity> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
+                public List<ActivityAIPC> load(int first, int pageSize, String sortField, SortOrder sortOrder, Map<String, Object> filters) {
                     int[] range = {first, first + pageSize};
-                    List<Activity> result = getFacade().itemsDateRange(startDate, endDate, range);
+                    List<ActivityAIPC> result = getFacade().itemsDateRange(startDate, endDate, range);
                     lazyItems.setRowCount(getFacade().itemsDateRangeCount(startDate, endDate));
                     return result;
                 }
@@ -375,7 +375,7 @@ public class ActivityController implements Serializable {
         }
     }
 
-    public Activity getActivity(java.lang.Integer id) {
+    public ActivityAIPC getActivity(java.lang.Integer id) {
         return getFacade().find(id);
     }
 
@@ -383,11 +383,11 @@ public class ActivityController implements Serializable {
         return dailyActivities;
     }
 
-    public List<Activity> getItemsAvailableSelectMany() {
+    public List<ActivityAIPC> getItemsAvailableSelectMany() {
         return getFacade().findAll();
     }
 
-    public List<Activity> getItemsAvailableSelectOne() {
+    public List<ActivityAIPC> getItemsAvailableSelectOne() {
         return getFacade().findAll();
     }
     
@@ -863,7 +863,7 @@ public class ActivityController implements Serializable {
     }
     
     public void draw(){
-        /*int curSeries = 0;
+        int curSeries = 0;
         List<Object[]> events;
         this.hospitalChartSeriesMapping = new HashMap<>();
         this.dailyChart = new CartesianChartModel();
@@ -886,7 +886,7 @@ public class ActivityController implements Serializable {
         }
         if(this.selectedTimeIntervals.contains("Monthly")) {
             drawMonthly(mdf);
-        }*/
+        }
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
@@ -897,7 +897,7 @@ public class ActivityController implements Serializable {
         return getFacade().getMonthlyStats(startDate, endDate, imrtOnly, includeWeekends);
     }
 
-    @FacesConverter(forClass = Activity.class)
+    @FacesConverter(forClass = ActivityAIPC.class)
     public static class ActivityControllerConverter implements Converter {
 
         @Override
@@ -927,11 +927,11 @@ public class ActivityController implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Activity) {
-                Activity o = (Activity) object;
+            if (object instanceof ActivityAIPC) {
+                ActivityAIPC o = (ActivityAIPC) object;
                 return getStringKey(o.getActinstproccodeser());
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Activity.class.getName()});
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), ActivityAIPC.class.getName()});
                 return null;
             }
         }

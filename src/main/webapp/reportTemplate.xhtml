@@ -21,10 +21,11 @@
             <p:layoutUnit position="north" size="75" resizable="false" closable="true" collapsible="true" id="layoutHeader">
                 <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
                 <h:form>
-                    <h:selectOneMenu>
+                    <p:selectOneMenu value="#{navigationController.selectedReport}">
                         <f:selectItem itemLabel="Treatment Trends" itemValue="trends" />
-                        <f:selectItem itemLabel="Histograms" itemValue="histo" />
-                    </h:selectOneMenu>
+                        <f:selectItem itemLabel="Histograms" itemValue="histograms" />
+                        <p:ajax event="change" listener="#{navigationController.redirectReportSelector}" />
+                    </p:selectOneMenu>
                 </h:form>
                 <ui:insert name="reportName"></ui:insert>
             </p:layoutUnit>

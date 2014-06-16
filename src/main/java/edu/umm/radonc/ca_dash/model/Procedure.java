@@ -51,7 +51,7 @@ public class Procedure implements Serializable {
     @Column(name = "shortcomment")
     private String shortcomment;
     @OneToMany(mappedBy = "procedurecodeser")
-    private Collection<Activity> activityCollection;
+    private Collection<ActivityAIPC> activityCollection;
 
     public Procedure() {
     }
@@ -93,11 +93,11 @@ public class Procedure implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Activity> getActivityCollection() {
+    public Collection<ActivityAIPC> getActivityCollection() {
         return activityCollection;
     }
 
-    public void setActivityCollection(Collection<Activity> activityCollection) {
+    public void setActivityCollection(Collection<ActivityAIPC> activityCollection) {
         this.activityCollection = activityCollection;
     }
 

@@ -27,7 +27,7 @@ import org.apache.commons.math.stat.descriptive.*;
  * @author michaelmcgrath
  */
 @Stateless
-public class ActivityFacade extends AbstractFacade<Activity> {
+public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
     @PersistenceContext(unitName = "clinicalActivityPU")
     private EntityManager em;
 
@@ -37,21 +37,21 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     }
 
     public ActivityFacade() {
-        super(Activity.class);
+        super(ActivityAIPC.class);
     }
     
-    public List<Activity> itemsDateRange(Date start, Date end, int[] range) {
+    public List<ActivityAIPC> itemsDateRange(Date start, Date end, int[] range) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery cq = cb.createQuery(Activity.class);
-        Root<Activity> rt = cq.from(Activity.class);
+        CriteriaQuery cq = cb.createQuery(ActivityAIPC.class);
+        Root<ActivityAIPC> rt = cq.from(ActivityAIPC.class);
         cq.where(
-                cb.and(rt.get(Activity_.fromdateofservice).isNotNull(),
+                cb.and(rt.get(ActivityAIPC_.fromdateofservice).isNotNull(),
                 cb.and(
-                        cb.notEqual(rt.get(Activity_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
-                        cb.between(rt.get(Activity_.fromdateofservice), start, end)
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
+                        cb.between(rt.get(ActivityAIPC_.fromdateofservice), start, end)
                 ))
         );
-        cq.orderBy(cb.asc(rt.get(Activity_.fromdateofservice)));
+        cq.orderBy(cb.asc(rt.get(ActivityAIPC_.fromdateofservice)));
         Query q = em.createQuery(cq);
         q.setMaxResults(range[1] - range[0] + 1);
         q.setFirstResult(range[0]);
@@ -61,14 +61,14 @@ public class ActivityFacade extends AbstractFacade<Activity> {
     
     public int itemsDateRangeCount(Date start, Date end) {
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery cq = cb.createQuery(Activity.class);
-        Root<Activity> rt = cq.from(Activity.class);
-        cq.select(cb.count(rt.get(Activity_.actinstproccodeser)));
+        CriteriaQuery cq = cb.createQuery(ActivityAIPC.class);
+        Root<ActivityAIPC> rt = cq.from(ActivityAIPC.class);
+        cq.select(cb.count(rt.get(ActivityAIPC_.actinstproccodeser)));
         cq.where(
-                cb.and(rt.get(Activity_.fromdateofservice).isNotNull(),
+                cb.and(rt.get(ActivityAIPC_.fromdateofservice).isNotNull(),
                 cb.and(
-                        cb.notEqual(rt.get(Activity_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
-                        cb.between(rt.get(Activity_.fromdateofservice), start, end)
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
+                        cb.between(rt.get(ActivityAIPC_.fromdateofservice), start, end)
                 ))
         );
  
@@ -250,7 +250,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
         
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
-                        " FROM Activity a " +
+                        " FROM ActivityAIPC a " +
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
                         "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + weekendString +
@@ -279,7 +279,7 @@ public class ActivityFacade extends AbstractFacade<Activity> {
             
         javax.persistence.Query q = getEntityManager()
                 .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
-                        " FROM Activity a " + 
+                        " FROM ActivityAIPC a " + 
                         "WHERE a.fromdateofservice IS NOT NULL " +
                         "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
                         "AND a.departmentser.hospitalser.hospitalser = :hosp " +

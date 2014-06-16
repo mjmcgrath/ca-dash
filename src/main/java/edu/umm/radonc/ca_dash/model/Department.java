@@ -45,7 +45,13 @@ public class Department implements Serializable {
     @Column(name = "departmentname")
     private String departmentname;
     @OneToMany(mappedBy = "departmentser")
-    private Collection<Activity> activityCollection;
+    private Collection<ActivityAIPC> activityCollection;
+    @OneToMany(mappedBy = "departmentser")
+    private Collection<Activityinstance> activityinstanceCollection;
+    @OneToMany(mappedBy = "departmentser")
+    private Collection<Activitycapture> activitycaptureCollection;
+    
+    
     @JoinColumn(name = "hospitalser", referencedColumnName = "hospitalser")
     @ManyToOne
     private Hospital hospitalser;
@@ -74,11 +80,11 @@ public class Department implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Activity> getActivityCollection() {
+    public Collection<ActivityAIPC> getActivityCollection() {
         return activityCollection;
     }
 
-    public void setActivityCollection(Collection<Activity> activityCollection) {
+    public void setActivityCollection(Collection<ActivityAIPC> activityCollection) {
         this.activityCollection = activityCollection;
     }
 
@@ -113,6 +119,32 @@ public class Department implements Serializable {
     @Override
     public String toString() {
         return "edu.umm.radonc.ca_dash.model.Department[ departmentser=" + departmentser + " ]";
+    }
+
+    /* public Integer getHospitalser() {
+        return hospitalser;
+    }
+
+    public void setHospitalser(Integer hospitalser) {
+        this.hospitalser = hospitalser;
+    } */
+
+    @XmlTransient
+    public Collection<Activityinstance> getActivityinstanceCollection() {
+        return activityinstanceCollection;
+    }
+
+    public void setActivityinstanceCollection(Collection<Activityinstance> activityinstanceCollection) {
+        this.activityinstanceCollection = activityinstanceCollection;
+    }
+
+    @XmlTransient
+    public Collection<Activitycapture> getActivitycaptureCollection() {
+        return activitycaptureCollection;
+    }
+
+    public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
+        this.activitycaptureCollection = activitycaptureCollection;
     }
     
 }

@@ -1,0 +1,240 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <f:event listener="#{activityController.draw()}" type="preRenderView" />
+    <!-- Comment -->
+    <f:view contentType="text/html">
+        <h:head>
+            <f:facet name="first">
+                <meta content='text/html; charset=UTF-8' http-equiv="Content-Type"/>
+                <title>PrimeFaces</title>
+            </f:facet>
+            <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+            <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css' />
+            <h:outputStylesheet name="css/style.css" />
+            <h:outputScript name="js/jqplot.barRenderer.js" />
+        </h:head>
+
+        <h:body>
+            <p:layout fullPage="true">
+
+                <p:layoutUnit position="north" size="75" resizable="false" closable="true" collapsible="true" id="layoutHeader">
+                    <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
+                </p:layoutUnit>
+                <p:layoutUnit position="south" size="100" closable="true" collapsible="true">
+                    <h:graphicImage value="resources/images/um-pms.png" />
+                    &copy; 2014 University of Maryland Medical System, All Rights Reserved
+                </p:layoutUnit>
+
+                <p:layoutUnit position="west" header="Filter" collapsible="true" size="200">
+                    <!--p:menu>
+                        <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
+                    </p:menu-->
+                    <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
+                    <h:form id="filters">
+                        <label class='hdr'>Start Date: </label>
+                        <p:calendar value="#{activityController.startDate}" id="startCal">
+                            <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                        </p:calendar>
+                        <br/>
+                        <label class='hdr'>End Date: </label>
+                        <p:calendar value="#{activityController.endDate}" id="endCal">
+                            <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                        </p:calendar>
+                        <br/><br/>
+                        <label class='hdr' for="facility">Facility: </label>
+                        <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
+                            <f:selectItem itemLabel="Aggregate" itemValue="-1" />
+                            <c:forEach items="${hospitalController.items}" var="hospital">
+                                <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
+                            </c:forEach>
+                        </p:selectManyCheckbox>
+                        <br/>
+                        <label class='hdr' for="timeInterval">Granularity: </label>
+                        <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
+                            <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{activityController.disableDailyCheckbox}"/>
+                            <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{activityController.disableWeeklyCheckbox}"/>
+                            <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{activityController.disableMonthlyCheckbox}"/>
+                            <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
+                        </p:selectManyCheckbox><br/>
+                        <label class="hdr">Other: </label><br/>
+                        <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
+                        <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
+                        <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                        <!--p:inputText id="percentileInput" value="" />
+                        <p:slider for="percentileInput">
+                            <p:ajax event="slideEnd" listener="" />
+                        </p:slider-->
+                        <p:commandButton value="Enter" actionListener="#{activityController.drawHistogram}" update=":charts" /> 
+                        </h:form>
+                    <!--/p:fieldset-->
+                </p:layoutUnit>
+
+                <p:layoutUnit position="center">
+                    <p:tabView id="charts" orientation="bottom" dynamic="true">
+                        <p:tab title="Daily" disabled="#{activityController.hideDailyTab}">
+                            <p:panel id="stats">
+                                Mean: <h:outputText value="#{activityController.dailySummary.mean}"/>
+                                Stddev: <h:outputText value="#{activityController.dailySummary.standardDeviation}"/>
+                            </p:panel>
+                            <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne" widgetVar="barChartD"
+                                title="Daily Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
+                                stacked="true">
+                                <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
+                            </p:barChart>
+                            <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
+                                <h3><h:outputText id="dlgDate" value ="#{activityController.selectedDate}" /></h3>
+                                <hr/>
+                                <p:dataTable
+                                    id="dailyDetail"
+                                    value="#{activityController.dailyActivities}"
+                                    var="item"
+                                >
+                                <p:column sortBy="shortcomment">
+                                    <f:facet name="header">
+                                        <h:outputText value="Procedure"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.shortcomment}"/>
+                                </p:column>
+                                    <p:column sortBy="procedurecode">
+                                    <f:facet name="header">
+                                        <h:outputText value="CPT"/>
+                                    </f:facet>
+                                        <h:outputText value="#{item.procedurecode}"/>
+                                </p:column>
+                                <p:column  sortBy="activityCount">
+                                    <f:facet name="header">
+                                        <h:outputText value="Count"/>
+                                    </f:facet>
+                                    <h:outputText value="#{item.activityCount}"/>
+                                </p:column>  
+                                </p:dataTable>
+                            </p:dialog>
+                        </p:tab>
+                        <p:tab title="Weekly" disabled="#{activityController.hideWeeklyTab}">
+                            <p:panel>
+                                <h:form> 
+                                <p:selectOneButton value="#{activityController.weeklyDisplayMode}">
+                                    <f:selectItem itemLabel="Raw" itemValue="Raw" />
+                                    <f:selectItem itemLabel="Summary" itemValue="Summary" />
+                                    <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
+                                </p:selectOneButton>
+                                    <p:selectOneButton value="#{activityController.weeklySegmentationMode}">
+                                    <f:selectItem itemLabel="Trailing" itemValue="Trailing" />
+                                    <f:selectItem itemLabel="Absolute" itemValue="Absolute" />
+                                    <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
+                                </p:selectOneButton>
+                                </h:form>
+                                <!--p:commandButton value="Save Image" id="wImageSave"
+                                   icon="ui-icon-disk" /-->
+                            </p:panel>
+                            <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
+                                title="Weekly Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
+                                
+                                extender="function(){
+                                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
+                                        this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.weeklyErrorBars};
+                                        this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.weeklyErrorLabels};
+                                }" />
+                        </p:tab>
+                        <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
+                             <p:panel>
+                                <h:form> 
+                                <p:selectOneButton value="#{activityController.monthlyDisplayMode}">
+                                    <f:selectItem itemLabel="Raw" itemValue="Raw" />
+                                    <f:selectItem itemLabel="Summary" itemValue="Summary" />
+                                    <p:ajax listener="#{activityController.draw}" update=":charts:monthlyBarChart,@(form)"/>
+                                </p:selectOneButton>
+                                </h:form>
+                                <!--p:commandButton value="Save Image" id="mImageSave"
+                                   icon="ui-icon-disk" /-->
+                            </p:panel>
+                            <p:barChart id="monthlyBarChart" value="#{activityController.monthlyBarChart}" legendPosition="ne"  
+                                title="Monthly Activities" min="0" xaxisAngle="45" 
+                                shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
+                                
+                                extender="function(){
+                                        this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
+                                        this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
+                                        this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.monthlyErrorBars};
+                                        this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.monthlyErrorLabels};
+                                }" />
+                        </p:tab>
+                        <p:tab title="Raw Data">
+                            <p:dataTable id="datalist" value="#{activityController.lazyItems}" var="item"
+                                 selectionMode="single" selection="#{activityController.selected}"
+                                 paginator="true"
+                                 lazy="true" 
+                                 rowKey="#{item.actinstproccodeser}"
+                                 rows="20"
+                                 rowsPerPageTemplate="10,20,30,40,50" 
+                                 >
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListProcedureTitle_shortcomment}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListProcedureTitle_procedurecode}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_completeddatetime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.completeddatetime}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_fromdateofservice}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.fromdateofservice}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListActivityTitle_todateofservice}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.todateofservice}">
+                                <f:convertDateTime pattern="MM/dd/yyyy" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column filterBy="#{item.departmentser.hospitalser.hospitalname}">
+                            <f:facet name="header">
+                                <h:outputText value="Hospital"/>
+                            </f:facet>
+                            <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
+                        </p:column>
+                        <p:column filterBy="#{item.departmentser.departmentname}" filterMatchMode="contains">
+                            <f:facet name="header">
+                                <h:outputText value="#{bundle.ListDepartmentTitle_departmentname}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.departmentser.departmentname}"/>
+                        </p:column>
+                    </p:dataTable>
+                        </p:tab>
+                    </p:tabView>
+                </p:layoutUnit>
+
+            </p:layout>
+
+        </h:body>
+
+    </f:view>
+</html>
+

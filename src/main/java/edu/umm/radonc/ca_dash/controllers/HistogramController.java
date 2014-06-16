@@ -11,7 +11,9 @@ package edu.umm.radonc.ca_dash.controllers;
  * @author mmcgrath
  */
 
-import edu.umm.radonc.ca_dash.model.Activity;
+
+
+import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.Hospital;
@@ -61,7 +63,7 @@ public class HistogramController implements Serializable {
     
     private CartesianChartModel histoChart;
     
-    private Activity selected;
+    private ActivityAIPC selected;
     private Date startDate;
     private Date endDate;
     private DateFormat df;
