@@ -71,10 +71,12 @@ public class HistogramController implements Serializable {
     private boolean includeWeekends;
     private CartesianChartModel histogram;
     private String interval;
+    private SynchronizedDescriptiveStatistics dstats;
             
     public HistogramController() {
         histogram = new CartesianChartModel();
         percentile = 50.0;
+        dstats = new SynchronizedDescriptiveStatistics();
     }
     
     private ActivityFacade getFacade() {
@@ -118,19 +120,19 @@ public class HistogramController implements Serializable {
     }
     
     public double getPercentileVal() {
+        updatePercentile();
         return percentileVal;
     }
     
     public void updatePercentile() {
         Long hospital = new Long(-1);
-        SynchronizedDescriptiveStatistics stats;
         if( hospital != null && hospital > 0) {
-            stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
         }
         else {
-            stats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
         }
-        percentileVal = stats.getPercentile(percentile);
+        percentileVal = dstats.getPercentile(percentile);
     }
     
 
