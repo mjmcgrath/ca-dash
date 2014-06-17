@@ -323,8 +323,6 @@ public class ActivityController implements Serializable {
         long diff = endDate.getTime() - startDate.getTime();
         long diffDays = diff / (24 * 60 * 60 * 1000);
         
-        System.out.println(diffDays);
-        
         this.disableDailyCheckbox = (diffDays < 1);
         this.disableWeeklyCheckbox = (diffDays < 7);
         this.disableMonthlyCheckbox = (diffDays < 28);

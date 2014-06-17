@@ -13,53 +13,69 @@
         <ui:define name="filters">
             <h:form id="filters">
                 <label class='hdr'>Start Date: </label>
-                <p:calendar value="#{activityController.startDate}" id="startCal">
-                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
-                </p:calendar>
+                <p:calendar value="#{histogramController.startDate}" id="startCal" />
                 <br/>
                 <label class='hdr'>End Date: </label>
-                <p:calendar value="#{activityController.endDate}" id="endCal">
-                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
-                </p:calendar>
+                <p:calendar value="#{histogramController.endDate}" id="endCal" />
                 <br/><br/>
+                <p:selectOneButton id="selectCal" value="#{histogramController.interval}">
+                    <f:selectItem itemLabel="7d" itemValue="1wk" />
+                    <f:selectItem itemLabel="1m" itemValue="1m" />
+                    <f:selectItem itemLabel="3m" itemValue="3m" />
+                    <f:selectItem itemLabel="6m" itemValue="6m" />
+                    <f:selectItem itemLabel="1y" itemValue="1y" />
+                    <f:selectItem itemLabel="2y" itemValue="2y" />
+                    <f:selectItem itemLabel="3y" itemValue="3y" />
+                    <p:ajax event="change" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton><br/>
+                <p:selectOneButton id="selectQtr" value="#{histogramController.interval}">
+                    <f:selectItem itemLabel="Q1" itemValue="Q1" />
+                    <f:selectItem itemLabel="Q2" itemValue="Q2" />
+                    <f:selectItem itemLabel="Q3" itemValue="Q3" />
+                    <f:selectItem itemLabel="Q4" itemValue="Q4" />
+                    <p:ajax event="change" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton>
                 <label class='hdr' for="facility">Facility: </label>
-                <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
+                <p:selectManyCheckbox id="facility" value="#{histogramController.selectedFacilities}" layout="pageDirection">
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
                     </c:forEach>
                 </p:selectManyCheckbox>
                 <br/>
-                <label class='hdr' for="timeInterval">Granularity: </label>
-                <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
-                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{activityController.disableDailyCheckbox}"/>
-                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{activityController.disableWeeklyCheckbox}"/>
-                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{activityController.disableMonthlyCheckbox}"/>
-                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
-                </p:selectManyCheckbox><br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
+                <p:selectBooleanCheckbox value="#{histogramController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
                 <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
-                <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                <p:selectBooleanCheckbox value="#{histogramController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
                 <!--p:inputText id="percentileInput" value="" />
                 <p:slider for="percentileInput">
                     <p:ajax event="slideEnd" listener="" />
                 </p:slider-->
-                <p:commandButton value="Enter" actionListener="#{activityController.drawHistogram}" update=":charts" /> 
+                <p:commandButton value="Enter" actionListener="#{histogramController.drawHistogram}" update=":histo" /> 
             </h:form>
             <!--/p:fieldset-->
         </ui:define>
 
         <ui:define name="body">
             <p:panel id="histoControls">
-                <!-- percentile slider goes here -->
+                <h:form>
+                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                        <p:inputText id="percentile" value="#{histogramController.percentile}">
+                            <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
+                        </p:inputText>
+                        <h3>Percentile</h3>
+
+                        <p:slider for="percentile" step="5">
+                            <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
+                        </p:slider>
+                        <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 5px; font-weight: bold; font-size: 20px" />
+                    </h:panelGrid>
+                </h:form>
             </p:panel>
-            <p:barChart id="dailyBarChart" value="#{histogramController.histogram}" legendPosition="ne" widgetVar="barChartD"
+            <p:barChart id="histo" value="#{histogramController.histogram}" legendPosition="ne" widgetVar="barChartD"
                         title="Daily Activities" min="0" xaxisAngle="45" 
                         shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
-                        stacked="true">
-                        <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
-            </p:barChart>
+            />
         </ui:define>
         
     </ui:composition>
