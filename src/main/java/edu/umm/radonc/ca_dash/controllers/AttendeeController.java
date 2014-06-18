@@ -1,9 +1,9 @@
 package edu.umm.radonc.ca_dash.controllers;
 
-import edu.umm.radonc.ca_dash.model.Procedure;
+import edu.umm.radonc.ca_dash.model.Attendee;
 import edu.umm.radonc.ca_dash.controllers.util.JsfUtil;
 import edu.umm.radonc.ca_dash.controllers.util.JsfUtil.PersistAction;
-import edu.umm.radonc.ca_dash.model.ProcedureFacade;
+import edu.umm.radonc.ca_dash.model.AttendeeFacade;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,23 +19,23 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-@Named("procedureController")
+@Named("attendeeController")
 @SessionScoped
-public class ProcedureController implements Serializable {
+public class AttendeeController implements Serializable {
 
     @EJB
-    private edu.umm.radonc.ca_dash.model.ProcedureFacade ejbFacade;
-    private List<Procedure> items = null;
-    private Procedure selected;
+    private edu.umm.radonc.ca_dash.model.AttendeeFacade ejbFacade;
+    private List<Attendee> items = null;
+    private Attendee selected;
 
-    public ProcedureController() {
+    public AttendeeController() {
     }
 
-    public Procedure getSelected() {
+    public Attendee getSelected() {
         return selected;
     }
 
-    public void setSelected(Procedure selected) {
+    public void setSelected(Attendee selected) {
         this.selected = selected;
     }
 
@@ -45,36 +45,36 @@ public class ProcedureController implements Serializable {
     protected void initializeEmbeddableKey() {
     }
 
-    private ProcedureFacade getFacade() {
+    private AttendeeFacade getFacade() {
         return ejbFacade;
     }
 
-    public Procedure prepareCreate() {
-        selected = new Procedure();
+    public Attendee prepareCreate() {
+        selected = new Attendee();
         initializeEmbeddableKey();
         return selected;
     }
 
     public void create() {
-        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("ProcedureCreated"));
+        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("AttendeeCreated"));
         if (!JsfUtil.isValidationFailed()) {
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
     public void update() {
-        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("ProcedureUpdated"));
+        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("AttendeeUpdated"));
     }
 
     public void destroy() {
-        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("ProcedureDeleted"));
+        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("AttendeeDeleted"));
         if (!JsfUtil.isValidationFailed()) {
             selected = null; // Remove selection
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
-    public List<Procedure> getItems() {
+    public List<Attendee> getItems() {
         if (items == null) {
             items = getFacade().findAll();
         }
@@ -109,29 +109,29 @@ public class ProcedureController implements Serializable {
         }
     }
 
-    public Procedure getProcedure(java.lang.Integer id) {
+    public Attendee getAttendee(java.lang.Integer id) {
         return getFacade().find(id);
     }
 
-    public List<Procedure> getItemsAvailableSelectMany() {
+    public List<Attendee> getItemsAvailableSelectMany() {
         return getFacade().findAll();
     }
 
-    public List<Procedure> getItemsAvailableSelectOne() {
+    public List<Attendee> getItemsAvailableSelectOne() {
         return getFacade().findAll();
     }
 
-    @FacesConverter(forClass = Procedure.class)
-    public static class ProcedureControllerConverter implements Converter {
+    @FacesConverter(forClass = Attendee.class)
+    public static class AttendeeControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            ProcedureController controller = (ProcedureController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "procedureController");
-            return controller.getProcedure(getKey(value));
+            AttendeeController controller = (AttendeeController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "attendeeController");
+            return controller.getAttendee(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {
@@ -151,11 +151,11 @@ public class ProcedureController implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Procedure) {
-                Procedure o = (Procedure) object;
-                return getStringKey(o.getProcedurecodeser());
+            if (object instanceof Attendee) {
+                Attendee o = (Attendee) object;
+                return getStringKey(o.getAttendeeser());
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Procedure.class.getName()});
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Attendee.class.getName()});
                 return null;
             }
         }

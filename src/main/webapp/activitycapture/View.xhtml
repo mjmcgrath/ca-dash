@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="ActivitycaptureViewDlg" widgetVar="ActivitycaptureViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.ViewActivitycaptureTitle}">
+            <h:form id="ActivitycaptureViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{activitycaptureController.selected != null}">
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_activitycaptureser}"/>
+                        <h:outputText value="#{activitycaptureController.selected.activitycaptureser}" title="#{bundle.ViewActivitycaptureTitle_activitycaptureser}"/>
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_attendingoncologistser}"/>
+                        <h:outputText value="#{activitycaptureController.selected.attendingoncologistser}" title="#{bundle.ViewActivitycaptureTitle_attendingoncologistser}"/>
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_hstrydatetime}"/>
+                        <h:outputText value="#{activitycaptureController.selected.hstrydatetime}" title="#{bundle.ViewActivitycaptureTitle_hstrydatetime}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_activityinstanceser}"/>
+                        <h:outputText value="#{activitycaptureController.selected.activityinstanceser}" title="#{bundle.ViewActivitycaptureTitle_activityinstanceser}"/>
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_courseser}"/>
+                        <h:outputText value="#{activitycaptureController.selected.courseser}" title="#{bundle.ViewActivitycaptureTitle_courseser}"/>
+                        <h:outputText value="#{bundle.ViewActivitycaptureLabel_departmentser}"/>
+                        <h:outputText value="#{activitycaptureController.selected.departmentser}" title="#{bundle.ViewActivitycaptureTitle_departmentser}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundle.Close}" onclick="ActivitycaptureViewDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

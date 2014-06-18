@@ -41,8 +41,9 @@ public class Activitycapture implements Serializable {
     @NotNull
     @Column(name = "activitycaptureser")
     private Integer activitycaptureser;
-    @Column(name = "attendingoncologistser")
-    private Integer attendingoncologistser;
+    @JoinColumn(name = "attendingoncologistser", referencedColumnName = "resourceser")
+    @ManyToOne
+    private Doctor attendingoncologistser;
     @Column(name = "hstrydatetime")
     @Temporal(TemporalType.DATE)
     private Date hstrydatetime;
@@ -71,11 +72,11 @@ public class Activitycapture implements Serializable {
         this.activitycaptureser = activitycaptureser;
     }
 
-    public Integer getAttendingoncologistser() {
+    public Doctor getAttendingoncologistser() {
         return attendingoncologistser;
     }
 
-    public void setAttendingoncologistser(Integer attendingoncologistser) {
+    public void setAttendingoncologistser(Doctor attendingoncologistser) {
         this.attendingoncologistser = attendingoncologistser;
     }
 

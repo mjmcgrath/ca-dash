@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AttendeeCreateDlg" widgetVar="AttendeeCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateAttendeeTitle}">
+            <h:form id="AttendeeCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{attendeeController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_attendeeser}" for="attendeeser" />
+                        <p:inputText id="attendeeser" value="#{attendeeController.selected.attendeeser}" title="#{bundle.CreateAttendeeTitle_attendeeser}" required="true" requiredMessage="#{bundle.CreateAttendeeRequiredMessage_attendeeser}"/>
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_activityinstanceser}" for="activityinstanceser" />
+                        <p:inputText id="activityinstanceser" value="#{attendeeController.selected.activityinstanceser}" title="#{bundle.CreateAttendeeTitle_activityinstanceser}" />
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_hstrydatetime}" for="hstrydatetime" />
+                        <p:calendar id="hstrydatetime" pattern="MM/dd/yyyy" value="#{attendeeController.selected.hstrydatetime}" title="#{bundle.EditAttendeeTitle_hstrydatetime}"  showOn="button"/>
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_objectstatus}" for="objectstatus" />
+                        <p:inputText id="objectstatus" value="#{attendeeController.selected.objectstatus}" title="#{bundle.CreateAttendeeTitle_objectstatus}" />
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_primaryflag}" for="primaryflag" />
+                        <p:selectBooleanCheckbox id="primaryflag" value="#{attendeeController.selected.primaryflag}" />
+                        <p:outputLabel value="#{bundle.CreateAttendeeLabel_resourceser}" for="resourceser" />
+                        <p:inputText id="resourceser" value="#{attendeeController.selected.resourceser}" title="#{bundle.CreateAttendeeTitle_resourceser}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{attendeeController.create}" value="#{bundle.Save}" update="display,:AttendeeListForm:datalist,:growl" oncomplete="handleSubmit(args,'AttendeeCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="AttendeeCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

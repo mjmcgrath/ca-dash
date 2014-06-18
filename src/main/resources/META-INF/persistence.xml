@@ -15,6 +15,9 @@
     <class>edu.umm.radonc.ca_dash.model.Activitycapture</class>
     <class>edu.umm.radonc.ca_dash.model.Activityinstance</class>
     <class>edu.umm.radonc.ca_dash.model.Course</class>
+    <class>edu.umm.radonc.ca_dash.model.Attendee</class>
+    <class>edu.umm.radonc.ca_dash.model.Doctor</class>
+    <class>edu.umm.radonc.ca_dash.model.Machine</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties/>
   </persistence-unit>

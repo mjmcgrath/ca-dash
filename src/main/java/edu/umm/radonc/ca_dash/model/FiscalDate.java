@@ -74,6 +74,27 @@ public class FiscalDate {
         }
     }
     
+    public static Date getQuarter(int quarter) {
+        Date today = new Date();
+        GregorianCalendar todaygc = new GregorianCalendar();
+        todaygc.setTime(today);
+        int yr = todaygc.get(Calendar.YEAR);
+        int mo = todaygc.get(Calendar.MONTH);
+        int day = todaygc.get(Calendar.DATE);
+        
+        if(mo < Calendar.JULY) {
+            yr = yr - 1;
+        }
+        GregorianCalendar fy = new GregorianCalendar();
+        fy.set(Calendar.YEAR, yr);
+        fy.set(Calendar.DAY_OF_MONTH, 1);
+        fy.set(Calendar.MONTH, Calendar.JULY);
+        for(int i = 1; i < quarter; i++) {
+            fy.add(Calendar.MONTH, 3);
+        }
+        return fy.getTime();
+    }
+    
     public int getFYWeek(Date date) {
         int wk = gc.get(Calendar.WEEK_OF_YEAR);
         GregorianCalendar gcfy = new GregorianCalendar();

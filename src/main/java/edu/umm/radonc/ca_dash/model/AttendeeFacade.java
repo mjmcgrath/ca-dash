@@ -15,8 +15,8 @@ import javax.persistence.PersistenceContext;
  * @author mmcgrath
  */
 @Stateless
-public class ProcedureFacade extends AbstractFacade<Procedure> {
-    @PersistenceContext(unitName = "clinicalActivityPU")
+public class AttendeeFacade extends AbstractFacade<Attendee> {
+    @PersistenceContext(unitName = "securityPU")
     private EntityManager em;
 
     @Override
@@ -24,8 +24,8 @@ public class ProcedureFacade extends AbstractFacade<Procedure> {
         return em;
     }
 
-    public ProcedureFacade() {
-        super(Procedure.class);
+    public AttendeeFacade() {
+        super(Attendee.class);
     }
     
 }

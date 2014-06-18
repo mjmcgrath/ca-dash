@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="CourseCreateDlg" widgetVar="CourseCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateCourseTitle}">
+            <h:form id="CourseCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{courseController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateCourseLabel_courseser}" for="courseser" />
+                        <p:inputText id="courseser" value="#{courseController.selected.courseser}" title="#{bundle.CreateCourseTitle_courseser}" required="true" requiredMessage="#{bundle.CreateCourseRequiredMessage_courseser}"/>
+                        <p:outputLabel value="#{bundle.CreateCourseLabel_patientser}" for="patientser" />
+                        <p:inputText id="patientser" value="#{courseController.selected.patientser}" title="#{bundle.CreateCourseTitle_patientser}" />
+                        <p:outputLabel value="#{bundle.CreateCourseLabel_intent}" for="intent" />
+                        <p:inputText id="intent" value="#{courseController.selected.intent}" title="#{bundle.CreateCourseTitle_intent}" />
+                        <p:outputLabel value="#{bundle.CreateCourseLabel_clinicalstatus}" for="clinicalstatus" />
+                        <p:inputText id="clinicalstatus" value="#{courseController.selected.clinicalstatus}" title="#{bundle.CreateCourseTitle_clinicalstatus}" />
+                        <p:outputLabel value="#{bundle.CreateCourseLabel_hstrydatetime}" for="hstrydatetime" />
+                        <p:calendar id="hstrydatetime" pattern="MM/dd/yyyy" value="#{courseController.selected.hstrydatetime}" title="#{bundle.EditCourseTitle_hstrydatetime}"  showOn="button"/>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{courseController.create}" value="#{bundle.Save}" update="display,:CourseListForm:datalist,:growl" oncomplete="handleSubmit(args,'CourseCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="CourseCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="ActivityinstanceCreateDlg" widgetVar="ActivityinstanceCreateDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.CreateActivityinstanceTitle}">
+            <h:form id="ActivityinstanceCreateForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{activityinstanceController.selected != null}">
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_activityinstanceser}" for="activityinstanceser" />
+                        <p:inputText id="activityinstanceser" value="#{activityinstanceController.selected.activityinstanceser}" title="#{bundle.CreateActivityinstanceTitle_activityinstanceser}" required="true" requiredMessage="#{bundle.CreateActivityinstanceRequiredMessage_activityinstanceser}"/>
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_objectstatus}" for="objectstatus" />
+                        <p:inputText id="objectstatus" value="#{activityinstanceController.selected.objectstatus}" title="#{bundle.CreateActivityinstanceTitle_objectstatus}" />
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_duration}" for="duration" />
+                        <p:inputText id="duration" value="#{activityinstanceController.selected.duration}" title="#{bundle.CreateActivityinstanceTitle_duration}" />
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_hstrydatetime}" for="hstrydatetime" />
+                        <p:calendar id="hstrydatetime" pattern="MM/dd/yyyy" value="#{activityinstanceController.selected.hstrydatetime}" title="#{bundle.EditActivityinstanceTitle_hstrydatetime}"  showOn="button"/>
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_activityser}" for="activityser" />
+                        <p:selectOneMenu id="activityser" value="#{activityinstanceController.selected.activityser}" >
+                            <f:selectItems value="#{activityController.itemsAvailableSelectOne}"
+                                           var="activityserItem"
+                                           itemValue="#{activityserItem}"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="#{bundle.CreateActivityinstanceLabel_departmentser}" for="departmentser" />
+                        <p:selectOneMenu id="departmentser" value="#{activityinstanceController.selected.departmentser}" >
+                            <f:selectItems value="#{departmentController.itemsAvailableSelectOne}"
+                                           var="departmentserItem"
+                                           itemValue="#{departmentserItem}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{activityinstanceController.create}" value="#{bundle.Save}" update="display,:ActivityinstanceListForm:datalist,:growl" oncomplete="handleSubmit(args,'ActivityinstanceCreateDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="ActivityinstanceCreateDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

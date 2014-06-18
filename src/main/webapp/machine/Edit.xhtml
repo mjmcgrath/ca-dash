@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="MachineEditDlg" widgetVar="MachineEditDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.EditMachineTitle}">
+            <h:form id="MachineEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{machineController.selected != null}">
+                        <p:outputLabel value="#{bundle.EditMachineLabel_resourceser}" for="resourceser" />
+                        <p:inputText id="resourceser" value="#{machineController.selected.resourceser}" title="#{bundle.EditMachineTitle_resourceser}" required="true" requiredMessage="#{bundle.EditMachineRequiredMessage_resourceser}"/>
+                        <p:outputLabel value="#{bundle.EditMachineLabel_machineid}" for="machineid" />
+                        <p:inputText id="machineid" value="#{machineController.selected.machineid}" title="#{bundle.EditMachineTitle_machineid}" />
+                        <p:outputLabel value="#{bundle.EditMachineLabel_machinename}" for="machinename" />
+                        <p:inputText id="machinename" value="#{machineController.selected.machinename}" title="#{bundle.EditMachineTitle_machinename}" />
+                        <p:outputLabel value="#{bundle.EditMachineLabel_machinetype}" for="machinetype" />
+                        <p:inputText id="machinetype" value="#{machineController.selected.machinetype}" title="#{bundle.EditMachineTitle_machinetype}" />
+                        <p:outputLabel value="#{bundle.EditMachineLabel_machinemodel}" for="machinemodel" />
+                        <p:inputText id="machinemodel" value="#{machineController.selected.machinemodel}" title="#{bundle.EditMachineTitle_machinemodel}" />
+                        <p:outputLabel value="#{bundle.EditMachineLabel_operationstatus}" for="operationstatus" />
+                        <p:inputText id="operationstatus" value="#{machineController.selected.operationstatus}" title="#{bundle.EditMachineTitle_operationstatus}" />
+                    </p:panelGrid>
+                    <p:commandButton actionListener="#{machineController.update}" value="#{bundle.Save}" update="display,:MachineListForm:datalist,:growl" oncomplete="handleSubmit(args, 'MachineEditDialog');"/>
+                    <p:commandButton value="#{bundle.Cancel}" onclick="MachineEditDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

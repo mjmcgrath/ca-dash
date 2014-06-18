@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AttendeeViewDlg" widgetVar="AttendeeViewDialog" modal="true" resizable="false" appendTo="@(body)" header="#{bundle.ViewAttendeeTitle}">
+            <h:form id="AttendeeViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{attendeeController.selected != null}">
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_attendeeser}"/>
+                        <h:outputText value="#{attendeeController.selected.attendeeser}" title="#{bundle.ViewAttendeeTitle_attendeeser}"/>
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_activityinstanceser}"/>
+                        <h:outputText value="#{attendeeController.selected.activityinstanceser}" title="#{bundle.ViewAttendeeTitle_activityinstanceser}"/>
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_hstrydatetime}"/>
+                        <h:outputText value="#{attendeeController.selected.hstrydatetime}" title="#{bundle.ViewAttendeeTitle_hstrydatetime}">
+                            <f:convertDateTime pattern="MM/dd/yyyy" />
+                        </h:outputText>
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_objectstatus}"/>
+                        <h:outputText value="#{attendeeController.selected.objectstatus}" title="#{bundle.ViewAttendeeTitle_objectstatus}"/>
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_primaryflag}"/>
+                        <p:selectBooleanCheckbox value="#{attendeeController.selected.primaryflag}" disabled="true"/>
+                        <h:outputText value="#{bundle.ViewAttendeeLabel_resourceser}"/>
+                        <h:outputText value="#{attendeeController.selected.resourceser}" title="#{bundle.ViewAttendeeTitle_resourceser}"/>
+                    </p:panelGrid>
+                    <p:commandButton value="#{bundle.Close}" onclick="AttendeeViewDialog.hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

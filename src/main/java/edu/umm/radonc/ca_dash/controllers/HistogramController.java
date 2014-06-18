@@ -15,6 +15,7 @@ package edu.umm.radonc.ca_dash.controllers;
 
 import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
+import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
 import java.io.Serializable;
 import java.text.DateFormat;
@@ -168,27 +169,57 @@ public class HistogramController implements Serializable {
         switch(interval) {
             case "1wk":
                 gc.add(Calendar.DATE, -7);
+                startDate = gc.getTime();
                 break;
             case "1m":
                 gc.add(Calendar.MONTH, -1);
+                startDate = gc.getTime();
                 break;
             case "3m":
                 gc.add(Calendar.MONTH, -3);
+                startDate = gc.getTime();
                 break;
             case "6m":
                 gc.add(Calendar.MONTH, -6);
+                startDate = gc.getTime();
                 break;
             case "1y":
                 gc.add(Calendar.YEAR, -1);
+                startDate = gc.getTime();
                 break;
             case "2y":
                 gc.add(Calendar.YEAR, -2);
+                startDate = gc.getTime();
                 break;
             case "3y":
                 gc.add(Calendar.YEAR, -3);
+                startDate = gc.getTime();
+                break;
+            case "Q1":
+                gc.setTime(FiscalDate.getQuarter(1));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q2":
+                gc.setTime(FiscalDate.getQuarter(2));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q3":
+                gc.setTime(FiscalDate.getQuarter(3));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q4":
+                gc.setTime(FiscalDate.getQuarter(4));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
                 break;
         }
-        startDate = gc.getTime();
     }
     
     public ChartSeries buildHistogram(Long hospital){

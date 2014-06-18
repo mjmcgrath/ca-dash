@@ -1,9 +1,9 @@
 package edu.umm.radonc.ca_dash.controllers;
 
-import edu.umm.radonc.ca_dash.model.Procedure;
+import edu.umm.radonc.ca_dash.model.Machine;
 import edu.umm.radonc.ca_dash.controllers.util.JsfUtil;
 import edu.umm.radonc.ca_dash.controllers.util.JsfUtil.PersistAction;
-import edu.umm.radonc.ca_dash.model.ProcedureFacade;
+import edu.umm.radonc.ca_dash.model.MachineFacade;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,23 +19,23 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
-@Named("procedureController")
+@Named("machineController")
 @SessionScoped
-public class ProcedureController implements Serializable {
+public class MachineController implements Serializable {
 
     @EJB
-    private edu.umm.radonc.ca_dash.model.ProcedureFacade ejbFacade;
-    private List<Procedure> items = null;
-    private Procedure selected;
+    private edu.umm.radonc.ca_dash.model.MachineFacade ejbFacade;
+    private List<Machine> items = null;
+    private Machine selected;
 
-    public ProcedureController() {
+    public MachineController() {
     }
 
-    public Procedure getSelected() {
+    public Machine getSelected() {
         return selected;
     }
 
-    public void setSelected(Procedure selected) {
+    public void setSelected(Machine selected) {
         this.selected = selected;
     }
 
@@ -45,36 +45,36 @@ public class ProcedureController implements Serializable {
     protected void initializeEmbeddableKey() {
     }
 
-    private ProcedureFacade getFacade() {
+    private MachineFacade getFacade() {
         return ejbFacade;
     }
 
-    public Procedure prepareCreate() {
-        selected = new Procedure();
+    public Machine prepareCreate() {
+        selected = new Machine();
         initializeEmbeddableKey();
         return selected;
     }
 
     public void create() {
-        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("ProcedureCreated"));
+        persist(PersistAction.CREATE, ResourceBundle.getBundle("/Bundle").getString("MachineCreated"));
         if (!JsfUtil.isValidationFailed()) {
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
     public void update() {
-        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("ProcedureUpdated"));
+        persist(PersistAction.UPDATE, ResourceBundle.getBundle("/Bundle").getString("MachineUpdated"));
     }
 
     public void destroy() {
-        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("ProcedureDeleted"));
+        persist(PersistAction.DELETE, ResourceBundle.getBundle("/Bundle").getString("MachineDeleted"));
         if (!JsfUtil.isValidationFailed()) {
             selected = null; // Remove selection
             items = null;    // Invalidate list of items to trigger re-query.
         }
     }
 
-    public List<Procedure> getItems() {
+    public List<Machine> getItems() {
         if (items == null) {
             items = getFacade().findAll();
         }
@@ -109,29 +109,29 @@ public class ProcedureController implements Serializable {
         }
     }
 
-    public Procedure getProcedure(java.lang.Integer id) {
+    public Machine getMachine(java.lang.Integer id) {
         return getFacade().find(id);
     }
 
-    public List<Procedure> getItemsAvailableSelectMany() {
+    public List<Machine> getItemsAvailableSelectMany() {
         return getFacade().findAll();
     }
 
-    public List<Procedure> getItemsAvailableSelectOne() {
+    public List<Machine> getItemsAvailableSelectOne() {
         return getFacade().findAll();
     }
 
-    @FacesConverter(forClass = Procedure.class)
-    public static class ProcedureControllerConverter implements Converter {
+    @FacesConverter(forClass = Machine.class)
+    public static class MachineControllerConverter implements Converter {
 
         @Override
         public Object getAsObject(FacesContext facesContext, UIComponent component, String value) {
             if (value == null || value.length() == 0) {
                 return null;
             }
-            ProcedureController controller = (ProcedureController) facesContext.getApplication().getELResolver().
-                    getValue(facesContext.getELContext(), null, "procedureController");
-            return controller.getProcedure(getKey(value));
+            MachineController controller = (MachineController) facesContext.getApplication().getELResolver().
+                    getValue(facesContext.getELContext(), null, "machineController");
+            return controller.getMachine(getKey(value));
         }
 
         java.lang.Integer getKey(String value) {
@@ -151,11 +151,11 @@ public class ProcedureController implements Serializable {
             if (object == null) {
                 return null;
             }
-            if (object instanceof Procedure) {
-                Procedure o = (Procedure) object;
-                return getStringKey(o.getProcedurecodeser());
+            if (object instanceof Machine) {
+                Machine o = (Machine) object;
+                return getStringKey(o.getResourceser());
             } else {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Procedure.class.getName()});
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "object {0} is of type {1}; expected type: {2}", new Object[]{object, object.getClass().getName(), Machine.class.getName()});
                 return null;
             }
         }
