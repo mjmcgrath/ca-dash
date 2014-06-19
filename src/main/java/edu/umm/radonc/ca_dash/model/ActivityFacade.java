@@ -7,13 +7,9 @@
 package edu.umm.radonc.ca_dash.model;
 
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.TreeMap;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -144,7 +140,7 @@ public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
         TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(end);
-        Date d = end;
+        Date d;
         SynchronizedDescriptiveStatistics stats;
         while(gc.getTime().compareTo(start) > 0) {
             d = gc.getTime();
