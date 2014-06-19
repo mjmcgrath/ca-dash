@@ -103,14 +103,14 @@ public class Doctor implements Serializable {
         this.oncologistflag = oncologistflag;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<Activitycapture> getActivitycaptureCollection() {
         return activitycaptureCollection;
     }
 
     public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
         this.activitycaptureCollection = activitycaptureCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {

@@ -35,6 +35,11 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Procedure.findByProcedurecode", query = "SELECT p FROM Procedure p WHERE p.procedurecode = :procedurecode"),
     @NamedQuery(name = "Procedure.findByShortcomment", query = "SELECT p FROM Procedure p WHERE p.shortcomment = :shortcomment")})
 public class Procedure implements Serializable {
+    @Size(max = 255)
+    @Column(name = "comment")
+    private String comment;
+    @Column(name = "departmentser")
+    private Integer departmentser;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -92,14 +97,14 @@ public class Procedure implements Serializable {
         this.shortcomment = shortcomment;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<ActivityAIPC> getActivityCollection() {
         return activityCollection;
     }
 
     public void setActivityCollection(Collection<ActivityAIPC> activityCollection) {
         this.activityCollection = activityCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {
@@ -124,6 +129,22 @@ public class Procedure implements Serializable {
     @Override
     public String toString() {
         return "edu.umm.radonc.ca_dash.model.Procedure[ procedurecodeser=" + procedurecodeser + " ]";
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Integer getDepartmentser() {
+        return departmentser;
+    }
+
+    public void setDepartmentser(Integer departmentser) {
+        this.departmentser = departmentser;
     }
     
 }

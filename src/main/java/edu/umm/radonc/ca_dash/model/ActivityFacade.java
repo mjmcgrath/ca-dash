@@ -43,7 +43,9 @@ public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
         cq.where(
                 cb.and(rt.get(ActivityAIPC_.fromdateofservice).isNotNull(),
                 cb.and(
-                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 528),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 529),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 530),
                         cb.between(rt.get(ActivityAIPC_.fromdateofservice), start, end)
                 ))
         );
@@ -63,7 +65,9 @@ public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
         cq.where(
                 cb.and(rt.get(ActivityAIPC_.fromdateofservice).isNotNull(),
                 cb.and(
-                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser).get(Procedure_.procedurecode), "00000"),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 528),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 529),
+                        cb.notEqual(rt.get(ActivityAIPC_.procedurecodeser), 530),
                         cb.between(rt.get(ActivityAIPC_.fromdateofservice), start, end)
                 ))
         );

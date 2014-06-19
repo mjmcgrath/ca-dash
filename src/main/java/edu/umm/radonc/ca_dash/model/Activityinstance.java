@@ -40,6 +40,10 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Activityinstance.findByDuration", query = "SELECT a FROM Activityinstance a WHERE a.duration = :duration"),
     @NamedQuery(name = "Activityinstance.findByHstrydatetime", query = "SELECT a FROM Activityinstance a WHERE a.hstrydatetime = :hstrydatetime")})
 public class Activityinstance implements Serializable {
+    @Column(name = "activityser")
+    private Integer activityser;
+    @Column(name = "departmentser")
+    private Integer departmentser;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -54,12 +58,12 @@ public class Activityinstance implements Serializable {
     @Column(name = "hstrydatetime")
     @Temporal(TemporalType.DATE)
     private Date hstrydatetime;
-    @JoinColumn(name = "activityser", referencedColumnName = "activityser")
+    /*@JoinColumn(name = "activityser", referencedColumnName = "activityser")
     @ManyToOne
     private Activity activityser;
     @JoinColumn(name = "departmentser", referencedColumnName = "departmentser")
     @ManyToOne
-    private Department departmentser;
+    private Department departmentser;*/
     @OneToMany(mappedBy = "activityinstanceser")
     private Collection<Activitycapture> activitycaptureCollection;
 
@@ -102,7 +106,7 @@ public class Activityinstance implements Serializable {
         this.hstrydatetime = hstrydatetime;
     }
 
-    public Activity getActivityser() {
+    /*public Activity getActivityser() {
         return activityser;
     }
 
@@ -116,7 +120,7 @@ public class Activityinstance implements Serializable {
 
     public void setDepartmentser(Department departmentser) {
         this.departmentser = departmentser;
-    }
+    }*/
 
     @XmlTransient
     public Collection<Activitycapture> getActivitycaptureCollection() {
@@ -150,6 +154,22 @@ public class Activityinstance implements Serializable {
     @Override
     public String toString() {
         return "edu.umm.radonc.ca_dash.model.Activityinstance[ activityinstanceser=" + activityinstanceser + " ]";
+    }
+
+    public Integer getActivityser() {
+        return activityser;
+    }
+
+    public void setActivityser(Integer activityser) {
+        this.activityser = activityser;
+    }
+
+    public Integer getDepartmentser() {
+        return departmentser;
+    }
+
+    public void setDepartmentser(Integer departmentser) {
+        this.departmentser = departmentser;
     }
     
 }

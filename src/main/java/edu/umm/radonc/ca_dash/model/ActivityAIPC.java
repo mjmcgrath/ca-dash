@@ -60,6 +60,12 @@ import javax.xml.bind.annotation.XmlRootElement;
         })
 
 public class ActivityAIPC implements Serializable {
+    @Column(name = "departmentser")
+    private Integer departmentser;
+    @Column(name = "procedurecodeser")
+    private Integer procedurecodeser;
+    @Column(name = "activityinstanceser")
+    private Integer activityinstanceser;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -75,12 +81,12 @@ public class ActivityAIPC implements Serializable {
     @Column(name = "todateofservice")
     @Temporal(TemporalType.DATE)
     private Date todateofservice;
-    @JoinColumn(name = "departmentser", referencedColumnName = "departmentser")
+    /*@JoinColumn(name = "departmentser", referencedColumnName = "departmentser")
     @ManyToOne
     private Department departmentser;
     @JoinColumn(name = "procedurecodeser", referencedColumnName = "procedurecodeser")
     @ManyToOne
-    private Procedure procedurecodeser;
+    private Procedure procedurecodeser;*/
 
     public ActivityAIPC() {
     }
@@ -121,7 +127,10 @@ public class ActivityAIPC implements Serializable {
         this.todateofservice = todateofservice;
     }
 
-    public Department getDepartmentser() {
+    
+    
+    
+    /*public Department getDepartmentser() {
         return departmentser;
     }
 
@@ -135,7 +144,7 @@ public class ActivityAIPC implements Serializable {
 
     public void setProcedurecodeser(Procedure procedurecodeser) {
         this.procedurecodeser = procedurecodeser;
-    }
+    }*/
     
     public void getActivityList() {
         
@@ -165,6 +174,30 @@ public class ActivityAIPC implements Serializable {
     @Override
     public String toString() {
         return "edu.umm.radonc.ca_dash.model.ActivityAIPC[ actinstproccodeser=" + actinstproccodeser + " ]";
+    }
+
+    public Integer getDepartmentser() {
+        return departmentser;
+    }
+
+    public void setDepartmentser(Integer departmentser) {
+        this.departmentser = departmentser;
+    }
+
+    public Integer getProcedurecodeser() {
+        return procedurecodeser;
+    }
+
+    public void setProcedurecodeser(Integer procedurecodeser) {
+        this.procedurecodeser = procedurecodeser;
+    }
+
+    public Integer getActivityinstanceser() {
+        return activityinstanceser;
+    }
+
+    public void setActivityinstanceser(Integer activityinstanceser) {
+        this.activityinstanceser = activityinstanceser;
     }
     
 }

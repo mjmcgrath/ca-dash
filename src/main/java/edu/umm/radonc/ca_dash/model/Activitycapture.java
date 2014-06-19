@@ -35,12 +35,21 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Activitycapture.findByAttendingoncologistser", query = "SELECT a FROM Activitycapture a WHERE a.attendingoncologistser = :attendingoncologistser"),
     @NamedQuery(name = "Activitycapture.findByHstrydatetime", query = "SELECT a FROM Activitycapture a WHERE a.hstrydatetime = :hstrydatetime")})
 public class Activitycapture implements Serializable {
+    @Column(name = "activityinstanceser")
+    private Integer activityinstanceser;
+    @Column(name = "attendingoncologistser")
+    private Integer attendingoncologistser;
+    @Column(name = "departmentser")
+    private Integer departmentser;
+    @Column(name = "courseser")
+    private Integer courseser;
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
     @NotNull
     @Column(name = "activitycaptureser")
     private Integer activitycaptureser;
+    /*
     @JoinColumn(name = "attendingoncologistser", referencedColumnName = "resourceser")
     @ManyToOne
     private Doctor attendingoncologistser;
@@ -55,7 +64,7 @@ public class Activitycapture implements Serializable {
     private Course courseser;
     @JoinColumn(name = "departmentser", referencedColumnName = "departmentser")
     @ManyToOne
-    private Department departmentser;
+    private Department departmentser;*/
 
     public Activitycapture() {
     }
@@ -72,7 +81,7 @@ public class Activitycapture implements Serializable {
         this.activitycaptureser = activitycaptureser;
     }
 
-    public Doctor getAttendingoncologistser() {
+    /*public Doctor getAttendingoncologistser() {
         return attendingoncologistser;
     }
 
@@ -110,7 +119,7 @@ public class Activitycapture implements Serializable {
 
     public void setDepartmentser(Department departmentser) {
         this.departmentser = departmentser;
-    }
+    }*/
 
     @Override
     public int hashCode() {
@@ -135,6 +144,38 @@ public class Activitycapture implements Serializable {
     @Override
     public String toString() {
         return "edu.umm.radonc.ca_dash.model.Activitycapture[ activitycaptureser=" + activitycaptureser + " ]";
+    }
+
+    public Integer getActivityinstanceser() {
+        return activityinstanceser;
+    }
+
+    public void setActivityinstanceser(Integer activityinstanceser) {
+        this.activityinstanceser = activityinstanceser;
+    }
+
+    public Integer getAttendingoncologistser() {
+        return attendingoncologistser;
+    }
+
+    public void setAttendingoncologistser(Integer attendingoncologistser) {
+        this.attendingoncologistser = attendingoncologistser;
+    }
+
+    public Integer getDepartmentser() {
+        return departmentser;
+    }
+
+    public void setDepartmentser(Integer departmentser) {
+        this.departmentser = departmentser;
+    }
+
+    public Integer getCourseser() {
+        return courseser;
+    }
+
+    public void setCourseser(Integer courseser) {
+        this.courseser = courseser;
     }
     
 }

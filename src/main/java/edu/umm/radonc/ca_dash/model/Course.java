@@ -106,14 +106,14 @@ public class Course implements Serializable {
         this.hstrydatetime = hstrydatetime;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<Activitycapture> getActivitycaptureCollection() {
         return activitycaptureCollection;
     }
 
     public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
         this.activitycaptureCollection = activitycaptureCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {

@@ -35,6 +35,8 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Department.findByDepartmentser", query = "SELECT d FROM Department d WHERE d.departmentser = :departmentser"),
     @NamedQuery(name = "Department.findByDepartmentname", query = "SELECT d FROM Department d WHERE d.departmentname = :departmentname")})
 public class Department implements Serializable {
+    @Column(name = "hospitalser")
+    private Integer hospitalser;
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -53,9 +55,9 @@ public class Department implements Serializable {
     private Collection<Activitycapture> activitycaptureCollection;
     
     
-    @JoinColumn(name = "hospitalser", referencedColumnName = "hospitalser")
-    @ManyToOne
-    private Hospital hospitalser;
+    //@JoinColumn(name = "hospitalser", referencedColumnName = "hospitalser")
+    //@ManyToOne
+    //private Hospital hospitalser;
 
     public Department() {
     }
@@ -80,7 +82,7 @@ public class Department implements Serializable {
         this.departmentname = departmentname;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<ActivityAIPC> getActivityCollection() {
         return activityCollection;
     }
@@ -89,13 +91,13 @@ public class Department implements Serializable {
         this.activityCollection = activityCollection;
     }
 
-    public Hospital getHospitalser() {
-        return hospitalser;
+    public Hospital getHospital() {
+        return Hospital hospitalser;
     }
 
     public void setHospitalser(Hospital hospitalser) {
         this.hospitalser = hospitalser;
-    }
+    }*/
 
     @Override
     public int hashCode() {
@@ -146,6 +148,14 @@ public class Department implements Serializable {
 
     public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
         this.activitycaptureCollection = activitycaptureCollection;
+    }
+
+    public Integer getHospitalser() {
+        return hospitalser;
+    }
+
+    public void setHospitalser(Integer hospitalser) {
+        this.hospitalser = hospitalser;
     }
     
 }

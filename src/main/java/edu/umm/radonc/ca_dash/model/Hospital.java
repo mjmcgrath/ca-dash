@@ -68,14 +68,14 @@ public class Hospital implements Serializable {
         this.hospitalname = hospitalname;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<Department> getDepartmentCollection() {
         return departmentCollection;
     }
 
     public void setDepartmentCollection(Collection<Department> departmentCollection) {
         this.departmentCollection = departmentCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {
