@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.descriptive.*;
  */
 @Stateless
 public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
-    @PersistenceContext(unitName = "clinicalActivityPU")
+    @PersistenceContext(unitName = "clinical`ActivityPU")
     private EntityManager em;
 
     @Override
