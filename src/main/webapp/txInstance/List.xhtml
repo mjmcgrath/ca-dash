@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{txBundle.ListTxInstanceTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:form styleClass="jsfcrud_list_form">
+                <h:panelGroup id="messagePanel" layout="block">
+                    <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+                </h:panelGroup>
+                <h:outputText escape="false" value="#{txBundle.ListTxInstanceEmpty}" rendered="#{txInstanceController.items.rowCount == 0}"/>
+                <h:panelGroup rendered="#{txInstanceController.items.rowCount > 0}">
+                    <h:outputText value="#{txInstanceController.pagination.pageFirstItem + 1}..#{txInstanceController.pagination.pageLastItem + 1}/#{txInstanceController.pagination.itemsCount}"/>&nbsp;
+                    <h:commandLink action="#{txInstanceController.previous}" value="#{txBundle.Previous} #{txInstanceController.pagination.pageSize}" rendered="#{txInstanceController.pagination.hasPreviousPage}"/>&nbsp;
+                    <h:commandLink action="#{txInstanceController.next}" value="#{txBundle.Next} #{txInstanceController.pagination.pageSize}" rendered="#{txInstanceController.pagination.hasNextPage}"/>&nbsp;
+                    <h:dataTable value="#{txInstanceController.items}" var="item" border="0" cellpadding="2" cellspacing="0" rowClasses="jsfcrud_odd_row,jsfcrud_even_row" rules="all" style="border:solid 1px">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_activityinstanceser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.activityinstanceser}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_objectstatus}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.objectstatus}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_activitycaptureser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.activitycaptureser}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_patientser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.patientser}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_activitycode}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.activitycode}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_procedurecode}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.procedurecode}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_shortcomment}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.shortcomment}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_hospitalname}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hospitalname}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_hospitalser}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.hospitalser}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_physId}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.physId}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_phys}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.phys}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{txBundle.ListTxInstanceTitle_dt}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.dt}">
+                                <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                            </h:outputText>
+                        </h:column>
+                    </h:dataTable>
+                </h:panelGroup>
+                <br />
+                <h:commandLink action="#{txInstanceController.prepareCreate}" value="#{txBundle.ListTxInstanceCreateLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{txBundle.ListTxInstanceIndexLink}"/>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

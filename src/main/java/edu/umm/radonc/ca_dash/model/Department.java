@@ -47,12 +47,12 @@ public class Department implements Serializable {
     @Size(max = 255)
     @Column(name = "departmentname")
     private String departmentname;
-    @OneToMany(mappedBy = "departmentser")
-    private Collection<ActivityAIPC> activityCollection;
-    @OneToMany(mappedBy = "departmentser")
-    private Collection<Activityinstance> activityinstanceCollection;
-    @OneToMany(mappedBy = "departmentser")
-    private Collection<Activitycapture> activitycaptureCollection;
+    //@OneToMany(mappedBy = "departmentser")
+    //private Collection<ActivityAIPC> activityCollection;
+    //@OneToMany(mappedBy = "departmentser")
+    //private Collection<Activityinstance> activityinstanceCollection;
+    //@OneToMany(mappedBy = "departmentser")
+    //private Collection<Activitycapture> activitycaptureCollection;
     
     
     //@JoinColumn(name = "hospitalser", referencedColumnName = "hospitalser")
@@ -132,7 +132,7 @@ public class Department implements Serializable {
         this.hospitalser = hospitalser;
     } */
 
-    @XmlTransient
+   /* @XmlTransient
     public Collection<Activityinstance> getActivityinstanceCollection() {
         return activityinstanceCollection;
     }
@@ -144,11 +144,11 @@ public class Department implements Serializable {
     @XmlTransient
     public Collection<Activitycapture> getActivitycaptureCollection() {
         return activitycaptureCollection;
-    }
+    }*/
 
-    public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
+    /*public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
         this.activitycaptureCollection = activitycaptureCollection;
-    }
+    }*/
 
     public Integer getHospitalser() {
         return hospitalser;

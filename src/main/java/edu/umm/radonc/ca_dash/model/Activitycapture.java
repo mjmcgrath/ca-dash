@@ -52,10 +52,11 @@ public class Activitycapture implements Serializable {
     /*
     @JoinColumn(name = "attendingoncologistser", referencedColumnName = "resourceser")
     @ManyToOne
-    private Doctor attendingoncologistser;
+    private Doctor attendingoncologistser;*/
     @Column(name = "hstrydatetime")
     @Temporal(TemporalType.DATE)
     private Date hstrydatetime;
+    /*
     @JoinColumn(name = "activityinstanceser", referencedColumnName = "activityinstanceser")
     @ManyToOne
     private Activityinstance activityinstanceser;

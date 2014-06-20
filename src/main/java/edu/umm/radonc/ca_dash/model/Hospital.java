@@ -42,8 +42,8 @@ public class Hospital implements Serializable {
     @Size(max = 255)
     @Column(name = "hospitalname")
     private String hospitalname;
-    @OneToMany(mappedBy = "hospitalser")
-    private Collection<Department> departmentCollection;
+    //@OneToMany(mappedBy = "hospitalser")
+    //private Collection<Department> departmentCollection;
 
     public Hospital() {
     }

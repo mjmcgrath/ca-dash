@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{txBundle.ViewTxInstanceTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_activityinstanceser}"/>
+                    <h:outputText value="#{txInstanceController.selected.activityinstanceser}" title="#{txBundle.ViewTxInstanceTitle_activityinstanceser}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_objectstatus}"/>
+                    <h:outputText value="#{txInstanceController.selected.objectstatus}" title="#{txBundle.ViewTxInstanceTitle_objectstatus}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_activitycaptureser}"/>
+                    <h:outputText value="#{txInstanceController.selected.activitycaptureser}" title="#{txBundle.ViewTxInstanceTitle_activitycaptureser}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_patientser}"/>
+                    <h:outputText value="#{txInstanceController.selected.patientser}" title="#{txBundle.ViewTxInstanceTitle_patientser}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_activitycode}"/>
+                    <h:outputText value="#{txInstanceController.selected.activitycode}" title="#{txBundle.ViewTxInstanceTitle_activitycode}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_procedurecode}"/>
+                    <h:outputText value="#{txInstanceController.selected.procedurecode}" title="#{txBundle.ViewTxInstanceTitle_procedurecode}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_shortcomment}"/>
+                    <h:outputText value="#{txInstanceController.selected.shortcomment}" title="#{txBundle.ViewTxInstanceTitle_shortcomment}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_hospitalname}"/>
+                    <h:outputText value="#{txInstanceController.selected.hospitalname}" title="#{txBundle.ViewTxInstanceTitle_hospitalname}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_hospitalser}"/>
+                    <h:outputText value="#{txInstanceController.selected.hospitalser}" title="#{txBundle.ViewTxInstanceTitle_hospitalser}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_physId}"/>
+                    <h:outputText value="#{txInstanceController.selected.physId}" title="#{txBundle.ViewTxInstanceTitle_physId}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_phys}"/>
+                    <h:outputText value="#{txInstanceController.selected.phys}" title="#{txBundle.ViewTxInstanceTitle_phys}"/>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_dt}"/>
+                    <h:outputText value="#{txInstanceController.selected.dt}" title="#{txBundle.ViewTxInstanceTitle_dt}">
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:outputText>
+                    <h:outputText value="#{txBundle.ViewTxInstanceLabel_id}"/>
+                    <h:outputText value="#{txInstanceController.selected.id}" title="#{txBundle.ViewTxInstanceTitle_id}"/>
+                </h:panelGrid>
+                <br />
+                <h:commandLink action="#{txInstanceController.destroyAndView}" value="#{txBundle.ViewTxInstanceDestroyLink}"/>
+                <br />
+                <br />
+                <h:link outcome="Edit" value="#{txBundle.ViewTxInstanceEditLink}"/>
+                <br />
+                <h:commandLink action="#{txInstanceController.prepareCreate}" value="#{txBundle.ViewTxInstanceCreateLink}" />
+                <br />
+                <h:commandLink action="#{txInstanceController.prepareList}" value="#{txBundle.ViewTxInstanceShowAllLink}"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{txBundle.ViewTxInstanceIndexLink}"/>
+
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

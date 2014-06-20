@@ -24,7 +24,7 @@ import org.apache.commons.math.stat.descriptive.*;
  */
 @Stateless
 public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
-    @PersistenceContext(unitName = "clinical`ActivityPU")
+    @PersistenceContext(unitName = "clinicalActivityPU")
     private EntityManager em;
 
     @Override
@@ -241,23 +241,24 @@ public class ActivityFacade extends AbstractFacade<ActivityAIPC> {
         String weekendString = "";
         
         if(imrtOnly) { 
-            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
+            imrtString = "AND p.shortcomment LIKE '%IMRT%' ";
         }
         
         if(!includeWeekends) {
-            weekendString = "AND FUNC('date_part', 'dow', a.fromdateofservice) <> 0 AND FUNC('date_part', 'dow', a.fromdateofservice) <> 6 ";
+            weekendString = "AND date_part('dow', a.fromdateofservice) <> 0 AND date_part('dow', a.fromdateofservice) <> 6 ";
         }
         
         javax.persistence.Query q = getEntityManager()
-                .createQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
-                        " FROM ActivityAIPC a " +
+                .createNativeQuery("SELECT a.fromdateofservice, count(a.actinstproccodeser) " + 
+                        " FROM actinstproccode a, procedurecode p " +
                         "WHERE a.fromdateofservice IS NOT NULL " +
-                        "AND a.fromdateofservice >= :start AND a.fromdateofservice <= :end " +
-                        "AND a.procedurecodeser.procedurecode != '00000' " + imrtString + weekendString +
+                        "AND a.fromdateofservice >= ? AND a.fromdateofservice <= ? " +
+                        "AND a.procedurecodeser = p.procedurecodeser " +
+                        "AND p.procedurecode != '00000' " + imrtString + weekendString +
                         "GROUP BY a.fromdateofservice " + 
                         "ORDER BY a.fromdateofservice ASC") 
-                .setParameter("start", start)
-                .setParameter("end", end);
+                .setParameter(1, start)
+                .setParameter(2, end);
         List<Object[]> retval = q.getResultList();
         return retval;
     }

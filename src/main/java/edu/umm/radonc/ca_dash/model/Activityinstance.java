@@ -64,8 +64,8 @@ public class Activityinstance implements Serializable {
     @JoinColumn(name = "departmentser", referencedColumnName = "departmentser")
     @ManyToOne
     private Department departmentser;*/
-    @OneToMany(mappedBy = "activityinstanceser")
-    private Collection<Activitycapture> activitycaptureCollection;
+    //@OneToMany(mappedBy = "activityinstanceser")
+    //private Collection<Activitycapture> activitycaptureCollection;
 
     public Activityinstance() {
     }
@@ -122,14 +122,14 @@ public class Activityinstance implements Serializable {
         this.departmentser = departmentser;
     }*/
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<Activitycapture> getActivitycaptureCollection() {
         return activitycaptureCollection;
     }
 
     public void setActivitycaptureCollection(Collection<Activitycapture> activitycaptureCollection) {
         this.activitycaptureCollection = activitycaptureCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {

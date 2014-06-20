@@ -56,8 +56,8 @@ public class Course implements Serializable {
     @Column(name = "hstrydatetime")
     @Temporal(TemporalType.DATE)
     private Date hstrydatetime;
-    @OneToMany(mappedBy = "courseser")
-    private Collection<Activitycapture> activitycaptureCollection;
+    //@OneToMany(mappedBy = "courseser")
+    //private Collection<Activitycapture> activitycaptureCollection;
 
     public Course() {
     }

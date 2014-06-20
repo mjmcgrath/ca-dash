@@ -10,6 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -20,17 +21,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
- * @author michaelmcgrath
+ * @author mmcgrath
  */
 @Entity
-@Table(name = "tx_flat")
+@Table(name = "tx_flat_t")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "TxInstance.findAll", query = "SELECT t FROM TxInstance t"),
+    @NamedQuery(name = "TxInstance.findByActivityinstanceser", query = "SELECT t FROM TxInstance t WHERE t.activityinstanceser = :activityinstanceser"),
+    @NamedQuery(name = "TxInstance.findByObjectstatus", query = "SELECT t FROM TxInstance t WHERE t.objectstatus = :objectstatus"),
+    @NamedQuery(name = "TxInstance.findByActivitycaptureser", query = "SELECT t FROM TxInstance t WHERE t.activitycaptureser = :activitycaptureser"),
     @NamedQuery(name = "TxInstance.findByPatientser", query = "SELECT t FROM TxInstance t WHERE t.patientser = :patientser"),
+    @NamedQuery(name = "TxInstance.findByActivitycode", query = "SELECT t FROM TxInstance t WHERE t.activitycode = :activitycode"),
     @NamedQuery(name = "TxInstance.findByProcedurecode", query = "SELECT t FROM TxInstance t WHERE t.procedurecode = :procedurecode"),
     @NamedQuery(name = "TxInstance.findByShortcomment", query = "SELECT t FROM TxInstance t WHERE t.shortcomment = :shortcomment"),
-    @NamedQuery(name = "TxInstance.findByActivitycode", query = "SELECT t FROM TxInstance t WHERE t.activitycode = :activitycode"),
     @NamedQuery(name = "TxInstance.findByHospitalname", query = "SELECT t FROM TxInstance t WHERE t.hospitalname = :hospitalname"),
     @NamedQuery(name = "TxInstance.findByHospitalser", query = "SELECT t FROM TxInstance t WHERE t.hospitalser = :hospitalser"),
     @NamedQuery(name = "TxInstance.findByPhysId", query = "SELECT t FROM TxInstance t WHERE t.physId = :physId"),
@@ -38,17 +42,25 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "TxInstance.findByDt", query = "SELECT t FROM TxInstance t WHERE t.dt = :dt")})
 public class TxInstance implements Serializable {
     private static final long serialVersionUID = 1L;
+     @Id
+    @Column(name = "activityinstanceser")
+    private Integer activityinstanceser;
+    @Size(max = 25)
+    @Column(name = "objectstatus")
+    private String objectstatus;
+    @Column(name = "activitycaptureser")
+    private Integer activitycaptureser;
     @Column(name = "patientser")
     private Integer patientser;
+    @Size(max = 255)
+    @Column(name = "activitycode")
+    private String activitycode;
     @Size(max = 255)
     @Column(name = "procedurecode")
     private String procedurecode;
     @Size(max = 255)
     @Column(name = "shortcomment")
     private String shortcomment;
-    @Size(max = 255)
-    @Column(name = "activitycode")
-    private String activitycode;
     @Size(max = 255)
     @Column(name = "hospitalname")
     private String hospitalname;
@@ -66,12 +78,44 @@ public class TxInstance implements Serializable {
     public TxInstance() {
     }
 
+    public Integer getActivityinstanceser() {
+        return activityinstanceser;
+    }
+
+    public void setActivityinstanceser(Integer activityinstanceser) {
+        this.activityinstanceser = activityinstanceser;
+    }
+
+    public String getObjectstatus() {
+        return objectstatus;
+    }
+
+    public void setObjectstatus(String objectstatus) {
+        this.objectstatus = objectstatus;
+    }
+
+    public Integer getActivitycaptureser() {
+        return activitycaptureser;
+    }
+
+    public void setActivitycaptureser(Integer activitycaptureser) {
+        this.activitycaptureser = activitycaptureser;
+    }
+
     public Integer getPatientser() {
         return patientser;
     }
 
     public void setPatientser(Integer patientser) {
         this.patientser = patientser;
+    }
+
+    public String getActivitycode() {
+        return activitycode;
+    }
+
+    public void setActivitycode(String activitycode) {
+        this.activitycode = activitycode;
     }
 
     public String getProcedurecode() {
@@ -88,14 +132,6 @@ public class TxInstance implements Serializable {
 
     public void setShortcomment(String shortcomment) {
         this.shortcomment = shortcomment;
-    }
-
-    public String getActivitycode() {
-        return activitycode;
-    }
-
-    public void setActivitycode(String activitycode) {
-        this.activitycode = activitycode;
     }
 
     public String getHospitalname() {

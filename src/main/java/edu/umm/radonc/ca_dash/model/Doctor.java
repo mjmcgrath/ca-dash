@@ -53,8 +53,8 @@ public class Doctor implements Serializable {
     private String middlename;
     @Column(name = "oncologistflag")
     private Boolean oncologistflag;
-    @OneToMany(mappedBy = "attendingoncologistser")
-    private Collection<Activitycapture> activitycaptureCollection;
+    //@OneToMany(mappedBy = "attendingoncologistser")
+    //private Collection<Activitycapture> activitycaptureCollection;
 
     public Doctor() {
     }

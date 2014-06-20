@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <ui:composition template="/template.xhtml">
+        <ui:define name="title">
+            <h:outputText value="#{txBundle.EditTxInstanceTitle}"></h:outputText>
+        </ui:define>
+        <ui:define name="body">
+            <h:panelGroup id="messagePanel" layout="block">
+                <h:messages errorStyle="color: red" infoStyle="color: green" layout="table"/>
+            </h:panelGroup>
+            <h:form>
+                <h:panelGrid columns="2">
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_activityinstanceser}" for="activityinstanceser" />
+                    <h:inputText id="activityinstanceser" value="#{txInstanceController.selected.activityinstanceser}" title="#{txBundle.EditTxInstanceTitle_activityinstanceser}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_objectstatus}" for="objectstatus" />
+                    <h:inputText id="objectstatus" value="#{txInstanceController.selected.objectstatus}" title="#{txBundle.EditTxInstanceTitle_objectstatus}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_activitycaptureser}" for="activitycaptureser" />
+                    <h:inputText id="activitycaptureser" value="#{txInstanceController.selected.activitycaptureser}" title="#{txBundle.EditTxInstanceTitle_activitycaptureser}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_patientser}" for="patientser" />
+                    <h:inputText id="patientser" value="#{txInstanceController.selected.patientser}" title="#{txBundle.EditTxInstanceTitle_patientser}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_activitycode}" for="activitycode" />
+                    <h:inputText id="activitycode" value="#{txInstanceController.selected.activitycode}" title="#{txBundle.EditTxInstanceTitle_activitycode}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_procedurecode}" for="procedurecode" />
+                    <h:inputText id="procedurecode" value="#{txInstanceController.selected.procedurecode}" title="#{txBundle.EditTxInstanceTitle_procedurecode}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_shortcomment}" for="shortcomment" />
+                    <h:inputText id="shortcomment" value="#{txInstanceController.selected.shortcomment}" title="#{txBundle.EditTxInstanceTitle_shortcomment}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_hospitalname}" for="hospitalname" />
+                    <h:inputText id="hospitalname" value="#{txInstanceController.selected.hospitalname}" title="#{txBundle.EditTxInstanceTitle_hospitalname}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_hospitalser}" for="hospitalser" />
+                    <h:inputText id="hospitalser" value="#{txInstanceController.selected.hospitalser}" title="#{txBundle.EditTxInstanceTitle_hospitalser}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_physId}" for="physId" />
+                    <h:inputText id="physId" value="#{txInstanceController.selected.physId}" title="#{txBundle.EditTxInstanceTitle_physId}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_phys}" for="phys" />
+                    <h:inputText id="phys" value="#{txInstanceController.selected.phys}" title="#{txBundle.EditTxInstanceTitle_phys}" />
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_dt}" for="dt" />
+                    <h:inputText id="dt" value="#{txInstanceController.selected.dt}" title="#{txBundle.EditTxInstanceTitle_dt}" >
+                        <f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+                    </h:inputText>
+                    <h:outputLabel value="#{txBundle.EditTxInstanceLabel_id}" for="id" />
+                    <h:inputText id="id" value="#{txInstanceController.selected.id}" title="#{txBundle.EditTxInstanceTitle_id}" />
+                </h:panelGrid>
+                <h:commandLink action="#{txInstanceController.update}" value="#{txBundle.EditTxInstanceSaveLink}"/>
+                <br />
+                <br />
+                <h:link outcome="View" value="#{txBundle.EditTxInstanceViewLink}"/>
+                <br />
+                <h:commandLink action="#{txInstanceController.prepareList}" value="#{txBundle.EditTxInstanceShowAllLink}" immediate="true"/>
+                <br />
+                <br />
+                <h:link outcome="/index" value="#{txBundle.EditTxInstanceIndexLink}" />
+            </h:form>
+        </ui:define>
+    </ui:composition>
+
+</html>

@@ -55,8 +55,8 @@ public class Procedure implements Serializable {
     @Size(max = 255)
     @Column(name = "shortcomment")
     private String shortcomment;
-    @OneToMany(mappedBy = "procedurecodeser")
-    private Collection<ActivityAIPC> activityCollection;
+   //@OneToMany(mappedBy = "procedurecodeser")
+    //private Collection<ActivityAIPC> activityCollection;
 
     public Procedure() {
     }

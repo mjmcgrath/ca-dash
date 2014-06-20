@@ -46,8 +46,8 @@ public class Activity implements Serializable {
     @Size(max = 255)
     @Column(name = "objectstatus")
     private String objectstatus;
-    @OneToMany(mappedBy = "activityser")
-    private Collection<Activityinstance> activityinstanceCollection;
+   // @OneToMany(mappedBy = "activityser")
+    //private Collection<Activityinstance> activityinstanceCollection;
 
     public Activity() {
     }
@@ -80,14 +80,14 @@ public class Activity implements Serializable {
         this.objectstatus = objectstatus;
     }
 
-    @XmlTransient
+    /*@XmlTransient
     public Collection<Activityinstance> getActivityinstanceCollection() {
         return activityinstanceCollection;
     }
 
     public void setActivityinstanceCollection(Collection<Activityinstance> activityinstanceCollection) {
         this.activityinstanceCollection = activityinstanceCollection;
-    }
+    }*/
 
     @Override
     public int hashCode() {
