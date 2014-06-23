@@ -640,10 +640,19 @@ public class TxInstanceController implements Serializable {
         }
     }
     
+    private String filterString() {
+        String retval = "";
+        for(String item : selectedFilters ) {
+            retval += "," + item;
+        }
+        return retval;
+    }
+    
     public void drawWeekly(DateFormat df) {
         this.weeklyChart.clear();
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
+
         weeklyChartmax = 0;
         //int curSeries = 0;
         List<Object[]> events;
