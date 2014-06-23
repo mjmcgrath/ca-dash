@@ -46,8 +46,12 @@ public class PieChartController implements Serializable{
     private String interval;
 
     public PieChartController() {
-        this.startDate = new Date();
-        this.endDate = new Date();
+        endDate = new Date();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(endDate);
+        gc.add(Calendar.MONTH, -1);
+        startDate = gc.getTime();
+        interval="1m";
         this.df =  new SimpleDateFormat("MM/dd/YYYY");
         this.selectedFacility = new Long(-1);
         this.dstats = new SynchronizedDescriptiveStatistics();

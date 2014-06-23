@@ -65,7 +65,7 @@ public class HistogramController implements Serializable {
     private Date startDate;
     private Date endDate;
     private DateFormat df;
-    private List<Integer> selectedFacilities;
+    private Long selectedFacility;
     private Date selectedDate;
     private double percentile;
     private double percentileVal;
@@ -79,12 +79,22 @@ public class HistogramController implements Serializable {
         histogram = new CartesianChartModel();
         percentile = 50.0;
         dstats = new SynchronizedDescriptiveStatistics();
-        startDate = new Date();
         endDate = new Date();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(endDate);
+        gc.add(Calendar.MONTH, -1);
+        startDate = gc.getTime();
+        interval="1m";
+
+        selectedFacility = new Long(-1);
     }
     
     private TxInstanceFacade getFacade() {
         return ejbFacade;
+    }
+    
+    private edu.umm.radonc.ca_dash.model.HospitalFacade getHospitalFacade(){
+        return hFacade;
     }
 
     public Date getStartDate() {
@@ -103,12 +113,12 @@ public class HistogramController implements Serializable {
         this.endDate = endDate;
     }
 
-    public List<Integer> getSelectedFacilities() {
-        return selectedFacilities;
+    public Long getSelectedFacility() {
+        return selectedFacility;
     }
 
-    public void setSelectedFacilities(List<Integer> selectedFacilities) {
-        this.selectedFacilities = selectedFacilities;
+    public void setSelectedFacility(Long selectedFacility) {
+        this.selectedFacility = selectedFacility;
     }
     
     public CartesianChartModel getHistogram() {
@@ -228,13 +238,8 @@ public class HistogramController implements Serializable {
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
-        if( hospital != null && hospital > 0) {
-            stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
-        }
-        else {
-            stats = getFacade().getDailyStats(startDate, endDate, new Long(-1), imrtOnly, includeWeekends);
-        }
-        
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        String label = "All";
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
         
@@ -253,12 +258,16 @@ public class HistogramController implements Serializable {
                 count = 1;
             }
         }
+        if ( hospital > 0 ) {
+            label = getHospitalFacade().find(hospital.intValue()).getHospitalname();
+        }
+        histo.setLabel(label);
         return histo;
     }
     
     public void drawHistogram() {
         this.histogram = new CartesianChartModel();
-        histogram.addSeries(buildHistogram(new Long(-1)));
+        histogram.addSeries(buildHistogram(selectedFacility));
     }
     
 }

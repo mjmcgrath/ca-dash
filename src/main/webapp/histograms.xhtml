@@ -36,12 +36,13 @@
                     <p:ajax event="change" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton>
                 <label class='hdr' for="facility">Facility: </label>
-                <p:selectManyCheckbox id="facility" value="#{histogramController.selectedFacilities}" layout="pageDirection">
+                <p:selectOneRadio id="facility" value="#{histogramController.selectedFacility}" layout="pageDirection">
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
                     </c:forEach>
-                </p:selectManyCheckbox>
+                </p:selectOneRadio>
+                <br/>
                 <br/>
                 <label class="hdr">Other: </label><br/>
                 <p:selectBooleanCheckbox value="#{histogramController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
@@ -57,6 +58,7 @@
         </ui:define>
 
         <ui:define name="body">
+            <f:event type="preRenderComponent" listener="#{histogramController.drawHistogram}"/>
             <p:panel id="histoControls">
                 <h:form>
                     <h:panelGrid columns="2" style="margin-bottom: 10px">

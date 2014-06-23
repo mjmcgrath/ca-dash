@@ -34,13 +34,13 @@ public class NavigationController implements Serializable {
         String redirect="";
         switch(selectedReport) {
             case "histograms":
-                redirect = "faces/histograms.xhtml";
+                redirect = "/ca-dash/faces/histograms.xhtml";
                 break;
             case "trends":
-                redirect = "faces/trends.xhtml";
+                redirect = "/ca-dash/faces/trends.xhtml";
                 break;
             case "physicians":
-                redirect = "faces/physicians.xhtml";
+                redirect = "/ca-dash/faces/physicians.xhtml";
                 break;   
         }
         try {

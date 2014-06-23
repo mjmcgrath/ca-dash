@@ -6,6 +6,7 @@
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     
     <ui:composition template="reportTemplate.xhtml">
+        
         <ui:define name="supplemental_js">
             <h:outputScript name="js/jqplot.barRenderer.js" />
         </ui:define>
@@ -26,6 +27,31 @@
                     <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
                 </p:calendar>
                 <br/><br/>
+                 <p:selectOneButton id="selectCal" value="#{txInstanceController.interval}">
+                    <f:selectItem itemLabel="7d" itemValue="1wk" />
+                    <f:selectItem itemLabel="1m" itemValue="1m" />
+                    <f:selectItem itemLabel="3m" itemValue="3m" />
+                    <f:selectItem itemLabel="6m" itemValue="6m" />
+                    <f:selectItem itemLabel="1y" itemValue="1y" />
+                    <f:selectItem itemLabel="2y" itemValue="2y" />
+                    <f:selectItem itemLabel="3y" itemValue="3y" />
+                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton><br/>
+                <p:selectOneButton id="selectQtr" value="#{txInstanceController.interval}">
+                    <f:selectItem itemLabel="Q1" itemValue="Q1" />
+                    <f:selectItem itemLabel="Q2" itemValue="Q2" />
+                    <f:selectItem itemLabel="Q3" itemValue="Q3" />
+                    <f:selectItem itemLabel="Q4" itemValue="Q4" />
+                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton>
+                <br/><br/>
+                <label class='hdr' for="timeInterval">Granularity: </label>
+                <p:selectManyCheckbox id="timeInterval" value="#{txInstanceController.selectedTimeIntervals}" layout="pageDirection">
+                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{txInstanceController.disableDailyCheckbox}"/>
+                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{txInstanceController.disableWeeklyCheckbox}"/>
+                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{txInstanceController.disableMonthlyCheckbox}"/>
+                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{txInstanceController.disableYearlyCheckbox}"/>
+                </p:selectManyCheckbox><br/>
                 <label class='hdr' for="facility">Facility: </label>
                 <p:selectManyCheckbox id="facility" value="#{txInstanceController.selectedFacilities}" layout="pageDirection">
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
@@ -34,23 +60,20 @@
                     </c:forEach>
                 </p:selectManyCheckbox>
                 <br/>
-                <label class='hdr' for="timeInterval">Granularity: </label>
-                <p:selectManyCheckbox id="timeInterval" value="#{txInstanceController.selectedTimeIntervals}" layout="pageDirection">
-                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{txInstanceController.disableDailyCheckbox}"/>
-                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{txInstanceController.disableWeeklyCheckbox}"/>
-                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{txInstanceController.disableMonthlyCheckbox}"/>
-                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{txInstanceController.disableYearlyCheckbox}"/>
-                </p:selectManyCheckbox><br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectBooleanCheckbox value="#{txInstanceController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
-                <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
                 <p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                <p:selectManyCheckbox id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
+                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
+                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
+                </p:selectManyCheckbox><br/>
                 <p:commandButton value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" /> 
             </h:form>
             
         </ui:define>
 
         <ui:define name="body">
+            <f:event type="preRenderComponent" listener="#{txInstanceController.draw}"/>
             <p:tabView id="charts" orientation="bottom" dynamic="true">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <p:panel id="stats">
@@ -123,17 +146,17 @@
                 </p:tab>
                 <p:tab title="Monthly" disabled="#{txInstanceController.hideMonthlyTab}">
                      <p:panel>
-                        <!--h:form> 
+                        <h:form> 
                         <p:selectOneButton value="#{txInstanceController.monthlyDisplayMode}">
                             <f:selectItem itemLabel="Raw" itemValue="Raw" />
                             <f:selectItem itemLabel="Summary" itemValue="Summary" />
                             <p:ajax listener="#{txInstanceController.draw}" update=":charts:monthlyBarChart,@(form)"/>
                         </p:selectOneButton>
-                        </h:form-->
+                        </h:form>
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <!--p:barChart id="monthlyBarChart" value="#{txInstanceController.monthlyBarChart}" legendPosition="ne"  
+                    <p:barChart id="monthlyBarChart" value="#{txInstanceController.monthlyBarChart}" legendPosition="ne"  
                         title="Monthly Activities" min="0" xaxisAngle="45" 
                         shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
 
@@ -143,7 +166,7 @@
                                 this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
                                 this.cfg.seriesDefaults.rendererOptions.errorData = #{txInstanceController.monthlyErrorBars};
                                 this.cfg.seriesDefaults.rendererOptions.errorTextData = #{txInstanceController.monthlyErrorLabels};
-                        }" /-->
+                        }"/>
                 </p:tab>
                 <p:tab title="Raw Data">
                     <!--p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"

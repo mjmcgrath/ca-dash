@@ -47,6 +47,7 @@
         </ui:define>
 
         <ui:define name="body">
+            <f:event type="preRenderComponent" listener="#{pieChartController.draw}"/>
             <p:pieChart id="physicianWorkload" value="#{pieChartController.pieChart}" legendPosition="ne" widgetVar="pieChartD"
                         shadow="false" style="height:650px;"
                         showDataLabels="true" dataFormat="value"

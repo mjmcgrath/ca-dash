@@ -18,10 +18,10 @@
 
     <h:body>
         <p:layout fullPage="true">
-            <p:layoutUnit position="north" size="75" resizable="false" closable="true" collapsible="true" id="layoutHeader">
+            <p:layoutUnit position="north" size="105" resizable="false" closable="true" collapsible="true" id="layoutHeader">
                 <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
-                <h:form>
-                    <p:selectOneMenu value="#{navigationController.selectedReport}">
+                <h:form id="navCtrl">
+                    <p:selectOneMenu  value="#{navigationController.selectedReport}">
                         <f:selectItem itemLabel="Treatment Trends" itemValue="trends" />
                         <f:selectItem itemLabel="Histograms" itemValue="histograms" />
                         <f:selectItem itemLabel="Physician Workload" itemValue="physicians" />

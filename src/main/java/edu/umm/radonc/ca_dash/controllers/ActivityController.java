@@ -3,6 +3,7 @@ package edu.umm.radonc.ca_dash.controllers;
 import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
+import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
@@ -81,6 +82,7 @@ public class ActivityController implements Serializable {
     private String monthlyDisplayMode;
     private Integer weeklyChartmax;
     private Integer monthlyChartmax;
+    private String interval;
     
     public ActivityController() {
         df = new SimpleDateFormat("MM/dd/yy");
@@ -177,6 +179,15 @@ public class ActivityController implements Serializable {
     public List<String> getSelectedTimeIntervals() {
         return selectedTimeIntervals;
     }
+
+    public String getInterval() {
+        return interval;
+    }
+
+    public void setInterval(String interval) {
+        this.interval = interval;
+    }
+    
 
     public String getWeeklyErrorBars() {
         return weeklyErrorBars.toString();
@@ -893,6 +904,67 @@ public class ActivityController implements Serializable {
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {
         return getFacade().getMonthlyStats(startDate, endDate, imrtOnly, includeWeekends);
+    }
+    
+     public void onSelectTimePeriod(){
+        endDate = new Date();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(endDate);
+        
+        switch(interval) {
+            case "1wk":
+                gc.add(Calendar.DATE, -7);
+                startDate = gc.getTime();
+                break;
+            case "1m":
+                gc.add(Calendar.MONTH, -1);
+                startDate = gc.getTime();
+                break;
+            case "3m":
+                gc.add(Calendar.MONTH, -3);
+                startDate = gc.getTime();
+                break;
+            case "6m":
+                gc.add(Calendar.MONTH, -6);
+                startDate = gc.getTime();
+                break;
+            case "1y":
+                gc.add(Calendar.YEAR, -1);
+                startDate = gc.getTime();
+                break;
+            case "2y":
+                gc.add(Calendar.YEAR, -2);
+                startDate = gc.getTime();
+                break;
+            case "3y":
+                gc.add(Calendar.YEAR, -3);
+                startDate = gc.getTime();
+                break;
+            case "Q1":
+                gc.setTime(FiscalDate.getQuarter(1));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q2":
+                gc.setTime(FiscalDate.getQuarter(2));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q3":
+                gc.setTime(FiscalDate.getQuarter(3));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q4":
+                gc.setTime(FiscalDate.getQuarter(4));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+        }
     }
 
     @FacesConverter(forClass = ActivityAIPC.class)

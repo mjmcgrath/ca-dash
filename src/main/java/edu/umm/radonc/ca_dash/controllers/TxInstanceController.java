@@ -3,6 +3,7 @@ package edu.umm.radonc.ca_dash.controllers;
 import edu.umm.radonc.ca_dash.model.TxInstance;
 import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
+import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
@@ -82,6 +83,9 @@ public class TxInstanceController implements Serializable {
     private String monthlyDisplayMode;
     private Integer weeklyChartmax;
     private Integer monthlyChartmax;
+    private String interval;
+    private List<String> selectedFilters;
+    
     
     public TxInstanceController() {
         df = new SimpleDateFormat("MM/dd/yy");
@@ -167,6 +171,14 @@ public class TxInstanceController implements Serializable {
     public void setMonthlyDisplayMode(String monthlyDisplayMode) {
         this.monthlyDisplayMode = monthlyDisplayMode;
     }
+
+    public String getInterval() {
+        return interval;
+    }
+
+    public void setInterval(String interval) {
+        this.interval = interval;
+    }
     
     public void setSelectedFacilities(List<String> selectedFacilities) {
         this.selectedFacilities = new ArrayList<>();
@@ -197,6 +209,14 @@ public class TxInstanceController implements Serializable {
 
     public void setSelectedTimeIntervals(List<String> selectedTimeSpans) {
         this.selectedTimeIntervals = selectedTimeSpans;
+    }
+
+    public List<String> getSelectedFilters() {
+        return selectedFilters;
+    }
+
+    public void setSelectedFilters(List<String> selectedFilters) {
+        this.selectedFilters = selectedFilters;
     }
 
     public void setSelected(TxInstance selected) {
@@ -592,7 +612,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public void drawDaily(DateFormat df) {
-        this.dailyChart = new CartesianChartModel();
+        this.dailyChart.clear();
         int curSeries = 0;
         List<Object[]> events;
         
@@ -621,8 +641,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public void drawWeekly(DateFormat df) {
-        this.weeklyChart = new CartesianChartModel();
-        this.weeklyChart = new CartesianChartModel();
+        this.weeklyChart.clear();
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
         weeklyChartmax = 0;
@@ -680,6 +699,7 @@ public class TxInstanceController implements Serializable {
                         errorData.put(errorItem);
                         errorTextData.put("");
                     } catch (Exception e) {
+                        System.out.println("error bar generation failed");
                     }
                     if(Double.isNaN(yval)) {
                         yval = 0.0;
@@ -698,8 +718,6 @@ public class TxInstanceController implements Serializable {
                 Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
-                this.weeklyErrorBars = new JSONArray();
-                this.weeklyErrorBars = new JSONArray();
                 
                 for(Date key : wTrSumStats.keySet()) {
                     String xval = this.df.format(key);
@@ -873,6 +891,67 @@ public class TxInstanceController implements Serializable {
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {
         return getFacade().getMonthlyStats(startDate, endDate, imrtOnly, includeWeekends);
+    }
+    
+    public void onSelectTimePeriod(){
+        endDate = new Date();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(endDate);
+        
+        switch(interval) {
+            case "1wk":
+                gc.add(Calendar.DATE, -7);
+                startDate = gc.getTime();
+                break;
+            case "1m":
+                gc.add(Calendar.MONTH, -1);
+                startDate = gc.getTime();
+                break;
+            case "3m":
+                gc.add(Calendar.MONTH, -3);
+                startDate = gc.getTime();
+                break;
+            case "6m":
+                gc.add(Calendar.MONTH, -6);
+                startDate = gc.getTime();
+                break;
+            case "1y":
+                gc.add(Calendar.YEAR, -1);
+                startDate = gc.getTime();
+                break;
+            case "2y":
+                gc.add(Calendar.YEAR, -2);
+                startDate = gc.getTime();
+                break;
+            case "3y":
+                gc.add(Calendar.YEAR, -3);
+                startDate = gc.getTime();
+                break;
+            case "Q1":
+                gc.setTime(FiscalDate.getQuarter(1));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q2":
+                gc.setTime(FiscalDate.getQuarter(2));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q3":
+                gc.setTime(FiscalDate.getQuarter(3));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+            case "Q4":
+                gc.setTime(FiscalDate.getQuarter(4));
+                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
+                break;
+        }
     }
 
     @FacesConverter(forClass = TxInstance.class)

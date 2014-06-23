@@ -199,7 +199,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mo, date_part('week', tf.dt) AS wk, count(DISTINCT tf.patientser) " +
                 "FROM tx_flat_s tf " +
-                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ?" +
+                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
                 "AND tf.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
                 .setParameter(1, startDate)
@@ -235,8 +235,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mn, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_s " +
-                "AND  tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
+                "FROM tx_flat_s tf " +
+                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
                 "AND tf.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mn ORDER BY yr,mn ASC;")
                 .setParameter(1, startDate)
