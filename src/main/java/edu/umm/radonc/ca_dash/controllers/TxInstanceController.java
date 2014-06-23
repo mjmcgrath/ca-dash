@@ -620,12 +620,6 @@ public class TxInstanceController implements Serializable {
         }
     }
     
-    
-    public void drawHistogram() {
-        this.dailyChart = new CartesianChartModel();
-        dailyChart.addSeries(histogram(new Long(-1)));
-    }
-    
     public void drawWeekly(DateFormat df) {
         this.weeklyChart = new CartesianChartModel();
         this.weeklyChart = new CartesianChartModel();
@@ -724,6 +718,7 @@ public class TxInstanceController implements Serializable {
                             errorData.put(errorItem);
                             errorTextData.put("");
                         } catch (Exception e) {
+                            System.out.println("error bar generation failed");
                         }
                     } else {
                         //FIXME

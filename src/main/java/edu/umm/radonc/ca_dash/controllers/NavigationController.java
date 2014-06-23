@@ -39,6 +39,9 @@ public class NavigationController implements Serializable {
             case "trends":
                 redirect = "faces/trends.xhtml";
                 break;
+            case "physicians":
+                redirect = "faces/physicians.xhtml";
+                break;   
         }
         try {
             FacesContext.getCurrentInstance().getExternalContext().redirect(redirect);

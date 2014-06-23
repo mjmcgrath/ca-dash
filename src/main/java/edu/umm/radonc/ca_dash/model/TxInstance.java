@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author mmcgrath
  */
 @Entity
-@Table(name = "tx_flat_t")
+@Table(name = "tx_flat_s")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "TxInstance.findAll", query = "SELECT t FROM TxInstance t"),
@@ -72,7 +72,7 @@ public class TxInstance implements Serializable {
     @Column(name = "phys")
     private String phys;
     @Column(name = "dt")
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date dt;
 
     public TxInstance() {

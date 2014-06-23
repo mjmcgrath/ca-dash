@@ -17,17 +17,17 @@
             <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
             <h:form id="filters">
                 <label class='hdr'>Start Date: </label>
-                <p:calendar value="#{activityController.startDate}" id="startCal">
-                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                <p:calendar value="#{txInstanceController.startDate}" id="startCal">
+                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
                 </p:calendar>
                 <br/>
                 <label class='hdr'>End Date: </label>
-                <p:calendar value="#{activityController.endDate}" id="endCal">
-                    <p:ajax event="dateSelect" listener="#{activityController.handleDateSelect}" update="@(form)" /> 
+                <p:calendar value="#{txInstanceController.endDate}" id="endCal">
+                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
                 </p:calendar>
                 <br/><br/>
                 <label class='hdr' for="facility">Facility: </label>
-                <p:selectManyCheckbox id="facility" value="#{activityController.selectedFacilities}" layout="pageDirection">
+                <p:selectManyCheckbox id="facility" value="#{txInstanceController.selectedFacilities}" layout="pageDirection">
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
@@ -35,44 +35,40 @@
                 </p:selectManyCheckbox>
                 <br/>
                 <label class='hdr' for="timeInterval">Granularity: </label>
-                <p:selectManyCheckbox id="timeInterval" value="#{activityController.selectedTimeIntervals}" layout="pageDirection">
-                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{activityController.disableDailyCheckbox}"/>
-                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{activityController.disableWeeklyCheckbox}"/>
-                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{activityController.disableMonthlyCheckbox}"/>
-                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{activityController.disableYearlyCheckbox}"/>
+                <p:selectManyCheckbox id="timeInterval" value="#{txInstanceController.selectedTimeIntervals}" layout="pageDirection">
+                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{txInstanceController.disableDailyCheckbox}"/>
+                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{txInstanceController.disableWeeklyCheckbox}"/>
+                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{txInstanceController.disableMonthlyCheckbox}"/>
+                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{txInstanceController.disableYearlyCheckbox}"/>
                 </p:selectManyCheckbox><br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectBooleanCheckbox value="#{activityController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
+                <p:selectBooleanCheckbox value="#{txInstanceController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
                 <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
-                <p:selectBooleanCheckbox value="#{activityController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
-                <!--p:inputText id="percentileInput" value="" />
-                <p:slider for="percentileInput">
-                    <p:ajax event="slideEnd" listener="" />
-                </p:slider-->
-                <p:commandButton value="Enter" actionListener="#{activityController.draw}" update=":charts" /> 
+                <p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                <p:commandButton value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" /> 
             </h:form>
-            <!--/p:fieldset-->
+            
         </ui:define>
 
         <ui:define name="body">
             <p:tabView id="charts" orientation="bottom" dynamic="true">
-                <p:tab title="Daily" disabled="#{activityController.hideDailyTab}">
+                <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <p:panel id="stats">
-                        Mean: <h:outputText value="#{activityController.dailySummary.mean}"/>
-                        Stddev: <h:outputText value="#{activityController.dailySummary.standardDeviation}"/>
+                        Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"/>
+                        Stddev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"/>
                     </p:panel>
-                    <p:barChart id="dailyBarChart" value="#{activityController.dailyBarChart}" legendPosition="ne" widgetVar="barChartD"
+                    <p:barChart id="dailyBarChart" value="#{txInstanceController.dailyBarChart}" legendPosition="ne" widgetVar="barChartD"
                         title="Daily Activities" min="0" xaxisAngle="45" 
                         shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
                         stacked="true">
-                        <p:ajax event="itemSelect" listener="#{activityController.itemSelect}" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" />
+                        <!--p:ajax event="itemSelect" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" /-->
                     </p:barChart>
-                    <p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
-                        <h3><h:outputText id="dlgDate" value ="#{activityController.selectedDate}" /></h3>
+                    <!--p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
+                        <h3><h:outputText id="dlgDate" value ="#{txInstanceController.selectedDate}" /></h3>
                         <hr/>
                         <p:dataTable
                             id="dailyDetail"
-                            value="#{activityController.dailyActivities}"
+                            value="#{txInstanceController.dailyActivities}"
                             var="item"
                         >
                         <p:column sortBy="shortcomment">
@@ -94,26 +90,26 @@
                             <h:outputText value="#{item.activityCount}"/>
                         </p:column>  
                         </p:dataTable>
-                    </p:dialog>
+                    </p:dialog-->
                 </p:tab>
-                <p:tab title="Weekly" disabled="#{activityController.hideWeeklyTab}">
+                <p:tab title="Weekly" disabled="#{txInstanceController.hideWeeklyTab}">
                     <p:panel>
                         <h:form> 
-                        <p:selectOneButton value="#{activityController.weeklyDisplayMode}">
+                        <p:selectOneButton value="#{txInstanceController.weeklyDisplayMode}">
                             <f:selectItem itemLabel="Raw" itemValue="Raw" />
                             <f:selectItem itemLabel="Summary" itemValue="Summary" />
-                            <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
+                            <p:ajax listener="#{txInstanceController.draw}" update=":charts:weeklyBarChart,@(form)"/>
                         </p:selectOneButton>
-                            <p:selectOneButton value="#{activityController.weeklySegmentationMode}">
+                            <p:selectOneButton value="#{txInstanceController.weeklySegmentationMode}">
                             <f:selectItem itemLabel="Trailing" itemValue="Trailing" />
                             <f:selectItem itemLabel="Absolute" itemValue="Absolute" />
-                            <p:ajax listener="#{activityController.draw}" update=":charts:weeklyBarChart,@(form)"/>
+                            <p:ajax listener="#{txInstanceController.draw}" update=":charts:weeklyBarChart,@(form)"/>
                         </p:selectOneButton>
                         </h:form>
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:barChart id="weeklyBarChart" value="#{activityController.weeklyBarChart}" legendPosition="ne"  
+                    <p:barChart id="weeklyBarChart" value="#{txInstanceController.weeklyBarChart}" legendPosition="ne"  
                         title="Weekly Activities" min="0" xaxisAngle="45" 
                         shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
 
@@ -121,23 +117,23 @@
                                 this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                 this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
                                 this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
-                                this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.weeklyErrorBars};
-                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.weeklyErrorLabels};
+                                this.cfg.seriesDefaults.rendererOptions.errorData = #{txInstanceController.weeklyErrorBars};
+                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{txInstanceController.weeklyErrorLabels};
                         }" />
                 </p:tab>
-                <p:tab title="Monthly" disabled="#{activityController.hideMonthlyTab}">
+                <p:tab title="Monthly" disabled="#{txInstanceController.hideMonthlyTab}">
                      <p:panel>
-                        <h:form> 
-                        <p:selectOneButton value="#{activityController.monthlyDisplayMode}">
+                        <!--h:form> 
+                        <p:selectOneButton value="#{txInstanceController.monthlyDisplayMode}">
                             <f:selectItem itemLabel="Raw" itemValue="Raw" />
                             <f:selectItem itemLabel="Summary" itemValue="Summary" />
-                            <p:ajax listener="#{activityController.draw}" update=":charts:monthlyBarChart,@(form)"/>
+                            <p:ajax listener="#{txInstanceController.draw}" update=":charts:monthlyBarChart,@(form)"/>
                         </p:selectOneButton>
-                        </h:form>
+                        </h:form-->
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:barChart id="monthlyBarChart" value="#{activityController.monthlyBarChart}" legendPosition="ne"  
+                    <!--p:barChart id="monthlyBarChart" value="#{txInstanceController.monthlyBarChart}" legendPosition="ne"  
                         title="Monthly Activities" min="0" xaxisAngle="45" 
                         shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
 
@@ -145,13 +141,13 @@
                                 this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
                                 this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
                                 this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
-                                this.cfg.seriesDefaults.rendererOptions.errorData = #{activityController.monthlyErrorBars};
-                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{activityController.monthlyErrorLabels};
-                        }" />
+                                this.cfg.seriesDefaults.rendererOptions.errorData = #{txInstanceController.monthlyErrorBars};
+                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{txInstanceController.monthlyErrorLabels};
+                        }" /-->
                 </p:tab>
                 <p:tab title="Raw Data">
-                    <p:dataTable id="datalist" value="#{activityController.lazyItems}" var="item"
-                         selectionMode="single" selection="#{activityController.selected}"
+                    <!--p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"
+                         selectionMode="single" selection="#{txInstanceController.selected}"
                          paginator="true"
                          lazy="true" 
                          rowKey="#{item.actinstproccodeser}"
@@ -206,7 +202,7 @@
                     </f:facet>
                     <h:outputText value="#{item.departmentser.departmentname}"/>
                 </p:column>
-            </p:dataTable>
+            </p:dataTable-->
                 </p:tab>
             </p:tabView>
         </ui:define>

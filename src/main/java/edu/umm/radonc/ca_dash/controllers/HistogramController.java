@@ -17,14 +17,15 @@ import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
+import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.time.*;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -42,18 +43,18 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
+import org.json.*;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.SortOrder;
 import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
-import org.json.*;
 
 @Named("histogramController")
 @SessionScoped
 public class HistogramController implements Serializable {
     
     @EJB
-    private edu.umm.radonc.ca_dash.model.ActivityFacade ejbFacade;
+    private edu.umm.radonc.ca_dash.model.TxInstanceFacade ejbFacade;
     
     @EJB
     private edu.umm.radonc.ca_dash.model.HospitalFacade hFacade;
@@ -78,9 +79,11 @@ public class HistogramController implements Serializable {
         histogram = new CartesianChartModel();
         percentile = 50.0;
         dstats = new SynchronizedDescriptiveStatistics();
+        startDate = new Date();
+        endDate = new Date();
     }
     
-    private ActivityFacade getFacade() {
+    private TxInstanceFacade getFacade() {
         return ejbFacade;
     }
 
@@ -131,7 +134,7 @@ public class HistogramController implements Serializable {
             dstats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
         }
         else {
-            dstats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1), imrtOnly, includeWeekends);
         }
         percentileVal = dstats.getPercentile(percentile);
     }
@@ -229,7 +232,7 @@ public class HistogramController implements Serializable {
             stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
         }
         else {
-            stats = getFacade().getDailyStats(startDate, endDate, imrtOnly, includeWeekends);
+            stats = getFacade().getDailyStats(startDate, endDate, new Long(-1), imrtOnly, includeWeekends);
         }
         
         //Freedman-Diaconis bin width

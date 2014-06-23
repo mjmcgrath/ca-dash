@@ -24,6 +24,7 @@
                     <p:selectOneMenu value="#{navigationController.selectedReport}">
                         <f:selectItem itemLabel="Treatment Trends" itemValue="trends" />
                         <f:selectItem itemLabel="Histograms" itemValue="histograms" />
+                        <f:selectItem itemLabel="Physician Workload" itemValue="physicians" />
                         <p:ajax event="change" listener="#{navigationController.redirectReportSelector}" />
                     </p:selectOneMenu>
                 </h:form>
