@@ -35,20 +35,17 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         super(TxInstance.class);
     }
     
-     public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, boolean imrtOnly, boolean includeWeekends) {
+    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, String filter, boolean includeWeekends) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
         
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
-        String imrtString = "";
+        String imrtString = buildFilterString(filter);
         String weekendString = "";
         String hospString = "";
-        if(imrtOnly) { 
-            imrtString = "AND a.procedurecodeser.shortcomment LIKE '%IMRT%' ";
-        }
         
         //if(!includeWeekends) {
-           weekendString = " AND date_part('dow', dt) <> 0 AND date_part('dow', dt) <> 6 ";
+        weekendString = " AND date_part('dow', dt) <> 0 AND date_part('dow', dt) <> 6 ";
         //}
         
         if(hospitalSer > 0) {
@@ -59,16 +56,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 .createNativeQuery("SELECT dt, COUNT (DISTINCT patientser) FROM tx_flat_s WHERE " +
                         " dt IS NOT NULL AND dt >= ? AND dt <= ? " +  
                         hospString +
-                        " AND (procedurecode = '77403' OR " +
-                        "procedurecode = '77408' OR " +
-                        "procedurecode = '77413' OR " +
-                        "procedurecode = '77404' OR " +
-                        "procedurecode = '77409' OR " +
-                        "procedurecode = '77414' OR " +
-                        "procedurecode = '77418' OR " +
-                        "procedurecode = '77416' OR " +
-                        "procedurecode = 'G0251' OR " +
-                        "procedurecode = 'G0173') " +
+                        imrtString +
                          weekendString +
                         "GROUP BY dt " +
                         "ORDER BY dt ASC") 
@@ -81,20 +69,20 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+    public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends) {
         SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
-        List<Object[]> counts = getDailyCounts(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        List<Object[]> counts = getDailyCounts(startDate, endDate, hospital, filter, includeWeekends);
         for(Object[] item : counts) {
             stats.addValue(((Long)item[1]).doubleValue());
         }
         return stats;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date startDate, Date endDate, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+    public TreeMap<String, SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends) {
         Calendar cal = new GregorianCalendar();
         TreeMap<String,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
-        List<Object[]> events  = getDailyCounts(startDate, endDate, hospitalser, imrtOnly, includeWeekends);
+        List<Object[]> events  = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends);
         
         cal.setTime(startDate);
         int wk = cal.get(Calendar.WEEK_OF_YEAR);
@@ -141,13 +129,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends) {
         Calendar cal = new GregorianCalendar();
         TreeMap<String,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
         List<Object[]> events ;
         
-        events = getDailyCounts(startDate, endDate, hospitalser, imrtOnly, includeWeekends);
+        events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends);
         
         cal.setTime(startDate);
 
@@ -185,12 +173,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends) {
         String imrtString = "";
         String hospString = "";
-        if(imrtOnly) {
-            imrtString = "AND tf.shortcomment LIKE '%IMRT%' ";
-        }
+        
+        imrtString = buildFilterString(filter);
         
         if(hospital != null && hospital > 0) {
             hospString =  "AND tf.hospitalser = ? ";
@@ -222,12 +209,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public List<Object[]> getMonthlyCounts(Date startDate, Date endDate, Long hospital, boolean imrtOnly, boolean includeWeekends) {
+    public List<Object[]> getMonthlyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends) {
         String imrtString = "";
         String hospString = "";
-        if(imrtOnly) {
-            imrtString = "AND tf.shortcomment LIKE '%IMRT%' ";
-        }
+        
+        imrtString = buildFilterString(filter);
         
         if(hospital != null && hospital > 0) {
             hospString =  "AND tf.hospitalser = ? ";
@@ -254,7 +240,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Map<Date, SynchronizedDescriptiveStatistics> getWeeklyTrailingSummaryStats(Date startDate, Date endDate, Long hospitalser, boolean imrtOnly, boolean includeWeekends) {
+    public Map<Date, SynchronizedDescriptiveStatistics> getWeeklyTrailingSummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends) {
         TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(endDate);
@@ -263,7 +249,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         while(gc.getTime().compareTo(startDate) > 0) {
             d = gc.getTime();
             gc.add(Calendar.DATE, -7);
-            stats = getDailyStats(gc.getTime(), d, hospitalser, imrtOnly, includeWeekends);
+            stats = getDailyStats(gc.getTime(), d, hospitalser, filter, includeWeekends);
             retval.put(gc.getTime(), stats);
         }
        
@@ -276,36 +262,9 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if(hospital != null && hospital > 0) {
            hospString = " AND tf.hospitalser = ? ";
         }
-        if(filter != null) {
-            filterString += " AND (";
-            if(filter.contains("imrt")) {
-               filterString = filterString + "procedurecode = '77403' OR " +
-                        "procedurecode = '77408' OR " +
-                        "procedurecode = '77413' OR " +
-                        "procedurecode = '77404' OR " +
-                        "procedurecode = '77409' OR " +
-                        "procedurecode = '77414' OR " +
-                        "procedurecode = '77418' OR " +
-                        "procedurecode = '77416' OR " +
-                        "procedurecode = 'G0251' OR " +
-                        "procedurecode = 'G0173' ";
-            }
-            if(filter.contains("igrt")) {
-               if(!(filterString.equals(""))) {
-                    filterString += " OR ";
-                }
-                filterString = filterString += "procedurecode = '77021' OR " +
-                                               "procedurecode = '77014' OR " +
-                                               "procedurecode = '0197T' ";
-            }
-            if (filter.contains("vmat")) {
-                if(!(filterString.equals(""))) {
-                    filterString += " OR ";
-                }
-            
-            }
-            filterString += ") ";
-        }
+        
+        filterString = buildFilterString(filter);
+        
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select tf.phys, count(DISTINCT tf.patientser) " +
                 "FROM tx_flat_s tf " +
@@ -320,6 +279,42 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
         List<Object[]> retval = q.getResultList();
         return retval;
+    }
+    
+    private String buildFilterString(String filter){
+        String filterString = "";
+        if(filter != null && !"".equals(filter)) {
+            filterString += " AND (";
+            if(filter.contains("imrt")) {
+               filterString = filterString + "procedurecode = '77403' OR " +
+                        "procedurecode = '77408' OR " +
+                        "procedurecode = '77413' OR " +
+                        "procedurecode = '77404' OR " +
+                        "procedurecode = '77409' OR " +
+                        "procedurecode = '77414' OR " +
+                        "procedurecode = '77418' OR " +
+                        "procedurecode = '77416' OR " +
+                        "procedurecode = 'G0251' OR " +
+                        "procedurecode = 'G0173' ";
+            }
+            if(filter.contains("igrt")) {
+               if(!(filterString.endsWith("("))) {
+                    filterString += " OR ";
+                }
+                filterString = filterString += "procedurecode = '77021' OR " +
+                                               "procedurecode = '77014' OR " +
+                                               "procedurecode = '0197T' ";
+            }
+            if (filter.contains("vmat")) {
+                if(!(filterString.endsWith("("))) {
+                    filterString += " OR ";
+                }
+                filterString += "procedurecode = '77413'"; //FIXME!
+            
+            }
+            filterString += ") ";
+        }
+        return filterString;
     }
 
     public SynchronizedDescriptiveStatistics getMonthlyStats(Date startDate, Date endDate, boolean imrtOnly, boolean includeWeekends) {

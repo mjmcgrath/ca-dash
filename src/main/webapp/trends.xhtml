@@ -74,18 +74,19 @@
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener="#{txInstanceController.draw}"/>
+            <style>
+                table.jqplot-table-legend { font-size: 1em; }
+            </style>
             <p:tabView id="charts" orientation="bottom" dynamic="true">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <p:panel id="stats">
                         Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"/>
                         Stddev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"/>
                     </p:panel>
-                    <p:barChart id="dailyBarChart" value="#{txInstanceController.dailyBarChart}" legendPosition="ne" widgetVar="barChartD"
-                        title="Daily Activities" min="0" xaxisAngle="45" 
-                        shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
-                        stacked="true">
+                    <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
+                        style="height:650px;">
                         <!--p:ajax event="itemSelect" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" /-->
-                    </p:barChart>
+                    </p:chart>
                     <!--p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
                         <h3><h:outputText id="dlgDate" value ="#{txInstanceController.selectedDate}" /></h3>
                         <hr/>
@@ -132,17 +133,8 @@
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:barChart id="weeklyBarChart" value="#{txInstanceController.weeklyBarChart}" legendPosition="ne"  
-                        title="Weekly Activities" min="0" xaxisAngle="45" 
-                        shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
-
-                        extender="function(){
-                                this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
-                                this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
-                                this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
-                                this.cfg.seriesDefaults.rendererOptions.errorData = #{txInstanceController.weeklyErrorBars};
-                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{txInstanceController.weeklyErrorLabels};
-                        }" />
+                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:650px;"
+                        />
                 </p:tab>
                 <p:tab title="Monthly" disabled="#{txInstanceController.hideMonthlyTab}">
                      <p:panel>
@@ -156,17 +148,7 @@
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:barChart id="monthlyBarChart" value="#{txInstanceController.monthlyBarChart}" legendPosition="ne"  
-                        title="Monthly Activities" min="0" xaxisAngle="45" 
-                        shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;" stacked="false"
-
-                        extender="function(){
-                                this.cfg.seriesDefaults.rendererOptions.fillToZero = true;
-                                this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2;
-                                this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';
-                                this.cfg.seriesDefaults.rendererOptions.errorData = #{txInstanceController.monthlyErrorBars};
-                                this.cfg.seriesDefaults.rendererOptions.errorTextData = #{txInstanceController.monthlyErrorLabels};
-                        }"/>
+                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:650px;"/>
                 </p:tab>
                 <p:tab title="Raw Data">
                     <!--p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"

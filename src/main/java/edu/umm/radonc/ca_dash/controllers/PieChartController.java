@@ -11,6 +11,7 @@ import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -44,6 +45,7 @@ public class PieChartController implements Serializable{
     private SynchronizedDescriptiveStatistics dstats;
     private PieChartModel pieChart;
     private String interval;
+    List<String> selectedFilters;
 
     public PieChartController() {
         endDate = new Date();
@@ -57,6 +59,7 @@ public class PieChartController implements Serializable{
         this.dstats = new SynchronizedDescriptiveStatistics();
         this.pieChart = new PieChartModel();
         this.interval = "";
+        selectedFilters = new ArrayList<>();
     }
 
     
@@ -89,12 +92,12 @@ public class PieChartController implements Serializable{
         this.selectedFacility = selectedFacility;
     }
 
-    public boolean isImrtOnly() {
-        return imrtOnly;
+    public List<String> getSelectedFilters() {
+        return selectedFilters;
     }
 
-    public void setImrtOnly(boolean imrtOnly) {
-        this.imrtOnly = imrtOnly;
+    public void setSelectedFilters(List<String> selectedFilters) {
+        this.selectedFilters = selectedFilters;
     }
 
     public String getInterval() {
@@ -112,8 +115,16 @@ public class PieChartController implements Serializable{
         return pieChart;
     }
     
+    private String filterString() {
+        String retval = "";
+        for(String item : selectedFilters ) {
+            retval += "," + item;
+        }
+        return retval;
+    }
+    
     public void updateChart(){
-        List<Object[]> counts = getFacade().DoctorCounts(startDate, endDate, selectedFacility, null);
+        List<Object[]> counts = getFacade().DoctorCounts(startDate, endDate, selectedFacility, filterString());
         pieChart.clear();
         dstats.clear();
         for(Object[] row : counts) {
@@ -122,6 +133,8 @@ public class PieChartController implements Serializable{
         }
         
         pieChart.setLegendPosition("ne");
+        pieChart.setShowDataLabels(true);
+        pieChart.setDataFormat("value");
         pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
     }
     

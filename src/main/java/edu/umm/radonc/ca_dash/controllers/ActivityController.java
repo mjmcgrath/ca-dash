@@ -618,7 +618,8 @@ public class ActivityController implements Serializable {
     }
     
     public void drawDaily(DateFormat df) {
-        this.dailyChart = new CartesianChartModel();
+        this.dailyChart.clear();
+        this.dailyChart.setTitle("Patients Treated");
         int curSeries = 0;
         List<Object[]> events;
         
@@ -646,15 +647,8 @@ public class ActivityController implements Serializable {
         }
     }
     
-    
-    public void drawHistogram() {
-        this.dailyChart = new CartesianChartModel();
-        dailyChart.addSeries(histogram(new Long(-1)));
-    }
-    
     public void drawWeekly(DateFormat df) {
-        this.weeklyChart = new CartesianChartModel();
-        this.weeklyChart = new CartesianChartModel();
+        this.weeklyChart.clear();
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
         weeklyChartmax = 0;
@@ -670,6 +664,7 @@ public class ActivityController implements Serializable {
             GregorianCalendar gc = new GregorianCalendar();
 
             if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
+                weeklyChart.setTitle("Patients Treated");
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
@@ -692,8 +687,9 @@ public class ActivityController implements Serializable {
             }
             
             if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
+                weeklyChart.setTitle("Average number of patients treated daily by week");
                 ChartSeries wSumSeries = new ChartSeries();
-                wSumSeries.setLabel("Mean Daily Treatments " + hospital);
+                wSumSeries.setLabel(hospital);
                 Map<String,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
@@ -726,6 +722,7 @@ public class ActivityController implements Serializable {
             }
             
             if(this.weeklySegmentationMode.equals("Trailing")) {
+                weeklyChart.setTitle("Number of patients treated (Trailing)");
                 ChartSeries wTrSumSeries = new ChartSeries();
                 Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
@@ -737,7 +734,8 @@ public class ActivityController implements Serializable {
                     String xval = this.df.format(key);
                     Double yval;
                     if(this.weeklyDisplayMode.equals("Summary")) {
-                        wTrSumSeries.setLabel("Mean Daily Treatments (Trailing) " + hospital);
+                        weeklyChart.setTitle("Average number of patients treated daily by week (Trailing)");
+                        wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getMean();
                         Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
                         if( (yval + (yval * twoSigma)) > weeklyChartmax ){
@@ -756,7 +754,7 @@ public class ActivityController implements Serializable {
                         if( wTrSumStats.get(key).getMax() > weeklyChartmax){
                             weeklyChartmax = new Double(wTrSumStats.get(key).getMax()).intValue();
                         }
-                        wTrSumSeries.setLabel("Total Treatments (Trailing) " + hospital);
+                        wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getSum();
                     }
                     wTrSumSeries.set(xval,yval);
@@ -798,6 +796,7 @@ public class ActivityController implements Serializable {
         List<Object[]> events;
         
         if (this.monthlyDisplayMode.equals("Raw")) {
+            monthlyChart.setTitle("Patients Treated");
             for (Integer fac: selectedFacilities) {
                 mSeries = new ChartSeries();
                 String hospital = "All";
@@ -822,7 +821,7 @@ public class ActivityController implements Serializable {
             }
         } else {
             //monthly summary
-
+            monthlyChart.setTitle("Average Number of Patients Treated Daily");
             for (Integer fac: selectedFacilities) {
                 String hospital = "All";
                 if( fac > 0 ) {
@@ -831,7 +830,7 @@ public class ActivityController implements Serializable {
                 
                 ChartSeries mSumSeries = new ChartSeries();
                 
-                mSumSeries.setLabel("Mean Daily Treatments " + hospital);
+                mSumSeries.setLabel(hospital);
                 Map<String,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
                 
                 JSONArray errorData = new JSONArray();

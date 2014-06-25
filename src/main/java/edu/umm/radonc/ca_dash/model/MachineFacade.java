@@ -16,7 +16,7 @@ import javax.persistence.PersistenceContext;
  */
 @Stateless
 public class MachineFacade extends AbstractFacade<Machine> {
-    @PersistenceContext(unitName = "securityPU")
+    @PersistenceContext(unitName = "clinicalActivityPU")
     private EntityManager em;
 
     @Override

@@ -1,10 +1,10 @@
 package edu.umm.radonc.ca_dash.controllers;
 
-import edu.umm.radonc.ca_dash.model.TxInstance;
 import edu.umm.radonc.ca_dash.model.ActivityCount;
 import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
+import edu.umm.radonc.ca_dash.model.TxInstance;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
@@ -37,7 +37,9 @@ import org.json.*;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.LazyDataModel;
 import org.primefaces.model.SortOrder;
-import org.primefaces.model.chart.CartesianChartModel;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 
 @Named("txInstanceController")
@@ -52,9 +54,9 @@ public class TxInstanceController implements Serializable {
     
     private List<TxInstance> items = null;
     private LazyDataModel<TxInstance> lazyItems = null;
-    private CartesianChartModel dailyChart;
-    private CartesianChartModel weeklyChart;
-    private CartesianChartModel monthlyChart;
+    private BarChartModel dailyChart;
+    private BarChartModel weeklyChart;
+    private BarChartModel monthlyChart;
     private List<ActivityCount> dailyActivities;
     private TxInstance selected;
     private Date startDate;
@@ -94,9 +96,9 @@ public class TxInstanceController implements Serializable {
         gc.setTime(endDate);
         gc.add(Calendar.MONTH, -1);
         startDate = gc.getTime();
-        dailyChart = new CartesianChartModel();
-        weeklyChart = new CartesianChartModel();
-        monthlyChart = new CartesianChartModel();
+        dailyChart = new BarChartModel();
+        weeklyChart = new BarChartModel();
+        monthlyChart = new BarChartModel();
         selectedFacilities = new ArrayList<Integer>();
         selectedFacilities.add(-1);
         selectedTimeIntervals = new ArrayList<>();
@@ -113,6 +115,7 @@ public class TxInstanceController implements Serializable {
         monthlyDisplayMode = "Raw";
         weeklyChartmax = 0;
         monthlyChartmax = 0;
+        selectedFilters = new ArrayList<>();
         handleDateSelect();
     }
 
@@ -421,8 +424,9 @@ public class TxInstanceController implements Serializable {
         
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
+        String fs = filterString();
         
-        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), imrtOnly, true);
+        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true);
         
         int i;
         outer:
@@ -444,7 +448,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public SynchronizedDescriptiveStatistics getDailySummary() {
-        return getFacade().getDailyStats(startDate, endDate, new Long (-1), imrtOnly, includeWeekends);
+        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends);
         
     }
     
@@ -452,7 +456,7 @@ public class TxInstanceController implements Serializable {
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
 
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
         
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
@@ -477,16 +481,16 @@ public class TxInstanceController implements Serializable {
     
     public Double percentile(Double p, Long hospital) {
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
         return stats.getPercentile(p);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
-        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
+        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
-        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
+        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -505,7 +509,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, imrtOnly, includeWeekends);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -560,7 +564,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public List<Object[]> getMonthlyCounts(Long index) {
-        return getFacade().getMonthlyCounts(startDate, endDate, index, imrtOnly, includeWeekends);
+        return getFacade().getMonthlyCounts(startDate, endDate, index, filterString(), includeWeekends);
     }
     
     public void setStartDate(Date startDate) {
@@ -579,15 +583,15 @@ public class TxInstanceController implements Serializable {
         return this.endDate;
     }
     
-    public CartesianChartModel getDailyBarChart() {
+    public BarChartModel getDailyBarChart() {
         return this.dailyChart;
     }
 
-    public CartesianChartModel getWeeklyBarChart() {
+    public BarChartModel getWeeklyBarChart() {
         return weeklyChart;
     }
     
-    public CartesianChartModel getMonthlyBarChart() {
+    public BarChartModel getMonthlyBarChart() {
         return this.monthlyChart;
     }
    
@@ -613,6 +617,15 @@ public class TxInstanceController implements Serializable {
     
     public void drawDaily(DateFormat df) {
         this.dailyChart.clear();
+        dailyChart.setLegendPosition("ne");
+        dailyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        dailyChart.setShadow(false);
+        Axis yAx = dailyChart.getAxis(AxisType.Y);
+        Axis xAx = dailyChart.getAxis(AxisType.X);
+        yAx.setMin(0);
+        xAx.setTickAngle(45);
+        dailyChart.setStacked(true);
+        this.dailyChart.setTitle("Patients Treated");
         int curSeries = 0;
         List<Object[]> events;
         
@@ -650,9 +663,15 @@ public class TxInstanceController implements Serializable {
     
     public void drawWeekly(DateFormat df) {
         this.weeklyChart.clear();
+        weeklyChart.setLegendPosition("ne");
+        weeklyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        weeklyChart.setShadow(false);
+        Axis yAx = weeklyChart.getAxis(AxisType.Y);
+        Axis xAx = weeklyChart.getAxis(AxisType.X);
+        yAx.setMin(0);
+        xAx.setTickAngle(45);
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
-
         weeklyChartmax = 0;
         //int curSeries = 0;
         List<Object[]> events;
@@ -666,6 +685,7 @@ public class TxInstanceController implements Serializable {
             GregorianCalendar gc = new GregorianCalendar();
 
             if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
+                weeklyChart.setTitle("Patients Treated");
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
@@ -688,8 +708,9 @@ public class TxInstanceController implements Serializable {
             }
             
             if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
+                weeklyChart.setTitle("Average number of patients treated daily by week");
                 ChartSeries wSumSeries = new ChartSeries();
-                wSumSeries.setLabel("Mean Daily Treatments " + hospital);
+                wSumSeries.setLabel(hospital);
                 Map<String,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
@@ -698,8 +719,9 @@ public class TxInstanceController implements Serializable {
                     String xval = key;
                     Double yval = wSumStats.get(key).getMean();
                     Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
-                    if( (yval + (yval * twoSigma)) > weeklyChartmax ){
+                    if( (yval + (yval * twoSigma)) > weeklyChartmax){
                         weeklyChartmax = calcChartMax(yval, twoSigma);
+                        yAx.setMax(weeklyChartmax);
                     }
                     JSONObject errorItem = new JSONObject();
                     try {
@@ -718,11 +740,16 @@ public class TxInstanceController implements Serializable {
                 
                 this.weeklyErrorBars.put(errorData);
                 this.weeklyErrorLabels.put(errorTextData);
+                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
+                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
                 weeklyChart.addSeries(wSumSeries);
                 hideWeeklyTab = false;
             }
             
             if(this.weeklySegmentationMode.equals("Trailing")) {
+                weeklyChart.setTitle("Number of patients treated (Trailing)");
                 ChartSeries wTrSumSeries = new ChartSeries();
                 Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
@@ -732,11 +759,13 @@ public class TxInstanceController implements Serializable {
                     String xval = this.df.format(key);
                     Double yval;
                     if(this.weeklyDisplayMode.equals("Summary")) {
-                        wTrSumSeries.setLabel("Mean Daily Treatments (Trailing) " + hospital);
+                        weeklyChart.setTitle("Average number of patients treated daily by week (Trailing)");
+                        wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getMean();
                         Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
                         if( (yval + (yval * twoSigma)) > weeklyChartmax ){
                             weeklyChartmax = calcChartMax(yval, twoSigma);
+                            yAx.setMax(weeklyChartmax);
                         }
                         JSONObject errorItem = new JSONObject();
                         try {
@@ -750,9 +779,9 @@ public class TxInstanceController implements Serializable {
                     } else {
                         //FIXME
                         if( wTrSumStats.get(key).getMax() > weeklyChartmax){
-                            weeklyChartmax = new Double(wTrSumStats.get(key).getMax()).intValue();
+                            yAx.setMax(new Double(wTrSumStats.get(key).getMax()).intValue());
                         }
-                        wTrSumSeries.setLabel("Total Treatments (Trailing) " + hospital);
+                        wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getSum();
                     }
                     wTrSumSeries.set(xval,yval);
@@ -787,13 +816,21 @@ public class TxInstanceController implements Serializable {
     }
     
     public void drawMonthly(DateFormat df) {
-        this.monthlyChart = new CartesianChartModel();
+        this.monthlyChart.clear();
+        monthlyChart.setLegendPosition("ne");
+        monthlyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        monthlyChart.setShadow(false);
+        Axis yAx = monthlyChart.getAxis(AxisType.Y);
+        Axis xAx = monthlyChart.getAxis(AxisType.X);
+        yAx.setMin(0);
+        xAx.setTickAngle(45);
         this.monthlyErrorBars = new JSONArray();
         this.monthlyErrorLabels = new JSONArray();
         ChartSeries mSeries;
         List<Object[]> events;
         
         if (this.monthlyDisplayMode.equals("Raw")) {
+            monthlyChart.setTitle("Patients Treated");
             for (Integer fac: selectedFacilities) {
                 mSeries = new ChartSeries();
                 String hospital = "All";
@@ -818,7 +855,7 @@ public class TxInstanceController implements Serializable {
             }
         } else {
             //monthly summary
-
+            monthlyChart.setTitle("Average Number of Patients Treated Daily");
             for (Integer fac: selectedFacilities) {
                 String hospital = "All";
                 if( fac > 0 ) {
@@ -827,7 +864,7 @@ public class TxInstanceController implements Serializable {
                 
                 ChartSeries mSumSeries = new ChartSeries();
                 
-                mSumSeries.setLabel("Mean Daily Treatments " + hospital);
+                mSumSeries.setLabel(hospital);
                 Map<String,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
                 
                 JSONArray errorData = new JSONArray();
@@ -838,7 +875,9 @@ public class TxInstanceController implements Serializable {
                     Double yval = mSumStats.get(key).getMean();
                     Double twoSigma = errorBar(mSumStats.get(key).getStandardDeviation(), mSumStats.get(key).getMean());
                     if( (yval + (yval * twoSigma)) > monthlyChartmax ){
+                        yAx = monthlyChart.getAxis(AxisType.Y);
                         monthlyChartmax = calcChartMax(yval, twoSigma);
+                        yAx.setMax(monthlyChartmax);
                     }
                     JSONObject errorItem = new JSONObject();
                     try {
@@ -855,6 +894,10 @@ public class TxInstanceController implements Serializable {
                 
                 this.monthlyErrorBars.put(errorData);
                 this.monthlyErrorLabels.put(errorTextData);
+                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
+                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
                 monthlyChart.addSeries(mSumSeries);
  
             }
@@ -871,8 +914,8 @@ public class TxInstanceController implements Serializable {
         int curSeries = 0;
         List<Object[]> events;
         this.hospitalChartSeriesMapping = new HashMap<>();
-        this.dailyChart = new CartesianChartModel();
-        this.weeklyChart = new CartesianChartModel();
+        this.dailyChart = new BarChartModel();
+        this.weeklyChart = new BarChartModel();
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
         this.monthlyErrorBars = new JSONArray();
@@ -895,7 +938,7 @@ public class TxInstanceController implements Serializable {
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
-        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), imrtOnly, includeWeekends);
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
     }
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {

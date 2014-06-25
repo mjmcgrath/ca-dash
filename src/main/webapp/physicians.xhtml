@@ -40,18 +40,19 @@
                 </p:selectOneRadio>
                 <br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectBooleanCheckbox value="#{pieChartController.imrtOnly}" /> <h:outputText value="IMRT" style="padding-left: 5px;"/><br/>
-                <p:selectBooleanCheckbox /> <h:outputText value="IGRT" style="padding-left: 5px;"/><br/>
+                <p:selectManyCheckbox id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
+                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
+                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
+                </p:selectManyCheckbox><br/>
                 <p:commandButton value="Enter" actionListener="#{pieChartController.draw}" update=":physicianWorkload,:totalPt" /> 
             </h:form>
         </ui:define>
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener="#{pieChartController.draw}"/>
-            <p:pieChart id="physicianWorkload" value="#{pieChartController.pieChart}" legendPosition="ne" widgetVar="pieChartD"
-                        shadow="false" style="height:650px;"
-                        showDataLabels="true" dataFormat="value"
-            />
+            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD"
+                        style="height:650px;"/>
             Total: <h:outputText id="totalPt" value="#{pieChartController.dstats.sum} patients treated" />
         </ui:define>
         

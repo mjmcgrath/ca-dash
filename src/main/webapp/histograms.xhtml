@@ -45,9 +45,12 @@
                 <br/>
                 <br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectBooleanCheckbox value="#{histogramController.imrtOnly}" /> <h:outputText value="Show IMRT Only" style="padding-left: 5px;"/><br/>
-                <p:selectBooleanCheckbox /> <h:outputText value="Show IGRT Only" style="padding-left: 5px;"/><br/>
                 <p:selectBooleanCheckbox value="#{histogramController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/>
+                <p:selectManyCheckbox id="txfilters" value="#{histogramController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
+                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
+                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
+                </p:selectManyCheckbox><br/>
                 <!--p:inputText id="percentileInput" value="" />
                 <p:slider for="percentileInput">
                     <p:ajax event="slideEnd" listener="" />
@@ -74,10 +77,10 @@
                     </h:panelGrid>
                 </h:form>
             </p:panel>
-            <p:barChart id="histo" value="#{histogramController.histogram}" legendPosition="ne" widgetVar="barChartD"
-                        title="Daily Activities" min="0" xaxisAngle="45" 
-                        shadow="false" seriesColors="C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D" style="height:650px;"  
-            />
+            <style>
+                table.jqplot-table-legend { font-size: 1em; }
+            </style>
+            <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:650px;" />
         </ui:define>
         
     </ui:composition>

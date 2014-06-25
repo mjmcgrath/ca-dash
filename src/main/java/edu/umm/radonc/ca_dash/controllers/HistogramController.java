@@ -14,38 +14,26 @@ package edu.umm.radonc.ca_dash.controllers;
 
 
 import edu.umm.radonc.ca_dash.model.ActivityAIPC;
-import edu.umm.radonc.ca_dash.model.ActivityFacade;
 import edu.umm.radonc.ca_dash.model.FiscalDate;
-import edu.umm.radonc.ca_dash.model.Hospital;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import java.io.Serializable;
 import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.*;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.*;
 import org.primefaces.event.ItemSelectEvent;
 import org.primefaces.model.SortOrder;
+import org.primefaces.model.chart.Axis;
+import org.primefaces.model.chart.AxisType;
+import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
 
@@ -69,14 +57,14 @@ public class HistogramController implements Serializable {
     private Date selectedDate;
     private double percentile;
     private double percentileVal;
-    private boolean imrtOnly;
+    private List<String> selectedFilters;
     private boolean includeWeekends;
-    private CartesianChartModel histogram;
+    private BarChartModel histogram;
     private String interval;
     private SynchronizedDescriptiveStatistics dstats;
             
     public HistogramController() {
-        histogram = new CartesianChartModel();
+        histogram = new BarChartModel();
         percentile = 50.0;
         dstats = new SynchronizedDescriptiveStatistics();
         endDate = new Date();
@@ -85,7 +73,7 @@ public class HistogramController implements Serializable {
         gc.add(Calendar.MONTH, -1);
         startDate = gc.getTime();
         interval="1m";
-
+        selectedFilters = new ArrayList<>();
         selectedFacility = new Long(-1);
     }
     
@@ -141,21 +129,20 @@ public class HistogramController implements Serializable {
     public void updatePercentile() {
         Long hospital = new Long(-1);
         if( hospital != null && hospital > 0) {
-            dstats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
         }
         else {
-            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1), imrtOnly, includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1),filterString(), includeWeekends);
         }
         percentileVal = dstats.getPercentile(percentile);
     }
-    
 
-    public boolean isImrtOnly() {
-        return imrtOnly;
+    public List<String> getSelectedFilters() {
+        return selectedFilters;
     }
 
-    public void setImrtOnly(boolean imrtOnly) {
-        this.imrtOnly = imrtOnly;
+    public void setSelectedFilters(List<String> selectedFilters) {
+        this.selectedFilters = selectedFilters;
     }
 
     public boolean isIncludeWeekends() {
@@ -235,10 +222,18 @@ public class HistogramController implements Serializable {
         }
     }
     
+    private String filterString() {
+        String retval = "";
+        for(String item : selectedFilters ) {
+            retval += "," + item;
+        }
+        return retval;
+    }
+    
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, imrtOnly, includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
         String label = "All";
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
@@ -266,7 +261,14 @@ public class HistogramController implements Serializable {
     }
     
     public void drawHistogram() {
-        this.histogram = new CartesianChartModel();
+        this.histogram.clear();
+        histogram.setLegendPosition("ne");
+        histogram.setTitle("Frequency Distribution");
+        Axis xAx = histogram.getAxis(AxisType.X);
+        xAx.setMin(0);
+        xAx.setTickAngle(45); 
+        histogram.setShadow(false);
+        histogram.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D"); 
         histogram.addSeries(buildHistogram(selectedFacility));
     }
     
