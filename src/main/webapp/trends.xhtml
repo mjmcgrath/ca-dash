@@ -78,11 +78,13 @@
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
             <p:tabView id="charts" orientation="bottom" dynamic="true">
+                <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <p:panel id="stats">
                         Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"/>
                         Stddev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"/>
                     </p:panel>
+
                     <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
                         style="height:650px;">
                         <!--p:ajax event="itemSelect" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" /-->
@@ -116,6 +118,8 @@
                         </p:dataTable>
                     </p:dialog-->
                 </p:tab>
+                </c:if>
+                <c:if test="#{txInstanceController.weeklyBarChart.series.size() > 0}">
                 <p:tab title="Weekly" disabled="#{txInstanceController.hideWeeklyTab}">
                     <p:panel>
                         <h:form> 
@@ -136,6 +140,8 @@
                     <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:650px;"
                         />
                 </p:tab>
+                </c:if>
+                <c:if test="#{txInstanceController.monthlyBarChart.series.size() > 0}">
                 <p:tab title="Monthly" disabled="#{txInstanceController.hideMonthlyTab}">
                      <p:panel>
                         <h:form> 
@@ -150,6 +156,7 @@
                     </p:panel>
                     <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:650px;"/>
                 </p:tab>
+                </c:if>
                 <p:tab title="Raw Data">
                     <!--p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"
                          selectionMode="single" selection="#{txInstanceController.selected}"

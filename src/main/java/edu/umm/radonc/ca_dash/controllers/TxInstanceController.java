@@ -485,7 +485,7 @@ public class TxInstanceController implements Serializable {
         return stats.getPercentile(p);
     }
     
-    public TreeMap<String,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
         return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
     }
     
@@ -628,7 +628,7 @@ public class TxInstanceController implements Serializable {
         this.dailyChart.setTitle("Patients Treated");
         int curSeries = 0;
         List<Object[]> events;
-        
+        hideDailyTab = true;
         for (Integer fac: selectedFacilities) {
             String hospital = "All";
             if( fac > 0 ) {
@@ -693,10 +693,11 @@ public class TxInstanceController implements Serializable {
                 for (Object[] event : events) {
                     Date d = (Date)event[0];
                     gc.setTime(d);
-                    String xval = df.format(d);
-                    if( gc.get(Calendar.MONTH) == Calendar.DECEMBER && gc.get(Calendar.WEEK_OF_YEAR) == 1){
-                        xval = (gc.get(Calendar.YEAR) + 1) + " Week " + gc.get(Calendar.WEEK_OF_YEAR);
-                    }
+                    gc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                    String xval = df.format(gc.getTime());
+                    //if( gc.get(Calendar.MONTH) == Calendar.DECEMBER && gc.get(Calendar.WEEK_OF_YEAR) == 1){
+                    //    xval = (gc.get(Calendar.YEAR) + 1) + " Week " + gc.get(Calendar.WEEK_OF_YEAR);
+                    //}
                     Long yval = (Long)event[1];
                     wSeries.set(xval, yval);
                     if(yval > weeklyChartmax){
@@ -711,12 +712,12 @@ public class TxInstanceController implements Serializable {
                 weeklyChart.setTitle("Average number of patients treated daily by week");
                 ChartSeries wSumSeries = new ChartSeries();
                 wSumSeries.setLabel(hospital);
-                Map<String,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
+                Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
                 
-                for(String key : wSumStats.keySet()) {
-                    String xval = key;
+                for(Date key : wSumStats.keySet()) {
+                    String xval = df.format(key);
                     Double yval = wSumStats.get(key).getMean();
                     Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
                     if( (yval + (yval * twoSigma)) > weeklyChartmax){
@@ -779,7 +780,8 @@ public class TxInstanceController implements Serializable {
                     } else {
                         //FIXME
                         if( wTrSumStats.get(key).getMax() > weeklyChartmax){
-                            yAx.setMax(new Double(wTrSumStats.get(key).getMax()).intValue());
+                            
+                            //yAx.setMax(new Double(wTrSumStats.get(key).getMax()).intValue());
                         }
                         wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getSum();
@@ -789,6 +791,10 @@ public class TxInstanceController implements Serializable {
                 
                 this.weeklyErrorBars.put(errorData);
                 this.weeklyErrorLabels.put(errorTextData);
+                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
+                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
                 weeklyChart.addSeries(wTrSumSeries);
                 hideWeeklyTab = false;
             }
@@ -925,12 +931,13 @@ public class TxInstanceController implements Serializable {
         
         DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
         DateFormat mdf = new SimpleDateFormat("yyyy MMM");
+        hideDailyTab = true;
         
         if(this.selectedTimeIntervals.contains("Daily")) {
             drawDaily(df);
         }
         if(this.selectedTimeIntervals.contains("Weekly")) {
-            drawWeekly(wdf);
+            drawWeekly(df);
         }
         if(this.selectedTimeIntervals.contains("Monthly")) {
             drawMonthly(mdf);

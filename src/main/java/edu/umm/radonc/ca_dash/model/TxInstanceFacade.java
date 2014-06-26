@@ -6,6 +6,8 @@
 
 package edu.umm.radonc.ca_dash.model;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -78,12 +80,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return stats;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends) {
+    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends) {
         Calendar cal = new GregorianCalendar();
-        TreeMap<String,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
+        TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
         List<Object[]> events  = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends);
         
+        DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
         int wk = cal.get(Calendar.WEEK_OF_YEAR);
         int mo = cal.get(Calendar.MONTH);
@@ -105,6 +108,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             
             prevYrWk = currYrWk;
             cal.setTime(d);
+            cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
             wk = cal.get(Calendar.WEEK_OF_YEAR);
             mo = cal.get(Calendar.MONTH);
             yr = cal.get(Calendar.YEAR);
@@ -117,14 +121,14 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
             
             if( !(prevYrWk.equals(currYrWk)) ) {
-                retval.put(prevYrWk, currStats);
+                retval.put(cal.getTime(), currStats);
                 currStats = new SynchronizedDescriptiveStatistics();
             }
             
             currStats.addValue(count);
             i++;
         }
-        retval.put(prevYrWk, currStats);
+        retval.put(cal.getTime(), currStats);
 
         return retval;
     }
