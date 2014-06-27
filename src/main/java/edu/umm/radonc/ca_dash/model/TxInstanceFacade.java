@@ -55,7 +55,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
             
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT dt, COUNT (DISTINCT patientser) FROM tx_flat_s WHERE " +
+                .createNativeQuery("SELECT dt, COUNT (DISTINCT patientser) FROM tx_flat_q WHERE " +
                         " dt IS NOT NULL AND dt >= ? AND dt <= ? " +  
                         hospString +
                         imrtString +
@@ -189,7 +189,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mo, date_part('week', tf.dt) AS wk, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_s tf " +
+                "FROM tx_flat_q tf " +
                 "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
                 "AND tf.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
@@ -225,7 +225,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mn, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_s tf " +
+                "FROM tx_flat_q tf " +
                 "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
                 "AND tf.procedurecode != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mn ORDER BY yr,mn ASC;")
@@ -271,7 +271,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select tf.phys, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_s tf " +
+                "FROM tx_flat_q tf " +
                 "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
                 "AND tf.procedurecode != '00000' " + filterString + hospString +
                 "GROUP BY tf.phys;")
@@ -290,7 +290,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if(filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if(filter.contains("imrt")) {
-               filterString = filterString + "procedurecode = '77403' OR " +
+               filterString = filterString + "((procedurecode = '77403' OR " +
                         "procedurecode = '77408' OR " +
                         "procedurecode = '77413' OR " +
                         "procedurecode = '77404' OR " +
@@ -299,7 +299,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                         "procedurecode = '77418' OR " +
                         "procedurecode = '77416' OR " +
                         "procedurecode = 'G0251' OR " +
-                        "procedurecode = 'G0173' ";
+                        "procedurecode = 'G0173' ) AND (activitycode LIKE '%IMRT%'))";
             }
             if(filter.contains("igrt")) {
                if(!(filterString.endsWith("("))) {
@@ -313,7 +313,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 if(!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString += "procedurecode = '77413'"; //FIXME!
+                filterString += "(activitycode = 'Rapid Arc' AND procedurecode = '77418') "; //FIXME!
             
             }
             filterString += ") ";

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author mmcgrath
  */
 @Entity
-@Table(name = "tx_flat_s")
+@Table(name = "tx_flat_q")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "TxInstance.findAll", query = "SELECT t FROM TxInstance t"),
