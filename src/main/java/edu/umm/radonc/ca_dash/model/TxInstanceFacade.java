@@ -47,7 +47,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         String hospString = "";
         
         //if(!includeWeekends) {
-        weekendString = " AND date_part('dow', dt) <> 0 AND date_part('dow', dt) <> 6 ";
+        weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
         //}
         
         if(hospitalSer > 0) {
@@ -55,13 +55,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
             
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT dt, COUNT (DISTINCT patientser) FROM tx_flat_q WHERE " +
-                        " dt IS NOT NULL AND dt >= ? AND dt <= ? " +  
+                .createNativeQuery("SELECT completed, COUNT (DISTINCT patientser) FROM tx_flat_v2 WHERE " +
+                        " completed IS NOT NULL AND completed >= ? AND completed <= ? " +  
                         hospString +
                         imrtString +
                          weekendString +
-                        "GROUP BY dt " +
-                        "ORDER BY dt ASC") 
+                        "GROUP BY completed " +
+                        "ORDER BY completed ASC") 
                 .setParameter(1, start)
                 .setParameter(2, end);
         if(hospitalSer > 0) {
@@ -188,10 +188,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mo, date_part('week', tf.dt) AS wk, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_q tf " +
-                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
-                "AND tf.procedurecode != '00000' " + imrtString + hospString +
+                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(DISTINCT tf.patientser) " +
+                "FROM tx_flat_v2 tf " +
+                "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
+                "AND tf.cpt != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
                 .setParameter(1, startDate)
                 .setParameter(2, endDate);
@@ -224,10 +224,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "SELECT date_part('year', tf.dt) AS yr, date_part('month', tf.dt) AS mn, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_q tf " +
-                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
-                "AND tf.procedurecode != '00000' " + imrtString + hospString +
+                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mn, count(DISTINCT tf.patientser) " +
+                "FROM tx_flat_v2 tf " +
+                "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
+                "AND tf.cpt != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mn ORDER BY yr,mn ASC;")
                 .setParameter(1, startDate)
                 .setParameter(2, endDate);
@@ -270,11 +270,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         filterString = buildFilterString(filter);
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "select tf.phys, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_q tf " +
-                "WHERE tf.dt IS NOT NULL AND tf.dt >= ? AND tf.dt <= ? " +
-                "AND tf.procedurecode != '00000' " + filterString + hospString +
-                "GROUP BY tf.phys;")
+                "select tf.doctor, count(DISTINCT tf.patientser) " +
+                "FROM tx_flat_v2 tf " +
+                "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
+                "AND tf.cpt != '00000' " + filterString + hospString +
+                "GROUP BY tf.doctor;")
                 .setParameter(1, startDate)
                 .setParameter(2, endDate);
         
@@ -290,30 +290,30 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if(filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if(filter.contains("imrt")) {
-               filterString = filterString + "((procedurecode = '77403' OR " +
-                        "procedurecode = '77408' OR " +
-                        "procedurecode = '77413' OR " +
-                        "procedurecode = '77404' OR " +
-                        "procedurecode = '77409' OR " +
-                        "procedurecode = '77414' OR " +
-                        "procedurecode = '77418' OR " +
-                        "procedurecode = '77416' OR " +
-                        "procedurecode = 'G0251' OR " +
-                        "procedurecode = 'G0173' ) AND (activitycode LIKE '%IMRT%'))";
+               filterString = filterString + "((cpt = '77403' OR " +
+                        "cpt = '77408' OR " +
+                        "cpt = '77413' OR " +
+                        "cpt = '77404' OR " +
+                        "cpt = '77409' OR " +
+                        "cpt = '77414' OR " +
+                        "cpt = '77418' OR " +
+                        "cpt = '77416' OR " +
+                        "cpt = 'G0251' OR " +
+                        "cpt = 'G0173' ) AND (aria_pm LIKE '%IMRT%'))";
             }
             if(filter.contains("igrt")) {
                if(!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString = filterString += "procedurecode = '77021' OR " +
-                                               "procedurecode = '77014' OR " +
-                                               "procedurecode = '0197T' ";
+                filterString = filterString += "cpt = '77021' OR " +
+                                               "cpt = '77014' OR " +
+                                               "cpt = '0197T' ";
             }
             if (filter.contains("vmat")) {
                 if(!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString += "(activitycode = 'Rapid Arc' AND procedurecode = '77418') "; //FIXME!
+                filterString += "(aria_pm = 'Rapid Arc' AND cpt = '77418') "; //FIXME!
             
             }
             filterString += ") ";
