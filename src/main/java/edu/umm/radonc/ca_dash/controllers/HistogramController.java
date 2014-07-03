@@ -62,6 +62,7 @@ public class HistogramController implements Serializable {
     private BarChartModel histogram;
     private String interval;
     private SynchronizedDescriptiveStatistics dstats;
+    private boolean patientsFlag;
             
     public HistogramController() {
         histogram = new BarChartModel();
@@ -75,6 +76,7 @@ public class HistogramController implements Serializable {
         interval="1m";
         selectedFilters = new ArrayList<>();
         selectedFacility = new Long(-1);
+        patientsFlag = true;
     }
     
     private TxInstanceFacade getFacade() {
@@ -125,14 +127,23 @@ public class HistogramController implements Serializable {
         updatePercentile();
         return percentileVal;
     }
+
+    public boolean isPatientsFlag() {
+        return patientsFlag;
+    }
+
+    public void setPatientsFlag(boolean patientsFlag) {
+        this.patientsFlag = patientsFlag;
+    }
+    
     
     public void updatePercentile() {
         Long hospital = new Long(-1);
         if( hospital != null && hospital > 0) {
-            dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
         }
         else {
-            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1),filterString(), includeWeekends);
+            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1),filterString(), includeWeekends, patientsFlag);
         }
         percentileVal = dstats.getPercentile(percentile);
     }
@@ -233,7 +244,7 @@ public class HistogramController implements Serializable {
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
         String label = "All";
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));

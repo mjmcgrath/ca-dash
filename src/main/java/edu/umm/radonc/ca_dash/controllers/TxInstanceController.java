@@ -87,7 +87,7 @@ public class TxInstanceController implements Serializable {
     private Integer monthlyChartmax;
     private String interval;
     private List<String> selectedFilters;
-    
+    private boolean patientsFlag;
     
     public TxInstanceController() {
         df = new SimpleDateFormat("MM/dd/yy");
@@ -116,6 +116,7 @@ public class TxInstanceController implements Serializable {
         weeklyChartmax = 0;
         monthlyChartmax = 0;
         selectedFilters = new ArrayList<>();
+        patientsFlag = true;
         handleDateSelect();
     }
 
@@ -151,6 +152,14 @@ public class TxInstanceController implements Serializable {
         }
     }
 
+    public boolean isPatientsFlag() {
+        return patientsFlag;
+    }
+
+    public void setPatientsFlag(boolean patientsFlag) {
+        this.patientsFlag = patientsFlag;
+    }
+    
     public String getWeeklyDisplayMode() {
         return weeklyDisplayMode;
     }
@@ -426,7 +435,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> itemsMerged = new ArrayList<>();
         String fs = filterString();
         
-        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true);
+        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true, patientsFlag);
         
         int i;
         outer:
@@ -448,7 +457,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public SynchronizedDescriptiveStatistics getDailySummary() {
-        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends);
+        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends, patientsFlag);
         
     }
     
@@ -456,7 +465,7 @@ public class TxInstanceController implements Serializable {
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
 
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
         
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
@@ -481,16 +490,16 @@ public class TxInstanceController implements Serializable {
     
     public Double percentile(Double p, Long hospital) {
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
         return stats.getPercentile(p);
     }
     
     public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
-        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
+        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
-        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
+        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -945,7 +954,7 @@ public class TxInstanceController implements Serializable {
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
-        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends);
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
     }
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {
