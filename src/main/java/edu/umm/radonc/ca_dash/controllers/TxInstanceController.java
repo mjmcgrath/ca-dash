@@ -715,27 +715,53 @@ public class TxInstanceController implements Serializable {
                 Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
+                ArrayList<Date> allMondays = new ArrayList<>();
+                GregorianCalendar wgc = new GregorianCalendar();
+                wgc.setTime(startDate);
+                wgc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                while(wgc.getTime().before(endDate)) {
+                    allMondays.add(wgc.getTime());
+                    wgc.add(Calendar.DATE, 7);
+                }
                 
-                for(Date key : wSumStats.keySet()) {
-                    String xval = df.format(key);
-                    Double yval = wSumStats.get(key).getMean();
-                    Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
-                    if( (yval + (yval * twoSigma)) > weeklyChartmax){
-                        weeklyChartmax = calcChartMax(yval, twoSigma);
-                        yAx.setMax(weeklyChartmax);
-                    }
+                wklyOuter:
+                for(Date mon : allMondays) {
+                    String xval = df.format(mon);
+                    Double yval = 0.0; 
                     JSONObject errorItem = new JSONObject();
+                    for(Date key : wSumStats.keySet()) {
+                        if(mon.equals(key)) {
+                            xval = df.format(key);
+                            yval = wSumStats.get(key).getMean();
+                            Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
+                            if( (yval + (yval * twoSigma)) > weeklyChartmax){
+                                weeklyChartmax = calcChartMax(yval, twoSigma);
+                                yAx.setMax(weeklyChartmax);
+                            }
+                            
+                            try {
+                                errorItem.put("min", twoSigma);
+                                errorItem.put("max", twoSigma);
+                                errorData.put(errorItem);
+                                errorTextData.put("");
+                            } catch (Exception e) {
+                                System.out.println("error bar generation failed");
+                            }
+                            if(Double.isNaN(yval)) {
+                                yval = 0.0;
+                            }
+                            wSumSeries.set(xval,yval);
+                            continue wklyOuter;
+                        }
+                    }
                     try {
-                        errorItem.put("min", twoSigma);
-                        errorItem.put("max", twoSigma);
-                        errorData.put(errorItem);
-                        errorTextData.put("");
-                    } catch (Exception e) {
-                        System.out.println("error bar generation failed");
-                    }
-                    if(Double.isNaN(yval)) {
-                        yval = 0.0;
-                    }
+                                errorItem.put("min", 0.0);
+                                errorItem.put("max", 0.0);
+                                errorData.put(errorItem);
+                                errorTextData.put("");
+                            } catch (Exception e) {
+                                System.out.println("error bar generation failed");
+                            }
                     wSumSeries.set(xval,yval);
                 }
                 

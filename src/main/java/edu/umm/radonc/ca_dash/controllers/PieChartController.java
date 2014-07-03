@@ -20,6 +20,7 @@ import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
+import org.json.JSONArray;
 import org.primefaces.model.chart.PieChartModel;
 
 
@@ -125,17 +126,34 @@ public class PieChartController implements Serializable{
     
     public void updateChart(){
         List<Object[]> counts = getFacade().DoctorCounts(startDate, endDate, selectedFacility, filterString());
+        JSONArray labels = new JSONArray();
         pieChart.clear();
         dstats.clear();
         for(Object[] row : counts) {
-            pieChart.set((String) row[0], (Long) row[1]);
-            dstats.addValue(((Long) row[1]));
+            String item = "";
+            String dr = (String) row[0];
+            Long ptCount = (Long) row[1];
+            pieChart.set(dr, ptCount);
+            dstats.addValue(ptCount);
+            try{
+                item = dr + "<br/>(" + ptCount + ")";
+                labels.put(item);
+            }catch(Exception e){
+                //FIXME
+            }
         }
         
-        pieChart.setLegendPosition("ne");
+        //pieChart.setLegendPosition("ne");
         pieChart.setShowDataLabels(true);
-        pieChart.setDataFormat("value");
+        pieChart.setShadow(false);
+        //pieChart.setDataFormat("value");
+
         pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
+        pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.22; " +
+                    "this.cfg.seriesDefaults.rendererOptions.diameter = 525; " +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 2;" +
+                    "this.legend = {show:false} }");
     }
     
     public void draw() {
