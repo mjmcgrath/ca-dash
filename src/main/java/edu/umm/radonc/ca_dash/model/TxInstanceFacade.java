@@ -275,11 +275,15 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         filterString = buildFilterString(filter);
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "select tf.doctor, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_v2 tf " +
-                "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
-                "AND tf.cpt != '00000' " + filterString + hospString +
-                "GROUP BY tf.doctor;")
+                "select (dr.lastname || ', ' || dr.firstname) AS doctor, COUNT(DISTINCT tf.patientser) " +
+"FROM tx_flat_v2 tf " +
+"INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser " +
+"INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser " +
+"WHERE tf.completed IS NOT NULL " +
+"AND ptdr.primaryflag = 'TRUE' AND ptdr.oncologistflag = 'TRUE' " +
+                "AND tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
+                filterString + hospString +
+                "GROUP BY dr.lastname, dr.firstname;")
                 .setParameter(1, startDate)
                 .setParameter(2, endDate);
         
