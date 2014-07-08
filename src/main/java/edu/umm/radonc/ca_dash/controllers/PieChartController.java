@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.JSONArray;
@@ -29,7 +29,7 @@ import org.primefaces.model.chart.PieChartModel;
  * @author michaelmcgrath
  */
 @Named("pieChartController")
-@SessionScoped
+@ViewScoped
 public class PieChartController implements Serializable{
     
     @EJB
@@ -152,7 +152,7 @@ public class PieChartController implements Serializable{
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.22; " +
                     "this.cfg.seriesDefaults.rendererOptions.diameter = 525; " +
-                    "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 2;" +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 0.5;" +
                     "this.legend = {show:false} }");
     }
     

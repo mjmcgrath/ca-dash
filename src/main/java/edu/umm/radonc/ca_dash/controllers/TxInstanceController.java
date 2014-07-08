@@ -26,11 +26,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.*;
@@ -43,7 +43,7 @@ import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
 
 @Named("txInstanceController")
-@SessionScoped
+@ViewScoped
 public class TxInstanceController implements Serializable {
 
     @EJB

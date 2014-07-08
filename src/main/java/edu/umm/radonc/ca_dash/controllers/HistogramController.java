@@ -25,7 +25,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
-import javax.enterprise.context.SessionScoped;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.*;
@@ -38,7 +38,7 @@ import org.primefaces.model.chart.CartesianChartModel;
 import org.primefaces.model.chart.ChartSeries;
 
 @Named("histogramController")
-@SessionScoped
+@ViewScoped
 public class HistogramController implements Serializable {
     
     @EJB
