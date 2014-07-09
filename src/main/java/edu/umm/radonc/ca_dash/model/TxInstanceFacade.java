@@ -60,7 +60,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
             
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT completed, COUNT ("+ ptString + " patientser) FROM tx_flat_v2 WHERE " +
+                .createNativeQuery("SELECT completed, COUNT ("+ ptString + " patientser) FROM tx_flat_v4 WHERE " +
                         " completed IS NOT NULL AND completed >= ? AND completed <= ? " +  
                         hospString +
                         imrtString +
@@ -194,7 +194,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_v2 tf " +
+                "FROM tx_flat_v4 tf " +
                 "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
                 "AND tf.cpt != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
@@ -230,7 +230,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mn, count(DISTINCT tf.patientser) " +
-                "FROM tx_flat_v2 tf " +
+                "FROM tx_flat_v4 tf " +
                 "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
                 "AND tf.cpt != '00000' " + imrtString + hospString +
                 "GROUP BY yr, mn ORDER BY yr,mn ASC;")
@@ -265,7 +265,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
     
-    public List<Object[]> DoctorCounts(Date startDate, Date endDate, Long hospital, String filter) {
+    public List<Object[]> DoctorPtCounts(Date startDate, Date endDate, Long hospital, String filter) {
         String hospString = "";
         String filterString = ""; 
         if(hospital != null && hospital > 0) {
@@ -276,7 +276,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select (dr.lastname || ', ' || dr.firstname) AS doctor, COUNT(DISTINCT tf.patientser) " +
-"FROM tx_flat_v2 tf " +
+"FROM tx_flat_v4 tf " +
 "INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser " +
 "INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser " +
 "WHERE tf.completed IS NOT NULL " +
@@ -284,6 +284,31 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 "AND tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
                 filterString + hospString +
                 "GROUP BY dr.lastname, dr.firstname;")
+                .setParameter(1, startDate)
+                .setParameter(2, endDate);
+        
+        if(hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
+        List<Object[]> retval = q.getResultList();
+        return retval;
+    }
+    
+    public List<Object[]> MachineTxCounts(Date startDate, Date endDate, Long hospital, String filter) {
+        String hospString = "";
+        String filterString = ""; 
+        if(hospital != null && hospital > 0) {
+           hospString = " AND tf.hospitalser = ? ";
+        }
+        
+        filterString = buildFilterString(filter);
+        
+        javax.persistence.Query q = getEntityManager().createNativeQuery(
+                "select machine, COUNT(DISTINCT tf.activityinstanceser) " +
+                "FROM tx_flat_v4 tf " +
+                "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? " +
+                filterString + hospString +
+                "GROUP BY tf.machine;")
                 .setParameter(1, startDate)
                 .setParameter(2, endDate);
         

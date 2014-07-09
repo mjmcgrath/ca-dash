@@ -124,11 +124,20 @@ public class PieChartController implements Serializable{
         return retval;
     }
     
-    public void updateChart(){
-        List<Object[]> counts = getFacade().DoctorCounts(startDate, endDate, selectedFacility, filterString());
-        JSONArray labels = new JSONArray();
+    public void updateChart(String dataSet){
+        List<Object[]> counts;
         pieChart.clear();
         dstats.clear();
+        
+        if(dataSet.equals("DR")) {
+            counts = getFacade().DoctorPtCounts(startDate, endDate, selectedFacility, filterString());
+            pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
+        } else {
+            counts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
+            pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
+        }
+        JSONArray labels = new JSONArray();
+
         for(Object[] row : counts) {
             String item = "";
             String dr = (String) row[0];
@@ -147,8 +156,7 @@ public class PieChartController implements Serializable{
         pieChart.setShowDataLabels(true);
         pieChart.setShadow(false);
         //pieChart.setDataFormat("value");
-
-        pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
+        
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.22; " +
                     "this.cfg.seriesDefaults.rendererOptions.diameter = 525; " +
@@ -156,8 +164,8 @@ public class PieChartController implements Serializable{
                     "this.legend = {show:false} }");
     }
     
-    public void draw() {
-        updateChart();
+    public void draw(String dataSet) {
+        updateChart(dataSet);
     
     }
     

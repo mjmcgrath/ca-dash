@@ -45,15 +45,15 @@
                     <f:selectItem itemLabel="IGRT" itemValue="igrt" />
                     <f:selectItem itemLabel="VMAT" itemValue="vmat" />
                 </p:selectManyCheckbox><br/>
-                <p:commandButton value="Enter" actionListener='#{pieChartController.draw("DR")}' update=":physicianWorkload,:totalPt" /> 
+                <p:commandButton value="Enter" actionListener='#{pieChartController.draw("MA")}' update=":machineUtil,:totalTx" /> 
             </h:form>
         </ui:define>
 
         <ui:define name="body">
-            <f:event type="preRenderComponent" listener='#{pieChartController.draw("DR")}'/>
-            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD"
+            <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
+            <p:chart type="pie" id="machineUtil" model="#{pieChartController.pieChart}" widgetVar="machinePieChartD"
                         style="height:750px;"/>
-            Total: <h:outputText id="totalPt" value="#{pieChartController.dstats.sum} patients treated" />
+            Total: <h:outputText id="totalTx" value="#{pieChartController.dstats.sum} treatments completed" />
         </ui:define>
         
     </ui:composition>
