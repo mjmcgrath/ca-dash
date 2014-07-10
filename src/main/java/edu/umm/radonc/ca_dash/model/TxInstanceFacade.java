@@ -78,14 +78,18 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
     public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag) {
         SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
-        List<Object[]> counts = getDailyCounts(startDate, endDate, hospital, filter, includeWeekends, ptflag);
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(endDate);
+        gc.add(Calendar.DATE, -1);
+        List<Object[]> counts = getDailyCounts(startDate, gc.getTime(), hospital, filter, includeWeekends, ptflag);
         for(Object[] item : counts) {
             stats.addValue(((Long)item[1]).doubleValue());
         }
         return stats;
     }
-
-    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+    
+    
+   public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsTr(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
         Calendar cal = new GregorianCalendar();
         TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
         
@@ -93,6 +97,47 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
+        SynchronizedDescriptiveStatistics currStats = new SynchronizedDescriptiveStatistics();
+        int i = 0;
+        int dayCount = 0;
+        while(cal.getTime().before(endDate) && i < events.size()) {
+            
+            Object[] event = events.get(i);
+            Date d = (Date)event[0];
+            Long count = (Long)event[1];
+            
+           //cal.setTime(d);
+            
+            if( dayCount == 6 ) {
+                retval.put(cal.getTime(), currStats);
+                currStats = new SynchronizedDescriptiveStatistics();
+                dayCount = -1;
+                cal.add(Calendar.DATE, 7);
+            }
+            
+            currStats.addValue(count);
+            dayCount++;
+            i++;
+        }
+        retval.put(cal.getTime(), currStats);
+
+        return retval;
+    }
+       
+    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsAbs(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+        Calendar cal = new GregorianCalendar();
+        TreeMap<Date,SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
+        
+        //SET TO BEGINNING OF WK FOR ABSOLUTE CALC
+        cal.setTime(startDate);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
+        startDate = cal.getTime();
+       
+        List<Object[]> events  = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag);
+        
+        DateFormat df = new SimpleDateFormat("MM/dd/yy");
+        cal.setTime(startDate);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
         int wk = cal.get(Calendar.WEEK_OF_YEAR);
         int mo = cal.get(Calendar.MONTH);
         int yr = cal.get(Calendar.YEAR);
@@ -102,7 +147,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             yr = yr - 1;
         }
         String currYrWk = yr + "-" + String.format("%02d", wk);
-        String prevYrWk = "";
+        //String prevYrWk = "";
+        String prevYrWk = currYrWk;
         SynchronizedDescriptiveStatistics currStats = new SynchronizedDescriptiveStatistics();
         int i = 0;
         while(cal.getTime().before(endDate) && i < events.size()) {
@@ -110,8 +156,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             Object[] event = events.get(i);
             Date d = (Date)event[0];
             Long count = (Long)event[1];
-            
-            prevYrWk = currYrWk;
+          
             cal.setTime(d);
             cal.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
             wk = cal.get(Calendar.WEEK_OF_YEAR);
@@ -126,9 +171,14 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
             
             if( !(prevYrWk.equals(currYrWk)) ) {
-                retval.put(cal.getTime(), currStats);
+                GregorianCalendar lastMon = new GregorianCalendar();
+                lastMon.setTime(cal.getTime());
+                lastMon.add(Calendar.DATE, -7);
+                retval.put(lastMon.getTime(), currStats);
                 currStats = new SynchronizedDescriptiveStatistics();
             }
+            
+            prevYrWk = currYrWk;
             
             currStats.addValue(count);
             i++;

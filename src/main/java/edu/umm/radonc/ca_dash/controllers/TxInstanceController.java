@@ -41,6 +41,7 @@ import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.ChartSeries;
+import org.primefaces.model.chart.DateAxis;
 
 @Named("txInstanceController")
 @ViewScoped
@@ -494,8 +495,12 @@ public class TxInstanceController implements Serializable {
         return stats.getPercentile(p);
     }
     
-    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummary(int hospital){
-        return getFacade().getWeeklySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital){
+        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+    }
+    
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryAbs(int hospital){
+        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
@@ -632,7 +637,11 @@ public class TxInstanceController implements Serializable {
         Axis yAx = dailyChart.getAxis(AxisType.Y);
         Axis xAx = dailyChart.getAxis(AxisType.X);
         yAx.setMin(0);
-        xAx.setTickAngle(45);
+
+        /*dailyChart.setExtender("function(){"
+                    +"this.cfg.axes.xaxis.renderer = $.jqplot.DateAxisRenderer;"
+                    +"console.log(this);"
+                + "}");*/
         dailyChart.setStacked(true);
         this.dailyChart.setTitle("Patients Treated");
         int curSeries = 0;
@@ -657,6 +666,10 @@ public class TxInstanceController implements Serializable {
                 hideDailyTab = false;
                 dailyChart.addSeries(series);
             }
+            DateAxis dAx = new DateAxis("Date");
+            dAx.setTickAngle(45);
+            dAx.setTickFormat("%m/%d/%y");
+            dailyChart.getAxes().put(AxisType.X,dAx);
             
             curSeries++;
         }
@@ -721,7 +734,7 @@ public class TxInstanceController implements Serializable {
                 weeklyChart.setTitle("Average number of patients treated daily by week");
                 ChartSeries wSumSeries = new ChartSeries();
                 wSumSeries.setLabel(hospital);
-                Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummary(fac);
+                Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummaryAbs(fac);
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
                 ArrayList<Date> allMondays = new ArrayList<>();
@@ -964,12 +977,13 @@ public class TxInstanceController implements Serializable {
         weeklyChartmax = 0;
         monthlyChartmax = 0;
         
+        DateFormat ddf = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
         DateFormat mdf = new SimpleDateFormat("yyyy MMM");
         hideDailyTab = true;
         
         if(this.selectedTimeIntervals.contains("Daily")) {
-            drawDaily(df);
+            drawDaily(ddf);
         }
         if(this.selectedTimeIntervals.contains("Weekly")) {
             drawWeekly(df);
