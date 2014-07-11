@@ -40,6 +40,7 @@ import org.primefaces.model.SortOrder;
 import org.primefaces.model.chart.Axis;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
+import org.primefaces.model.chart.CategoryAxis;
 import org.primefaces.model.chart.ChartSeries;
 import org.primefaces.model.chart.DateAxis;
 
@@ -98,6 +99,7 @@ public class TxInstanceController implements Serializable {
         gc.add(Calendar.MONTH, -1);
         startDate = gc.getTime();
         dailyChart = new BarChartModel();
+
         weeklyChart = new BarChartModel();
         monthlyChart = new BarChartModel();
         selectedFacilities = new ArrayList<Integer>();
@@ -630,19 +632,28 @@ public class TxInstanceController implements Serializable {
     }
     
     public void drawDaily(DateFormat df) {
-        this.dailyChart.clear();
+        //this.dailyChart.clear();
         dailyChart.setLegendPosition("ne");
         dailyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
         dailyChart.setShadow(false);
         Axis yAx = dailyChart.getAxis(AxisType.Y);
+        DateAxis dAx = new DateAxis("Date");
+        dailyChart.getAxes().put(AxisType.X,dAx);
         Axis xAx = dailyChart.getAxis(AxisType.X);
         yAx.setMin(0);
+        yAx.setLabel("Foo");
+        xAx.setTickAngle(45);
+        xAx.setTickFormat("%m/%d/%y");
+        dailyChart.setZoom(false);
+        dailyChart.setExtender(
+                "function(){ console.log(this); }"
+        );
 
         /*dailyChart.setExtender("function(){"
                     +"this.cfg.axes.xaxis.renderer = $.jqplot.DateAxisRenderer;"
                     +"console.log(this);"
                 + "}");*/
-        dailyChart.setStacked(true);
+        dailyChart.setStacked(false);
         this.dailyChart.setTitle("Patients Treated");
         int curSeries = 0;
         List<Object[]> events;
@@ -666,10 +677,6 @@ public class TxInstanceController implements Serializable {
                 hideDailyTab = false;
                 dailyChart.addSeries(series);
             }
-            DateAxis dAx = new DateAxis("Date");
-            dAx.setTickAngle(45);
-            dAx.setTickFormat("%m/%d/%y");
-            dailyChart.getAxes().put(AxisType.X,dAx);
             
             curSeries++;
         }
