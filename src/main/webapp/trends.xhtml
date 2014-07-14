@@ -164,63 +164,58 @@
                 </p:tab>
                 </c:if>
                 <p:tab title="Raw Data">
-                    <!--p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"
-                         selectionMode="single" selection="#{txInstanceController.selected}"
+                    <p:dataTable id="datalist" value="#{txInstanceController.lazyItems}" var="item"
                          paginator="true"
                          lazy="true" 
-                         rowKey="#{item.actinstproccodeser}"
+                         rowKey="#{item.activityinstanceser}"
                          rows="20"
                          rowsPerPageTemplate="10,20,30,40,50" 
                          >
-                <p:column>
+                 <p:column>
                     <f:facet name="header">
-                        <h:outputText value="#{bundle.ListProcedureTitle_shortcomment}"/>
+                        <h:outputText value="#{txBundle.ListTxInstanceTitle_dt}"/>
                     </f:facet>
-                    <h:outputText value="#{item.procedurecodeser.shortcomment}"/>
-                </p:column>
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="#{bundle.ListProcedureTitle_procedurecode}"/>
-                    </f:facet>
-                    <h:outputText value="#{item.procedurecodeser.procedurecode}"/>
-                </p:column>
-                <p:column>
-                    <f:facet name="header">
-                        <h:outputText value="#{bundle.ListActivityTitle_completeddatetime}"/>
-                    </f:facet>
-                    <h:outputText value="#{item.completeddatetime}">
+                    <h:outputText value="#{item.completed}">
                         <f:convertDateTime pattern="MM/dd/yyyy" />
                     </h:outputText>
                 </p:column>
                 <p:column>
                     <f:facet name="header">
-                        <h:outputText value="#{bundle.ListActivityTitle_fromdateofservice}"/>
+                        <h:outputText value="#{txBundle.ListTxInstanceTitle_procedurecode}"/>
                     </f:facet>
-                    <h:outputText value="#{item.fromdateofservice}">
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:outputText>
+                    <h:outputText value="#{item.cpt}"/>
                 </p:column>
                 <p:column>
                     <f:facet name="header">
-                        <h:outputText value="#{bundle.ListActivityTitle_todateofservice}"/>
+                        <h:outputText value="#{txBundle.ListTxInstanceTitle_shortcomment}"/>
                     </f:facet>
-                    <h:outputText value="#{item.todateofservice}">
-                        <f:convertDateTime pattern="MM/dd/yyyy" />
-                    </h:outputText>
+                    <h:outputText value="#{item.shortcomment}"/>
                 </p:column>
-                <p:column filterBy="#{item.departmentser.hospitalser.hospitalname}">
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{txBundle.ListTxInstanceTitle_patientser}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.patientser}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="#{txBundle.ListTxInstanceTitle_phys}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.doctor}"/>
+                </p:column>
+                <p:column>
+                    <f:facet name="header">
+                        <h:outputText value="Machine}"/>
+                    </f:facet>
+                    <h:outputText value="#{item.machine}"/>
+                </p:column>
+                <p:column filterBy="#{item.hospital}">
                     <f:facet name="header">
                         <h:outputText value="Hospital"/>
                     </f:facet>
-                    <h:outputText value="#{item.departmentser.hospitalser.hospitalname}"/>
+                    <h:outputText value="#{item.hospital}"/>
                 </p:column>
-                <p:column filterBy="#{item.departmentser.departmentname}" filterMatchMode="contains">
-                    <f:facet name="header">
-                        <h:outputText value="#{bundle.ListDepartmentTitle_departmentname}"/>
-                    </f:facet>
-                    <h:outputText value="#{item.departmentser.departmentname}"/>
-                </p:column>
-            </p:dataTable-->
+            </p:dataTable>
                 </p:tab>
             </p:tabView>
         </ui:define>
