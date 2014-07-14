@@ -17,6 +17,10 @@ import java.util.TreeMap;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 
 /**
@@ -261,7 +265,20 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
     }
 
     public List<TxInstance> itemsDateRange(Date startDate, Date endDate, int[] range) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        CriteriaQuery cq = cb.createQuery(TxInstance.class);
+        Root<TxInstance> rt = cq.from(TxInstance.class);
+        cq.where(
+                cb.and(rt.get(TxInstance_.completed).isNotNull(),
+                cb.and(
+                        cb.between(rt.get(TxInstance_.completed), startDate, endDate)
+                ))
+        );
+        cq.orderBy(cb.asc(rt.get(TxInstance_.completed)));
+        Query q = em.createQuery(cq);
+        q.setMaxResults(range[1] - range[0] + 1);
+        q.setFirstResult(range[0]);
+        return q.getResultList();
     }
 
     public int itemsDateRangeCount(Date startDate, Date endDate) {

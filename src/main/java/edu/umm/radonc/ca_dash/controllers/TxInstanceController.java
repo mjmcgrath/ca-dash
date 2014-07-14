@@ -637,24 +637,36 @@ public class TxInstanceController implements Serializable {
         dailyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
         dailyChart.setShadow(false);
         Axis yAx = dailyChart.getAxis(AxisType.Y);
-        DateAxis dAx = new DateAxis("Date");
-        dailyChart.getAxes().put(AxisType.X,dAx);
         Axis xAx = dailyChart.getAxis(AxisType.X);
         yAx.setMin(0);
-        yAx.setLabel("Foo");
+        if(patientsFlag) {
+            yAx.setLabel("Patients");
+            this.dailyChart.setTitle("Patients Treated");
+        } else {
+            yAx.setLabel("Treatments");
+            this.dailyChart.setTitle("Completed Treatments");
+        }
         xAx.setTickAngle(45);
         xAx.setTickFormat("%m/%d/%y");
         dailyChart.setZoom(false);
-        dailyChart.setExtender(
-                "function(){ console.log(this); }"
-        );
+        dailyChart.setExtender("function(){"
+                + " var interval = 1; "
+                + " var items = this.cfg.axes.xaxis.ticks.length; "
+                + "if( items > 730) { interval = 365; } "
+                + "else if( items > 180) { interval = 30; } "
+                + "else if( items > 42) { interval = 7; } "
+                + "for(var i = 0; i < this.cfg.axes.xaxis.ticks.length; i++) { "
+                + "   if(i % interval != 0) { "
+                + "     this.cfg.axes.xaxis.ticks[i] = \" \"; "
+                + "   } "
+                + " } "
+                + "}");
 
         /*dailyChart.setExtender("function(){"
                     +"this.cfg.axes.xaxis.renderer = $.jqplot.DateAxisRenderer;"
                     +"console.log(this);"
                 + "}");*/
-        dailyChart.setStacked(false);
-        this.dailyChart.setTitle("Patients Treated");
+        dailyChart.setStacked(true);
         int curSeries = 0;
         List<Object[]> events;
         hideDailyTab = true;
@@ -697,6 +709,13 @@ public class TxInstanceController implements Serializable {
         weeklyChart.setShadow(false);
         Axis yAx = weeklyChart.getAxis(AxisType.Y);
         Axis xAx = weeklyChart.getAxis(AxisType.X);
+        if(patientsFlag) {
+            yAx.setLabel("Patients");
+            this.weeklyChart.setTitle("Patients Treated");
+        } else {
+            yAx.setLabel("Treatments");
+            this.weeklyChart.setTitle("Completed Treatments");
+        }
         yAx.setMin(0);
         xAx.setTickAngle(45);
         this.weeklyErrorBars = new JSONArray();
@@ -714,7 +733,6 @@ public class TxInstanceController implements Serializable {
             GregorianCalendar gc = new GregorianCalendar();
 
             if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
-                weeklyChart.setTitle("Patients Treated");
                 ChartSeries wSeries = new ChartSeries();
                 wSeries.setLabel(hospital);
                 events = this.getWeeklyCounts(new Long(fac));
@@ -738,7 +756,6 @@ public class TxInstanceController implements Serializable {
             }
             
             if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
-                weeklyChart.setTitle("Average number of patients treated daily by week");
                 ChartSeries wSumSeries = new ChartSeries();
                 wSumSeries.setLabel(hospital);
                 Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummaryAbs(fac);
@@ -805,7 +822,6 @@ public class TxInstanceController implements Serializable {
             }
             
             if(this.weeklySegmentationMode.equals("Trailing")) {
-                weeklyChart.setTitle("Number of patients treated (Trailing)");
                 ChartSeries wTrSumSeries = new ChartSeries();
                 Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
                 JSONArray errorData = new JSONArray();
@@ -815,7 +831,6 @@ public class TxInstanceController implements Serializable {
                     String xval = this.df.format(key);
                     Double yval;
                     if(this.weeklyDisplayMode.equals("Summary")) {
-                        weeklyChart.setTitle("Average number of patients treated daily by week (Trailing)");
                         wTrSumSeries.setLabel(hospital);
                         yval = wTrSumStats.get(key).getMean();
                         Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
@@ -885,6 +900,13 @@ public class TxInstanceController implements Serializable {
         Axis xAx = monthlyChart.getAxis(AxisType.X);
         yAx.setMin(0);
         xAx.setTickAngle(45);
+        if(patientsFlag) {
+            yAx.setLabel("Patients");
+            this.monthlyChart.setTitle("Patients Treated");
+        } else {
+            yAx.setLabel("Treatments");
+            this.monthlyChart.setTitle("Completed Treatments");
+        }
         this.monthlyErrorBars = new JSONArray();
         this.monthlyErrorLabels = new JSONArray();
         ChartSeries mSeries;
@@ -984,13 +1006,12 @@ public class TxInstanceController implements Serializable {
         weeklyChartmax = 0;
         monthlyChartmax = 0;
         
-        DateFormat ddf = new SimpleDateFormat("yyyy-MM-dd");
         DateFormat wdf = new SimpleDateFormat("yyyy 'Week' ww");
         DateFormat mdf = new SimpleDateFormat("yyyy MMM");
         hideDailyTab = true;
         
         if(this.selectedTimeIntervals.contains("Daily")) {
-            drawDaily(ddf);
+            drawDaily(df);
         }
         if(this.selectedTimeIntervals.contains("Weekly")) {
             drawWeekly(df);

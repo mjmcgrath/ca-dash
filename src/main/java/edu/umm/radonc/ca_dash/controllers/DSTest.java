@@ -17,6 +17,7 @@ import javax.inject.Named;
 import org.primefaces.model.chart.AxisType;
 import org.primefaces.model.chart.BarChartModel;
 import org.primefaces.model.chart.BarChartSeries;
+import org.primefaces.model.chart.CategoryAxis;
 import org.primefaces.model.chart.DateAxis;
 import org.primefaces.model.chart.LineChartModel;
 import org.primefaces.model.chart.LineChartSeries;
@@ -64,10 +65,22 @@ public class DSTest implements Serializable {
         dateModel.setTitle("Zoom for Details");
         dateModel.setZoom(true);
         dateModel.getAxis(AxisType.Y).setLabel("Values");
-        DateAxis axis = new DateAxis("Dates");
+        CategoryAxis axis = new CategoryAxis("Dates");
         axis.setTickAngle(-50);
-        axis.setMax("2014-02-01");
         axis.setTickFormat("%b %#d, %y");
+        
+        dateModel.setExtender("function(){"
+                + " var interval = 1; "
+                + " var items = this.cfg.axes.xaxis.ticks.length; "
+                + "if( items > 21) { interval = 7; } "
+                + "else if( items > 45) { interval = 30; } "
+                + "else if( items > 500) { interval = 365; } "
+                + "for(var i = 0; i < this.cfg.axes.xaxis.ticks.length; i++) { "
+                + "   if(i % inteval != 0) { "
+                + "     this.cfg.axes.xaxis.ticks[i] = \" \"; "
+                + "   } "
+                + " } "
+                + "}");
          
         dateModel.getAxes().put(AxisType.X, axis);
     }

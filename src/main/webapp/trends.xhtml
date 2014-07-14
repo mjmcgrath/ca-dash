@@ -18,6 +18,11 @@
             </p:menu-->
             <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
             <h:form id="filters">
+                <p:selectOneButton id="dataTypeSelect" value="#{txInstanceController.patientsFlag}">
+                    <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
+                    <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
+                </p:selectOneButton>
+                <br/><br/>
                 <label class='hdr'>Start Date: </label>
                 <p:calendar value="#{txInstanceController.startDate}" id="startCal">
                     <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
