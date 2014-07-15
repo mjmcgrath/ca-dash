@@ -68,20 +68,8 @@ public class DSTest implements Serializable {
         CategoryAxis axis = new CategoryAxis("Dates");
         axis.setTickAngle(-50);
         axis.setTickFormat("%b %#d, %y");
-        
-        dateModel.setExtender("function(){"
-                + " var interval = 1; "
-                + " var items = this.cfg.axes.xaxis.ticks.length; "
-                + "if( items > 21) { interval = 7; } "
-                + "else if( items > 45) { interval = 30; } "
-                + "else if( items > 500) { interval = 365; } "
-                + "for(var i = 0; i < this.cfg.axes.xaxis.ticks.length; i++) { "
-                + "   if(i % inteval != 0) { "
-                + "     this.cfg.axes.xaxis.ticks[i] = \" \"; "
-                + "   } "
-                + " } "
-                + "}");
-         
+
+        dateModel.setExtender("dailyChartExtender");        
         dateModel.getAxes().put(AxisType.X, axis);
     }
 }

@@ -9,7 +9,7 @@
         
         <ui:define name="supplemental_js">
             <h:outputScript name="js/jqplot.barRenderer.js" />
-            <h:outputScript name="js/jqplot.dateAxisRenderer.js" />
+            <h:outputScript name="js/util.js" />
         </ui:define>
 
         <ui:define name="filters">
@@ -83,6 +83,7 @@
             <style>
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
+            <div id="zoomSlider"></div>
             <p:tabView id="charts" orientation="bottom" dynamic="true">
                 <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
