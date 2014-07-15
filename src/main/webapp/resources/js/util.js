@@ -12,15 +12,18 @@ function dailyChartExtender(){
         if (i % interval != 0) { 
             this.cfg.axes.xaxis.ticks[i] = "";
         }
+        
+        this.cfg.axes.yaxis.numberTicks = 20;
     }
 }
 
 $(
    function (){
-   console.log("fff");
-   $("#zoomSlider").slider({min: 8, max: 24, change: 
+   $("#zoomSlider").slider({value: 1, min: 0.5, max: 2, step: 0.1, change: 
            function(){
-               console.log($(this).slider("value"));
+               $("#charts\\:dailyBarChart").css("zoom", $("#zoomSlider").slider("value") );
+               $("#charts\\:weeklyBarChart").css("zoom", $("#zoomSlider").slider("value") );
+               $("#charts\\:monthlyBarChart").css("zoom", $("#zoomSlider").slider("value") );
            } });
    
 });
