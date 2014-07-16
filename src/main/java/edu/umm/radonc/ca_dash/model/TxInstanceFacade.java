@@ -396,7 +396,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if (filter.contains("imrt")) {
-                filterString = filterString + "((cpt = '77403' OR "
+                filterString = filterString + "(cpt = '77403' OR "
                         + "cpt = '77408' OR "
                         + "cpt = '77413' OR "
                         + "cpt = '77404' OR "
@@ -405,7 +405,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                         + "cpt = '77418' OR "
                         + "cpt = '77416' OR "
                         + "cpt = 'G0251' OR "
-                        + "cpt = 'G0173' ) AND (aria_pm LIKE '%IMRT%'))";
+                        + "cpt = 'G0173')";
             }
             if (filter.contains("igrt")) {
                 if (!(filterString.endsWith("("))) {
@@ -417,10 +417,14 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             }
             if (filter.contains("vmat")) {
                 if (!(filterString.endsWith("("))) {
+                    //FIXME
                     filterString += " OR ";
                 }
                 filterString += "(aria_pm = 'Rapid Arc' AND cpt = '77418') "; //FIXME!
-
+            }
+            if (filter.equals("overlap")) {
+                //FIXME -- what are the CPT codes that indicate IGRT AND IMRT
+                filterString = filterString + "(cpt = '77414')";
             }
             filterString += ") ";
         }
