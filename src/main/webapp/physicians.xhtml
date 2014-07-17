@@ -6,7 +6,11 @@
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     
     <ui:composition template="reportTemplate.xhtml">
-        <ui:define name="filters">
+        <ui:define name="supplemental_js">
+            <h:outputScript name="js/util.js" />
+        </ui:define>
+        
+        <ui:define name="filters">           
             <h:form id="filters">
                 <label class='hdr'>Start Date: </label>
                 <p:calendar value="#{pieChartController.startDate}" id="startCal" />
@@ -51,8 +55,7 @@
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener='#{pieChartController.draw("DR")}'/>
-            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD"
-                        style="height:750px;"/>
+            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD" />
             Total: <h:outputText id="totalPt" value="#{pieChartController.dstats.sum} patients treated" />
         </ui:define>
         

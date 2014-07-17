@@ -25,5 +25,11 @@ $(
                $("#charts\\:weeklyBarChart").css("zoom", $("#zoomSlider").slider("value") );
                $("#charts\\:monthlyBarChart").css("zoom", $("#zoomSlider").slider("value") );
            } });
+       
+    $("#charts\\:dailyBarChart").height($(window).height() - 323);
+    $("#charts\\:weeklyBarChart").height($(window).height() - 323);
+    $("#charts\\:monthlyBarChart").height($(window).height() - 323);
+    $("#histo").height($(window).height() - 323);
+    $("#physicianWorkload").height($(window).height() - 223);
 });
 

@@ -145,7 +145,7 @@ public class PieChartController implements Serializable{
             pieChart.set(dr, ptCount);
             dstats.addValue(ptCount);
             try{
-                item = dr + "<br/>(" + ptCount + ")";
+                item = dr + " (" + ptCount + ")";
                 labels.put(item);
             }catch(Exception e){
                 //FIXME
@@ -158,9 +158,10 @@ public class PieChartController implements Serializable{
         //pieChart.setDataFormat("value");
         
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.22; " +
-                    "this.cfg.seriesDefaults.rendererOptions.diameter = 525; " +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.3; " +
+                    "this.cfg.seriesDefaults.rendererOptions.diameter = $(window).height() * 0.5; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 0.5;" +
+                    "this.cfg.sliceMargin = 3; " +
                     "this.legend = {show:false} }");
     }
     

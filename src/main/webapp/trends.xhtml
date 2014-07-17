@@ -84,7 +84,7 @@
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
             <div id="zoomSlider"></div>
-            <p:tabView id="charts" orientation="bottom" dynamic="true">
+            <p:tabView id="charts" orientation="bottom" dynamic="true" style="position:inherit;" >
                 <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <p:panel id="stats">
@@ -93,7 +93,7 @@
                     </p:panel>
 
                     <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
-                        style="height:100%; position:inherit;">
+                        style="height:650px; position:inherit;">
                         <!--p:ajax event="itemSelect" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" /-->
                     </p:chart>
                     <!--p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
@@ -144,7 +144,7 @@
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:650px;"
+                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}"
                         />
                 </p:tab>
                 </c:if>
@@ -161,7 +161,7 @@
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:650px;"/>
+                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" />
                 </p:tab>
                 </c:if>
                 <p:tab title="Raw Data">
