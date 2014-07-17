@@ -639,6 +639,7 @@ public class TxInstanceController implements Serializable {
         Axis yAx = dailyChart.getAxis(AxisType.Y);
         Axis xAx = dailyChart.getAxis(AxisType.X);
         yAx.setMin(0);
+        xAx.setLabel("Date");
         if(patientsFlag) {
             yAx.setLabel("Patients");
             this.dailyChart.setTitle("Patients Treated");
@@ -717,6 +718,7 @@ public class TxInstanceController implements Serializable {
             this.weeklyChart.setTitle("Completed Treatments");
         }
         yAx.setMin(0);
+        xAx.setLabel("Date");
         xAx.setTickAngle(45);
         this.weeklyErrorBars = new JSONArray();
         this.weeklyErrorLabels = new JSONArray();
@@ -899,6 +901,7 @@ public class TxInstanceController implements Serializable {
         Axis yAx = monthlyChart.getAxis(AxisType.Y);
         Axis xAx = monthlyChart.getAxis(AxisType.X);
         yAx.setMin(0);
+        xAx.setLabel("Month");
         xAx.setTickAngle(45);
         if(patientsFlag) {
             yAx.setLabel("Patients");

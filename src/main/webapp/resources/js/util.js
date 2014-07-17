@@ -25,6 +25,5 @@ $(
                $("#charts\\:weeklyBarChart").css("zoom", $("#zoomSlider").slider("value") );
                $("#charts\\:monthlyBarChart").css("zoom", $("#zoomSlider").slider("value") );
            } });
-   
 });
 

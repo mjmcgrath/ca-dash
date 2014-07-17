@@ -57,3 +57,7 @@ label.hdr {
 #filters\:selectCal, #filters\:selectQtr {
     font-size: 11px;
 }
+
+.ui-tabs-panels {
+    height: 100%;
+}
