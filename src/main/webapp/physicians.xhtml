@@ -55,7 +55,7 @@
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener='#{pieChartController.draw("DR")}'/>
-            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD" />
+            <p:chart type="pie" id="physicianWorkload" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:800px;" />
             Total: <h:outputText id="totalPt" value="#{pieChartController.dstats.sum} patients treated" />
         </ui:define>
         

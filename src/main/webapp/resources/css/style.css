@@ -10,13 +10,12 @@ and open the template in the editor.
 
 
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Source Sans Pro', sans-serif;
     width: 950px;
     margin: auto;
 }
 
 h1 {
-    font-family: 'Montserrat';
     font-weight: 400;
 }
 
@@ -46,7 +45,6 @@ h1 {
 }
 
 label.hdr {
-    font-family: 'Montserrat';
     font-weight: 400;
 }
 
@@ -60,4 +58,9 @@ label.hdr {
 
 .ui-tabs-panels {
     height: 100%;
+}
+
+#main, #main .ui-widget-content, #charts, #physicianWorkload, #histo, #machineUtil {
+ background: #fff;
+ color: #000;
 }

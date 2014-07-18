@@ -158,8 +158,8 @@ public class PieChartController implements Serializable{
         //pieChart.setDataFormat("value");
         
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.3; " +
-                    "this.cfg.seriesDefaults.rendererOptions.diameter = $(window).height() * 0.5; " +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.2; " +
+                    "this.cfg.seriesDefaults.rendererOptions.diameter = 600; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 0.5;" +
                     "this.cfg.sliceMargin = 3; " +
                     "this.legend = {show:false} }");

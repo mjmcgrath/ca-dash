@@ -9,7 +9,7 @@
     <h:head>
         <title><ui:insert name="title">RO-CART</ui:insert></title>
         <h:outputStylesheet name="css/style.css" />
-        <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css' />
+        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css' />
         <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css' />
         <h:outputStylesheet library="css" name="style.css"/>
         <ui:insert name="supplemental_css"></ui:insert>
@@ -20,27 +20,25 @@
         <p:layout fullPage="true">
             <p:layoutUnit position="north" size="105" resizable="false" closable="true" collapsible="true" id="layoutHeader">
                 <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
-                <h:form id="navCtrl">
-                    <p:selectOneMenu  value="#{navigationController.selectedReport}">
-                        <f:selectItem itemLabel="Select One..." itemValue="" />  
-                        <f:selectItem itemLabel="Treatment Trends" itemValue="trends" />
-                        <f:selectItem itemLabel="Histograms" itemValue="histograms" />
-                        <f:selectItem itemLabel="Physician Workload" itemValue="physicians" />
-                        <p:ajax event="change" listener="#{navigationController.redirectReportSelector}" />
-                    </p:selectOneMenu>
-                </h:form>
-                <ui:insert name="reportName"></ui:insert>
-            </p:layoutUnit>
-            
-            <p:layoutUnit position="south" size="60">
-                <ui:insert name="footer"/>
             </p:layoutUnit>
 
-            <p:layoutUnit position="west" header="Filter" collapsible="true" size="200">
-                <ui:insert name="filters"/>
+            <p:layoutUnit position="west" header="Navigation" collapsible="true" size="230">
+                <p:tabView>
+                    <p:tab id="reportSelect" title="Reports">
+                        <p:menu>
+                            <p:menuitem value="Treatment Trends" url="/faces/trends.xhtml" />
+                            <p:menuitem value="Histograms" url="/faces/histograms.xhtml" />
+                            <p:menuitem value="Physician Workload" url="/faces/physicians.xhtml" />
+                            <p:menuitem value="Machine Use" url="/faces/machines.xhtml" />
+                        </p:menu>
+                    </p:tab>
+                    <p:tab id="options" title="Options"> 
+                        <ui:insert name="filters"/>
+                    </p:tab>
+                </p:tabView>
             </p:layoutUnit>
             
-            <p:layoutUnit position="center">
+            <p:layoutUnit position="center" id="main">
                 <ui:insert name="body"/>
             </p:layoutUnit>
 

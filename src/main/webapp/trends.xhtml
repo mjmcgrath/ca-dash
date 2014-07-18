@@ -73,7 +73,7 @@
                     <f:selectItem itemLabel="IGRT" itemValue="igrt" />
                     <f:selectItem itemLabel="VMAT" itemValue="vmat" />
                 </p:selectManyCheckbox><br/>
-                <p:commandButton value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" /> 
+                <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" widgetVar="submit" /> 
             </h:form>
             
         </ui:define>
@@ -144,8 +144,7 @@
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}"
-                        />
+                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:650px;" />
                 </p:tab>
                 </c:if>
                 <c:if test="#{txInstanceController.monthlyBarChart.series.size() > 0}">
@@ -161,7 +160,7 @@
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" />
+                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:650px;"/>
                 </p:tab>
                 </c:if>
                 <p:tab title="Raw Data">

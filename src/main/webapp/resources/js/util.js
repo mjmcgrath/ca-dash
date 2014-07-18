@@ -26,10 +26,24 @@ $(
                $("#charts\\:monthlyBarChart").css("zoom", $("#zoomSlider").slider("value") );
            } });
        
-    $("#charts\\:dailyBarChart").height($(window).height() - 323);
+    /*$("#charts\\:dailyBarChart").height($(window).height() - 323);
     $("#charts\\:weeklyBarChart").height($(window).height() - 323);
     $("#charts\\:monthlyBarChart").height($(window).height() - 323);
     $("#histo").height($(window).height() - 323);
     $("#physicianWorkload").height($(window).height() - 223);
+    
+    $("#j_idt15\\:filters\\:submit").click(function(){
+        $("#charts\\:dailyBarChart").height($(window).height() - 323);
+        $("#charts\\:weeklyBarChart").height($(window).height() - 323);
+        $("#charts\\:monthlyBarChart").height($(window).height() - 323);
+        $("#charts [role='tab'] a").click(function(){
+            console.log("asdasd");
+            $("#charts\\:dailyBarChart").height($(window).height() - 323);
+            $("#charts\\:weeklyBarChart").height($(window).height() - 323);
+            $("#charts\\:monthlyBarChart").height($(window).height() - 323);
+        });
+    });*/
+    
+    
 });
 
