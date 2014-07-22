@@ -91,11 +91,14 @@
                         Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"/>
                         Stddev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"/>
                     </p:panel>
-
-                    <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
-                        style="height:650px; position:inherit;">
+                    <!--c:if test="#{txInstanceController.dailyBarChart.series.size() > 0}"-->
+                        <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
+                        style="height:650px; position:inherit;" />
+                    <!--/c:if>
+                    <c:otherwise>
+                        <h:outputText value="No Data" />
+                    </c:otherwise-->
                         <!--p:ajax event="itemSelect" update="dlgDate,dailyDetail,stats" onsuccess="PF('dailyDlg').show()" /-->
-                    </p:chart>
                     <!--p:dialog id="dailyDialog" header="Detail" widgetVar="dailyDlg" style="max-width: 425px; max-height: 650px;">                                
                         <h3><h:outputText id="dlgDate" value ="#{txInstanceController.selectedDate}" /></h3>
                         <hr/>

@@ -257,7 +257,7 @@ public class HistogramController implements Serializable {
             if(sortedValues[i] < currIntervalEnd) {
                 count++;
             } else {
-                String intervalString = Math.ceil(currIntervalStart) + "-" +  Math.ceil(currIntervalEnd);
+                String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)Math.ceil(currIntervalEnd));
                 histo.set(intervalString, count);
                 currIntervalStart = currIntervalEnd;
                 currIntervalEnd += interval;
@@ -274,10 +274,13 @@ public class HistogramController implements Serializable {
     public void drawHistogram() {
         this.histogram.clear();
         histogram.setLegendPosition("ne");
-        histogram.setTitle("Frequency Distribution");
+        histogram.setTitle("Patient Frequency Distribution");
         Axis xAx = histogram.getAxis(AxisType.X);
+        Axis yAx = histogram.getAxis(AxisType.Y);
         xAx.setMin(0);
-        xAx.setTickAngle(45); 
+        xAx.setTickAngle(45);
+        xAx.setLabel("Patients Treated");
+        yAx.setLabel("Frequency");
         histogram.setShadow(false);
         histogram.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D"); 
         histogram.addSeries(buildHistogram(selectedFacility));

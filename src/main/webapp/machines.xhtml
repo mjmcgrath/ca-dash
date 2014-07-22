@@ -45,15 +45,25 @@
                     <f:selectItem itemLabel="IGRT" itemValue="igrt" />
                     <f:selectItem itemLabel="VMAT" itemValue="vmat" />
                 </p:selectManyCheckbox><br/>
-                <p:commandButton value="Enter" actionListener='#{pieChartController.draw("MA")}' update=":machineUtil,:totalTx" /> 
+                <p:commandButton value="Enter" actionListener='#{pieChartController.draw("MA")}' update=":machineUtil" /> 
             </h:form>
         </ui:define>
 
         <ui:define name="body">
-            <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
-            <p:chart type="pie" id="machineUtil" model="#{pieChartController.pieChart}" widgetVar="machinePieChartD"
-                        style="height:750px;"/>
-            Total: <h:outputText id="totalTx" value="#{pieChartController.dstats.sum} treatments completed" />
+            <h:panelGroup id="machineUtil" layout="block">
+                 <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
+                    <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:800px;" rendered="#{pieChartController.pieChart.data.size() > 0}">
+
+                    </p:chart>
+                <h:outputText value="Total: " rendered="#{pieChartController.pieChart.data.size() > 0}" /> 
+                <h:outputText value="#{pieChartController.dstats.sum}" rendered="#{pieChartController.pieChart.data.size() > 0}">
+                    <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" /> 
+                </h:outputText>
+                <h:outputText value=" treatments completed" rendered="#{pieChartController.pieChart.data.size() > 0}" />
+                    <h:panelGroup rendered='#{pieChartController.pieChart == null || pieChartController.pieChart.data.size() == 0}'>
+                        <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
+                    </h:panelGroup>
+            </h:panelGroup>
         </ui:define>
         
     </ui:composition>

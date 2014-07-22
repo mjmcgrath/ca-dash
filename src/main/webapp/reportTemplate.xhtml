@@ -18,18 +18,14 @@
 
     <h:body>
         <p:layout fullPage="true">
-            <p:layoutUnit position="north" size="105" resizable="false" closable="true" collapsible="true" id="layoutHeader">
-                <h1>Radiation Oncology Clinical Activity Reporting Tool</h1>
-            </p:layoutUnit>
-
-            <p:layoutUnit position="west" header="Navigation" collapsible="true" size="230">
-                <p:tabView>
+            <p:layoutUnit position="west" header="Navigation" collapsible="true" size="250">
+                <p:tabView activeIndex="#{navigationController.activeTab}">
                     <p:tab id="reportSelect" title="Reports">
                         <p:menu>
-                            <p:menuitem value="Treatment Trends" url="/faces/trends.xhtml" />
-                            <p:menuitem value="Histograms" url="/faces/histograms.xhtml" />
-                            <p:menuitem value="Physician Workload" url="/faces/physicians.xhtml" />
-                            <p:menuitem value="Machine Use" url="/faces/machines.xhtml" />
+                            <p:menuitem value="Treatment Trends" url="/faces/trends.xhtml" onclick="#{navigationController.setActiveTab(1)}"/>
+                            <p:menuitem value="Histograms" url="/faces/histograms.xhtml" onclick="#{navigationController.setActiveTab(1)}" />
+                            <p:menuitem value="Physician Workload" url="/faces/physicians.xhtml" onclick="#{navigationController.setActiveTab(1)}" />
+                            <p:menuitem value="Machine Use" url="/faces/machines.xhtml" onclick="#{navigationController.setActiveTab(1)}" />
                         </p:menu>
                     </p:tab>
                     <p:tab id="options" title="Options"> 

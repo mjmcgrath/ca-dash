@@ -55,16 +55,17 @@
                 <p:slider for="percentileInput">
                     <p:ajax event="slideEnd" listener="" />
                 </p:slider-->
-                <p:commandButton class="submit" value="Enter" actionListener="#{histogramController.drawHistogram}" update=":histo" /> 
+                <p:commandButton id="submit" value="Enter" actionListener="#{histogramController.drawHistogram}" update=":histoChart" /> 
             </h:form>
             <!--/p:fieldset-->
         </ui:define>
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener="#{histogramController.drawHistogram}"/>
-            <p:panel id="histoControls">
+            <h:panelGroup id="histoChart" style="display:block">
+            <p:panel id="histoControls" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
                 <h:form>
-                    <h:panelGrid columns="2" style="margin-bottom: 10px">
+                    <h:panelGrid columns="2" style="margin-bottom: 10px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
                         <p:inputText id="percentile" value="#{histogramController.percentile}">
                             <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
                         </p:inputText>
@@ -73,14 +74,20 @@
                         <p:slider for="percentile" step="5">
                             <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
                         </p:slider>
-                        <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 5px; font-weight: bold; font-size: 20px" />
+                        <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 5px; font-weight: bold; font-size: 20px" >
+                            <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />
+                        </h:outputText>
                     </h:panelGrid>
                 </h:form>
             </p:panel>
             <style>
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
-            <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:650px;" />
+                <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:650px;" rendered="#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}" />
+                 <h:panelGroup style="display:block"  rendered="#{histogramController.histogram.series.get(0).data.size() == 0}">
+                <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
+                 </h:panelGroup>
+            </h:panelGroup>
         </ui:define>
         
     </ui:composition>

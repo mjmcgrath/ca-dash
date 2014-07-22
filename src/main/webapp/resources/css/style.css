@@ -64,3 +64,8 @@ label.hdr {
  background: #fff;
  color: #000;
 }
+
+.nodataerr {
+    text-align: center;
+    margin-top: 15%;
+}

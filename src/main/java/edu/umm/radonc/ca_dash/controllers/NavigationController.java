@@ -21,6 +21,11 @@ import javax.inject.Named;
 public class NavigationController implements Serializable {
     
     private String selectedReport;
+    private int activeTab;
+
+    public NavigationController() {
+        this.activeTab = 0;
+    }
 
     public String getSelectedReport() {
         return selectedReport;
@@ -28,6 +33,14 @@ public class NavigationController implements Serializable {
 
     public void setSelectedReport(String selectedReport) {
         this.selectedReport = selectedReport;
+    }
+
+    public int getActiveTab() {
+        return activeTab;
+    }
+
+    public void setActiveTab(int activeTab) {
+        this.activeTab = activeTab;
     }
     
     public void redirectReportSelector() {
