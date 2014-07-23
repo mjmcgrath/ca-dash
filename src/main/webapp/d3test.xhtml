@@ -1,0 +1,77 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <ui:composition template="reportTemplate.xhtml">
+        <ui:define name="supplemental_js">
+            <h:outputScript name="js/d3.min.js" />
+            <h:outputScript name="js/util.js" />
+        </ui:define>
+        
+        <ui:define name="filters">           
+            <h:form id="filters">
+                <label class='hdr'>Start Date: </label>
+                <p:calendar value="#{d3PieChartController.startDate}" id="startCal" />
+                <br/>
+                <label class='hdr'>End Date: </label>
+                <p:calendar value="#{d3PieChartController.endDate}" id="endCal" />
+                <br/><br/>
+                <p:selectOneButton id="selectCal" value="#{d3PieChartController.interval}">
+                    <f:selectItem itemLabel="7d" itemValue="1wk" />
+                    <f:selectItem itemLabel="1m" itemValue="1m" />
+                    <f:selectItem itemLabel="3m" itemValue="3m" />
+                    <f:selectItem itemLabel="6m" itemValue="6m" />
+                    <f:selectItem itemLabel="1y" itemValue="1y" />
+                    <f:selectItem itemLabel="2y" itemValue="2y" />
+                    <f:selectItem itemLabel="3y" itemValue="3y" />
+                    <p:ajax event="change" listener="#{d3PieChartController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton><br/>
+                <p:selectOneButton id="selectQtr" value="#{d3PieChartController.interval}">
+                    <f:selectItem itemLabel="Q1" itemValue="Q1" />
+                    <f:selectItem itemLabel="Q2" itemValue="Q2" />
+                    <f:selectItem itemLabel="Q3" itemValue="Q3" />
+                    <f:selectItem itemLabel="Q4" itemValue="Q4" />
+                    <p:ajax event="change" listener="#{d3PieChartController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton>
+                <label class='hdr' for="facility">Facility: </label>
+                <p:selectOneRadio id="facility" value="#{d3PieChartController.selectedFacility}" layout="pageDirection">
+                    <f:selectItem itemLabel="Aggregate" itemValue="-1" />
+                    <c:forEach items="${hospitalController.items}" var="hospital">
+                        <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
+                    </c:forEach>
+                </p:selectOneRadio>
+                <br/>
+                <label class="hdr">Other: </label><br/>
+                <p:selectManyCheckbox id="txfilters" value="#{d3PieChartController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
+                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
+                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
+                </p:selectManyCheckbox><br/>
+                <p:commandButton value="Enter" actionListener='#{d3PieChartController.draw("DR")}' update=":physicianWorkload" /> 
+            </h:form>
+        </ui:define>
+
+        <ui:define name="body">
+            <h:panelGroup id="physicianWorkload" layout="block">
+                <f:event type="preRenderView" listener='#{d3PieChartController.draw("DR")}' />
+                <script>
+                    var testjsf = <h:outputText value="#{d3PieChartController.jsonData}" />;
+                </script>
+                <h:outputText value="Total: " /> 
+                <h:outputText value="#{d3PieChartController.dstats.sum}" >
+                    <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" /> 
+                </h:outputText>
+                <h:outputText value=" patients treated" />
+                    <h:panelGroup>
+                        <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
+                    </h:panelGroup>
+            </h:panelGroup>
+            <h:outputScript name="js/pie.js" />
+        </ui:define>
+        
+    </ui:composition>
+</html>
+

@@ -815,7 +815,8 @@ public class TxInstanceController implements Serializable {
                 
                 this.weeklyErrorBars.put(errorData);
                 this.weeklyErrorLabels.put(errorTextData);
-                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                    "this.cfg.axes.yaxis.numberTicks = 7; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
                     "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
@@ -863,7 +864,8 @@ public class TxInstanceController implements Serializable {
                 
                 this.weeklyErrorBars.put(errorData);
                 this.weeklyErrorLabels.put(errorTextData);
-                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                    "this.cfg.axes.yaxis.numberTicks = 7; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
                     "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
@@ -980,7 +982,8 @@ public class TxInstanceController implements Serializable {
                 
                 this.monthlyErrorBars.put(errorData);
                 this.monthlyErrorLabels.put(errorTextData);
-                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " + 
+                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                    "this.cfg.axes.yaxis.numberTicks = 7; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
                     "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
