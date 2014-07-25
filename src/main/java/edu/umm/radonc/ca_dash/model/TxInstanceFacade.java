@@ -232,18 +232,23 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends) {
+    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag) {
         String imrtString = "";
         String hospString = "";
-
+        String ptString = "";
+        
         imrtString = buildFilterString(filter);
 
         if (hospital != null && hospital > 0) {
             hospString = "AND tf.hospitalser = ? ";
         }
+        
+         if (ptflag) {
+            ptString = "DISTINCT";
+        }
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(DISTINCT tf.patientser) "
+                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(" + ptString +  " tf.patientser) "
                 + "FROM tx_flat_v4 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + "AND tf.cpt != '00000' " + imrtString + hospString
@@ -290,18 +295,23 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return ((Long)(q.getSingleResult())).intValue();
     }
 
-    public List<Object[]> getMonthlyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends) {
+    public List<Object[]> getMonthlyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptFlag) {
         String imrtString = "";
         String hospString = "";
-
+        String ptString = "";
+        
         imrtString = buildFilterString(filter);
 
         if (hospital != null && hospital > 0) {
             hospString = "AND tf.hospitalser = ? ";
         }
+        
+        if (ptFlag) {
+            ptString = "DISTINCT";
+        }
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
-                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mn, count(DISTINCT tf.patientser) "
+                "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mn, count( " + ptString + " tf.patientser) "
                 + "FROM tx_flat_v4 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + "AND tf.cpt != '00000' " + imrtString + hospString

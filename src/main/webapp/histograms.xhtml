@@ -12,6 +12,11 @@
 
         <ui:define name="filters">
             <h:form id="filters">
+                <label class='hdr'>Mode</label><br/>
+                <p:selectOneButton id="dataTypeSelect" value="#{histogramController.patientsFlag}">
+                    <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
+                    <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
+                </p:selectOneButton><br/>
                 <label class='hdr'>Start Date: </label>
                 <p:calendar value="#{histogramController.startDate}" id="startCal" />
                 <br/>
@@ -65,25 +70,24 @@
             <h:panelGroup id="histoChart" style="display:block">
             <p:panel id="histoControls" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
                 <h:form>
-                    <h:panelGrid columns="2" style="margin-bottom: 10px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
-                        <p:inputText id="percentile" value="#{histogramController.percentile}">
+                    <h:panelGrid columns="2" style="margin-bottom: 5px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
+                        <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right;">
                             <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
                         </p:inputText>
-                        <h3>Percentile</h3>
+                        <h:outputText id="percentileText" value="th Percentile: #{histogramController.percentileVal}" style="padding: 2px;" >
+                            <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />
+                        </h:outputText>
 
                         <p:slider for="percentile" step="5">
                             <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
                         </p:slider>
-                        <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 5px; font-weight: bold; font-size: 20px" >
-                            <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />
-                        </h:outputText>
                     </h:panelGrid>
                 </h:form>
             </p:panel>
             <style>
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
-                <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:650px;" rendered="#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}" />
+                <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:800px;" rendered="#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}" />
                  <h:panelGroup style="display:block"  rendered="#{histogramController.histogram.series.get(0).data.size() == 0}">
                 <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
                  </h:panelGroup>

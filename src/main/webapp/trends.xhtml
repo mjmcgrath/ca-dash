@@ -18,6 +18,9 @@
             </p:menu-->
             <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
             <h:form id="filters">
+                <!--label class='hdr'>Zoom</label>
+                <div id="zoomSlider"></div-->
+                <label class='hdr'>Mode</label><br/>
                 <p:selectOneButton id="dataTypeSelect" value="#{txInstanceController.patientsFlag}">
                     <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
@@ -83,17 +86,14 @@
             <style>
                 table.jqplot-table-legend { font-size: 1em; }
             </style>
-            <div id="zoomSlider"></div>
             <p:tabView id="charts" orientation="bottom" dynamic="true" style="position:inherit;" >
                 <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
-                    <p:panel id="stats">
-                        Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"/>
-                        Stddev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"/>
-                    </p:panel>
                     <!--c:if test="#{txInstanceController.dailyBarChart.series.size() > 0}"-->
                         <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
-                        style="height:650px; position:inherit;" />
+                        style="height:800px; position:inherit;" />
+                        Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"><f:convertNumber type="number" maxFractionDigits="2" pattern="#0.00" /></h:outputText><br/>
+                        Std Dev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"><f:convertNumber type="number" maxFractionDigits="2" pattern="#0.00" /></h:outputText>
                     <!--/c:if>
                     <c:otherwise>
                         <h:outputText value="No Data" />
@@ -147,7 +147,7 @@
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:650px;" />
+                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:800px;" />
                 </p:tab>
                 </c:if>
                 <c:if test="#{txInstanceController.monthlyBarChart.series.size() > 0}">
@@ -163,7 +163,7 @@
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:650px;"/>
+                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:800px;"/>
                 </p:tab>
                 </c:if>
                 <p:tab title="Raw Data">
@@ -208,11 +208,11 @@
                 </p:column>
                 <p:column>
                     <f:facet name="header">
-                        <h:outputText value="Machine}"/>
+                        <h:outputText value="Machine"/>
                     </f:facet>
                     <h:outputText value="#{item.machine}"/>
                 </p:column>
-                <p:column filterBy="#{item.hospital}">
+                <p:column>
                     <f:facet name="header">
                         <h:outputText value="Hospital"/>
                     </f:facet>

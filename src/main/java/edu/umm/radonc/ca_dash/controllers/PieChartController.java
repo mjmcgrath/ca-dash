@@ -156,7 +156,7 @@ public class PieChartController implements Serializable{
         pieChart.setShowDataLabels(true);
         pieChart.setShadow(false);
         //pieChart.setDataFormat("value");
-        
+        pieChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, A2B85C, BBBEC3, D8C9B6, BD8A79, 3C857A, CD3935");
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.2; " +
                     "this.cfg.seriesDefaults.rendererOptions.diameter = 600; " +

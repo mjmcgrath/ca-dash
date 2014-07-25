@@ -115,7 +115,7 @@ public class TxInstanceController implements Serializable {
         disableDailyCheckbox = false;
         weeklyDisplayMode = "Summary";
         weeklySegmentationMode = "Absolute";
-        monthlyDisplayMode = "Raw";
+        monthlyDisplayMode = "Summary";
         weeklyChartmax = 0;
         monthlyChartmax = 0;
         selectedFilters = new ArrayList<>();
@@ -525,7 +525,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -580,7 +580,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public List<Object[]> getMonthlyCounts(Long index) {
-        return getFacade().getMonthlyCounts(startDate, endDate, index, filterString(), includeWeekends);
+        return getFacade().getMonthlyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag);
     }
     
     public void setStartDate(Date startDate) {
@@ -634,7 +634,7 @@ public class TxInstanceController implements Serializable {
     public void drawDaily(DateFormat df) {
         //this.dailyChart.clear();
         dailyChart.setLegendPosition("ne");
-        dailyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        dailyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         dailyChart.setShadow(false);
         Axis yAx = dailyChart.getAxis(AxisType.Y);
         Axis xAx = dailyChart.getAxis(AxisType.X);
@@ -706,7 +706,7 @@ public class TxInstanceController implements Serializable {
     public void drawWeekly(DateFormat df) {
         this.weeklyChart.clear();
         weeklyChart.setLegendPosition("ne");
-        weeklyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        weeklyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         weeklyChart.setShadow(false);
         Axis yAx = weeklyChart.getAxis(AxisType.Y);
         Axis xAx = weeklyChart.getAxis(AxisType.X);
@@ -898,7 +898,7 @@ public class TxInstanceController implements Serializable {
     public void drawMonthly(DateFormat df) {
         this.monthlyChart.clear();
         monthlyChart.setLegendPosition("ne");
-        monthlyChart.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D");
+        monthlyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         monthlyChart.setShadow(false);
         Axis yAx = monthlyChart.getAxis(AxisType.Y);
         Axis xAx = monthlyChart.getAxis(AxisType.X);
@@ -918,7 +918,9 @@ public class TxInstanceController implements Serializable {
         List<Object[]> events;
         
         if (this.monthlyDisplayMode.equals("Raw")) {
-            monthlyChart.setTitle("Patients Treated");
+            this.monthlyErrorBars = new JSONArray();
+            this.monthlyErrorLabels = new JSONArray();
+            
             for (Integer fac: selectedFacilities) {
                 mSeries = new ChartSeries();
                 String hospital = "All";
@@ -936,14 +938,20 @@ public class TxInstanceController implements Serializable {
                     Long yval = (Long)event[2];
                     mSeries.set(xval, yval);
                     if(yval > monthlyChartmax){
-                        monthlyChartmax = yval.intValue();
+                        yAx = monthlyChart.getAxis(AxisType.Y);
+                        monthlyChartmax = calcChartMax(yval.doubleValue(), 0.0);
+                        yAx.setMax(monthlyChartmax);
                     }
                 }
+                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                    "this.cfg.axes.yaxis.numberTicks = 7; " +
+                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
+                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
                 monthlyChart.addSeries(mSeries);
             }
         } else {
             //monthly summary
-            monthlyChart.setTitle("Average Number of Patients Treated Daily");
             for (Integer fac: selectedFacilities) {
                 String hospital = "All";
                 if( fac > 0 ) {

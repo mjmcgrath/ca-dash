@@ -273,16 +273,22 @@ public class HistogramController implements Serializable {
     
     public void drawHistogram() {
         this.histogram.clear();
-        histogram.setLegendPosition("ne");
-        histogram.setTitle("Patient Frequency Distribution");
         Axis xAx = histogram.getAxis(AxisType.X);
         Axis yAx = histogram.getAxis(AxisType.Y);
+        histogram.setLegendPosition("ne");
+        if(patientsFlag) {
+            histogram.setTitle("Patient Frequency Distribution");
+            xAx.setLabel("Patients Treated");
+        } else {
+            histogram.setTitle("Treatment Frequency Distribution");
+            xAx.setLabel("Treatments Completed");
+        }
+
         xAx.setMin(0);
         xAx.setTickAngle(45);
-        xAx.setLabel("Patients Treated");
         yAx.setLabel("Frequency");
         histogram.setShadow(false);
-        histogram.setSeriesColors("C8102E, FFCD00, 007698, 2C2A29, 33460D,49182D"); 
+        histogram.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D"); 
         histogram.addSeries(buildHistogram(selectedFacility));
     }
     
