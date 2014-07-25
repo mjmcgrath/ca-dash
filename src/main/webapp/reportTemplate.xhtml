@@ -19,9 +19,9 @@
     <h:body>
         <p:layout fullPage="true">
             <p:layoutUnit position="west" header="Navigation" collapsible="true" size="250">
-                <p:tabView activeIndex="#{navigationController.activeTab}">
+                <p:tabView id="navTV" activeIndex="#{navigationController.activeTab}">
                     <p:tab id="reportSelect" title="Reports">
-                        <p:menu>
+                        <p:menu id="navMenu">
                             <p:menuitem value="Treatment Trends" url="/faces/trends.xhtml" onclick="#{navigationController.setActiveTab(1)}"/>
                             <p:menuitem value="Histograms" url="/faces/histograms.xhtml" onclick="#{navigationController.setActiveTab(1)}" />
                             <p:menuitem value="Physician Workload" url="/faces/physicians.xhtml" onclick="#{navigationController.setActiveTab(1)}" />
