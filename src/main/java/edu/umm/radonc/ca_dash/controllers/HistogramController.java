@@ -138,13 +138,7 @@ public class HistogramController implements Serializable {
     
     
     public void updatePercentile() {
-        Long hospital = new Long(-1);
-        if( hospital != null && hospital > 0) {
-            dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
-        }
-        else {
-            dstats = getFacade().getDailyStats(startDate, endDate, new Long(-1),filterString(), includeWeekends, patientsFlag);
-        }
+        dstats = getFacade().getDailyStats(startDate, endDate, selectedFacility, filterString(), includeWeekends, patientsFlag);
         percentileVal = dstats.getPercentile(percentile);
     }
 
@@ -243,13 +237,12 @@ public class HistogramController implements Serializable {
     
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
-        SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
+        dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
         String label = "All";
         //Freedman-Diaconis bin width
-        double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
+        double interval = 2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0));
         
-        double[] sortedValues = stats.getSortedValues();
+        double[] sortedValues = dstats.getSortedValues();
         double currIntervalStart = 0.0;
         double currIntervalEnd = interval;
         int count = 0;

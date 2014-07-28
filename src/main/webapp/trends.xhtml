@@ -85,6 +85,16 @@
             <f:event type="preRenderComponent" listener="#{txInstanceController.draw}"/>
             <style>
                 table.jqplot-table-legend { font-size: 1em; }
+                .jqplot-title {
+                    font-size: 2em;
+                    font-family: 'Source Sans Pro', sans-serif; 
+                }
+
+                .jqplot-xaxis-label, .jqplot-yaxis-label {
+                    font-family: 'Source Sans Pro', sans-serif; 
+                    font-size: 12pt;
+                    font-weight: bold;
+                }
             </style>
             <p:tabView id="charts" orientation="bottom" dynamic="true" style="position:inherit;" >
                 <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">

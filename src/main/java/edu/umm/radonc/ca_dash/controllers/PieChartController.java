@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -44,6 +45,7 @@ public class PieChartController implements Serializable{
     private Long selectedFacility;
     private boolean imrtOnly;
     private SynchronizedDescriptiveStatistics dstats;
+    private TreeMap<String, SynchronizedDescriptiveStatistics> dstatsPerDoc;
     private PieChartModel pieChart;
     private String interval;
     List<String> selectedFilters;
@@ -58,6 +60,7 @@ public class PieChartController implements Serializable{
         this.df =  new SimpleDateFormat("MM/dd/YYYY");
         this.selectedFacility = new Long(-1);
         this.dstats = new SynchronizedDescriptiveStatistics();
+        this.dstatsPerDoc = new TreeMap<>();
         this.pieChart = new PieChartModel();
         this.interval = "";
         selectedFilters = new ArrayList<>();
@@ -112,6 +115,11 @@ public class PieChartController implements Serializable{
     public SynchronizedDescriptiveStatistics getDstats() {
         return dstats;
     }
+
+    public TreeMap<String, SynchronizedDescriptiveStatistics> getDstatsPerDoc() {
+        return dstatsPerDoc;
+    }
+    
     public PieChartModel getPieChart() {
         return pieChart;
     }
@@ -128,9 +136,10 @@ public class PieChartController implements Serializable{
         List<Object[]> counts;
         pieChart.clear();
         dstats.clear();
-        
+        dstatsPerDoc.clear();
         if(dataSet.equals("DR")) {
             counts = getFacade().DoctorPtCounts(startDate, endDate, selectedFacility, filterString());
+            dstatsPerDoc = getFacade().doctorStats(startDate, endDate, selectedFacility, filterString());
             pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
         } else {
             counts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());

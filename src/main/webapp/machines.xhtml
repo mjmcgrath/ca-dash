@@ -50,6 +50,19 @@
         </ui:define>
 
         <ui:define name="body">
+            <style>
+                table.jqplot-table-legend { font-size: 1em; }
+                .jqplot-title {
+                    font-size: 2em;
+                    font-family: 'Source Sans Pro', sans-serif; 
+                }
+
+                .jqplot-xaxis-label, .jqplot-yaxis-label {
+                    font-family: 'Source Sans Pro', sans-serif; 
+                    font-size: 12pt;
+                    font-weight: bold;
+                }
+            </style>
             <h:panelGroup id="machineUtil" layout="block">
                  <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
                     <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:800px;" rendered="#{pieChartController.pieChart.data.size() > 0}">

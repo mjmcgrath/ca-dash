@@ -346,6 +346,52 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         return retval;
     }
+    
+    public TreeMap<String, SynchronizedDescriptiveStatistics > doctorStats (Date startDate, Date endDate, Long hospital, String filter) {
+        TreeMap<String, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
+           String hospString = "";
+        String filterString = "";
+        if (hospital != null && hospital > 0) {
+            hospString = " AND tf.hospitalser = ? ";
+        }
+
+        filterString = buildFilterString(filter);
+
+        javax.persistence.Query q = getEntityManager().createNativeQuery(
+                "select (dr.lastname || ', ' || dr.firstname) AS doctor, completed, COUNT(DISTINCT tf.patientser) "
+                + "FROM tx_flat_v4 tf "
+                + "INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser "
+                + "INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser "
+                + "WHERE tf.completed IS NOT NULL "
+                + "AND ptdr.primaryflag = 'TRUE' AND ptdr.oncologistflag = 'TRUE' "
+                + "AND tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
+                + filterString + hospString
+                + "GROUP BY dr.lastname, dr.firstname, completed;")
+                .setParameter(1, startDate)
+                .setParameter(2, endDate);
+
+        if (hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
+        List<Object[]> results = q.getResultList();
+        
+        String currDoc = "";
+        if(!(results.isEmpty())) {
+            currDoc = (String)results.get(0)[0];
+        }
+        SynchronizedDescriptiveStatistics drStats = new SynchronizedDescriptiveStatistics();
+        for(Object[] row : results) {
+            String dr = (String)row[0];
+            if( !(dr.equals(currDoc)) ) {
+                retval.put(dr, drStats);
+                drStats = new SynchronizedDescriptiveStatistics();
+            }
+            drStats.addValue((Long)row[1]);
+            currDoc = dr;
+        }
+        
+        return retval;
+    }
 
     public List<Object[]> DoctorPtCounts(Date startDate, Date endDate, Long hospital, String filter) {
         String hospString = "";
