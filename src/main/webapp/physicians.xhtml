@@ -73,18 +73,17 @@
                     <p:row>
                         <p:column style="width:60%"><p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:850px;"></p:chart></p:column>
                         <p:column>
-                            <!--p:dataTable var="car" value="#{dtBasicView.cars}">
-                                <p:column headerText="Doctor">
-                                    <h:outputText value="#{car.id}" />
+                            <p:dataTable var="doctor" value="#{pieChartController.dstatsPerDoc.entrySet()}">
+                                <p:column headerText="Oncologist">
+                                    <h:outputText value="#{doctor.key}" />
                                 </p:column>
-                                <p:column headerText="Cumulative">
-                                    <h:outputText value="#{car.year}" />
+                                <p:column headerText="Mean">
+                                    <h:outputText value="#{doctor.value.getMean()}">
+                                        <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
+                                    </h:outputText>
                                 </p:column>
 
-                                <p:column headerText="Mean">
-                                    <h:outputText value="#{car.brand}" />
-                                </p:column>
-                            </p:dataTable-->
+                            </p:dataTable>
                         </p:column>
                     </p:row>
                     <p:row>

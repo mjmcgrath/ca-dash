@@ -383,12 +383,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         for(Object[] row : results) {
             String dr = (String)row[0];
             if( !(dr.equals(currDoc)) ) {
-                retval.put(dr, drStats);
+                retval.put(currDoc, drStats);
                 drStats = new SynchronizedDescriptiveStatistics();
             }
-            drStats.addValue((Long)row[1]);
+            drStats.addValue((Long)row[2]);
             currDoc = dr;
         }
+        retval.put(currDoc, drStats);
         
         return retval;
     }
