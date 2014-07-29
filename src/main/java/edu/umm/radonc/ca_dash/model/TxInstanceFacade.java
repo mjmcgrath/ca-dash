@@ -64,7 +64,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
 
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v4 WHERE "
+                .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v5 WHERE "
                         + " completed IS NOT NULL AND completed >= ? AND completed <= ? "
                         + hospString
                         + imrtString
@@ -249,7 +249,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(" + ptString +  " tf.patientser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + "AND tf.cpt != '00000' " + imrtString + hospString
                 + "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
@@ -312,7 +312,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mn, count( " + ptString + " tf.patientser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + "AND tf.cpt != '00000' " + imrtString + hospString
                 + "GROUP BY yr, mn ORDER BY yr,mn ASC;")
@@ -359,7 +359,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select (dr.lastname || ', ' || dr.firstname) AS doctor, completed, COUNT(DISTINCT tf.patientser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser "
                 + "INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser "
                 + "WHERE tf.completed IS NOT NULL "
@@ -394,9 +394,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public List<Object[]> DoctorPtCounts(Date startDate, Date endDate, Long hospital, String filter) {
+    public TreeMap<String, Long>doctorPtCounts(Date startDate, Date endDate, Long hospital, String filter) {
         String hospString = "";
         String filterString = "";
+        TreeMap<String,Long> retval = new TreeMap<>();
+        
         if (hospital != null && hospital > 0) {
             hospString = " AND tf.hospitalser = ? ";
         }
@@ -405,7 +407,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select (dr.lastname || ', ' || dr.firstname) AS doctor, COUNT(DISTINCT tf.patientser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser "
                 + "INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser "
                 + "WHERE tf.completed IS NOT NULL "
@@ -419,7 +421,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (hospital != null && hospital > 0) {
             q.setParameter(3, hospital);
         }
-        List<Object[]> retval = q.getResultList();
+        List<Object[]> result = q.getResultList();
+        for(Object[] row : result ) {
+            retval.put((String)row[0], (Long)row[1]);
+        }
         return retval;
     }
 
@@ -434,7 +439,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "select machine, COUNT(DISTINCT tf.activityinstanceser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + filterString + hospString
                 + "GROUP BY tf.machine;")

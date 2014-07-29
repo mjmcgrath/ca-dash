@@ -153,7 +153,7 @@ public class TxInstanceFacadeREST extends AbstractFacade<TxInstance> {
         if(dataSet.equals("DR")) {
                 q = getEntityManager().createNativeQuery(
                 "select (dr.lastname || ', ' || dr.firstname) AS doctor, COUNT(DISTINCT tf.patientser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "INNER JOIN patientdoctor ptdr ON tf.patientser = ptdr.patientser "
                 + "INNER JOIN doctor dr ON ptdr.resourceser = dr.resourceser "
                 + "WHERE tf.completed IS NOT NULL "
@@ -171,7 +171,7 @@ public class TxInstanceFacadeREST extends AbstractFacade<TxInstance> {
         } else {
             q = getEntityManager().createNativeQuery(
                 "select machine, COUNT(DISTINCT tf.activityinstanceser) "
-                + "FROM tx_flat_v4 tf "
+                + "FROM tx_flat_v5 tf "
                 + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
                 + filterString + hospString
                 + "GROUP BY tf.machine;")

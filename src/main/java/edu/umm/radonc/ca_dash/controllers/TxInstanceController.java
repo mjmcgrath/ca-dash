@@ -90,6 +90,7 @@ public class TxInstanceController implements Serializable {
     private String interval;
     private List<String> selectedFilters;
     private boolean patientsFlag;
+    private boolean scheduledFlag;
     
     public TxInstanceController() {
         df = new SimpleDateFormat("MM/dd/yy");
@@ -120,6 +121,7 @@ public class TxInstanceController implements Serializable {
         monthlyChartmax = 0;
         selectedFilters = new ArrayList<>();
         patientsFlag = true;
+        scheduledFlag = false;
         handleDateSelect();
     }
 
@@ -161,6 +163,14 @@ public class TxInstanceController implements Serializable {
 
     public void setPatientsFlag(boolean patientsFlag) {
         this.patientsFlag = patientsFlag;
+    }
+
+    public boolean isScheduledFlag() {
+        return scheduledFlag;
+    }
+
+    public void setScheduledFlag(boolean scheduledFlag) {
+        this.scheduledFlag = scheduledFlag;
     }
     
     public String getWeeklyDisplayMode() {

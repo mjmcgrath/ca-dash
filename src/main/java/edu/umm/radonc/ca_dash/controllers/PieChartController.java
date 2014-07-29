@@ -23,6 +23,7 @@ import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.JSONArray;
 import org.primefaces.model.chart.PieChartModel;
+import edu.umm.radonc.ca_dash.model.DoctorStats;
 
 
 /**
@@ -45,7 +46,7 @@ public class PieChartController implements Serializable{
     private Long selectedFacility;
     private boolean imrtOnly;
     private SynchronizedDescriptiveStatistics dstats;
-    private TreeMap<String, SynchronizedDescriptiveStatistics> dstatsPerDoc;
+    private TreeMap<String, DoctorStats> dstatsPerDoc;
     private PieChartModel pieChart;
     private String interval;
     List<String> selectedFilters;
@@ -116,7 +117,7 @@ public class PieChartController implements Serializable{
         return dstats;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getDstatsPerDoc() {
+    public TreeMap<String, DoctorStats> getDstatsPerDoc() {
         return dstatsPerDoc;
     }
     
@@ -132,34 +133,58 @@ public class PieChartController implements Serializable{
         return retval;
     }
     
+    public void updateData(String dataset){
+    
+    }
+    
     public void updateChart(String dataSet){
-        List<Object[]> counts;
+        List<Object[]> machinecounts = new ArrayList<>();
+        TreeMap<String, Long> ptcounts;
+        TreeMap<String, SynchronizedDescriptiveStatistics> ptstats;
         pieChart.clear();
         dstats.clear();
         dstatsPerDoc.clear();
+        JSONArray labels = new JSONArray();
+        
         if(dataSet.equals("DR")) {
-            counts = getFacade().DoctorPtCounts(startDate, endDate, selectedFacility, filterString());
-            dstatsPerDoc = getFacade().doctorStats(startDate, endDate, selectedFacility, filterString());
+            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, filterString());
+            ptstats = getFacade().doctorStats(startDate, endDate, selectedFacility, filterString());
+            for(String doctor : ptcounts.keySet()) {
+                Long count = ptcounts.get(doctor);
+                DoctorStats newItem = new DoctorStats();
+                newItem.setTotalPatients(count);
+                newItem.setAverageDailyPatients(ptstats.get(doctor));
+                dstatsPerDoc.put(doctor, newItem);
+                pieChart.set(doctor, count);
+                dstats.addValue(count);
+                try{
+                    String item = doctor + " (" + count + ")";
+                    labels.put(item);
+                }catch(Exception e){
+                    //FIXME
+                }
+            }
+            
             pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
         } else {
-            counts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
+            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
             pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
-        }
-        JSONArray labels = new JSONArray();
-
-        for(Object[] row : counts) {
-            String item = "";
-            String dr = (String) row[0];
-            Long ptCount = (Long) row[1];
-            pieChart.set(dr, ptCount);
-            dstats.addValue(ptCount);
-            try{
-                item = dr + " (" + ptCount + ")";
-                labels.put(item);
-            }catch(Exception e){
-                //FIXME
+            
+            for(Object[] row : machinecounts) {
+                String item = "";
+                String dr = (String) row[0];
+                Long ptCount = (Long) row[1];
+                pieChart.set(dr, ptCount);
+                dstats.addValue(ptCount);
+                try{
+                    item = dr + " (" + ptCount + ")";
+                    labels.put(item);
+                }catch(Exception e){
+                    //FIXME
+                }
             }
         }
+
         
         //pieChart.setLegendPosition("ne");
         pieChart.setShowDataLabels(true);

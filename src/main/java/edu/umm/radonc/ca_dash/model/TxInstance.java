@@ -24,14 +24,16 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author mmcgrath
  */
 @Entity
-@Table(name = "tx_flat_v4")
+@Table(name = "tx_flat_v5")
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "TxInstance.findAll", query = "SELECT t FROM TxInstance t"),
     @NamedQuery(name = "TxInstance.findByActivityinstanceser", query = "SELECT t FROM TxInstance t WHERE t.activityinstanceser = :activityinstanceser"),
     @NamedQuery(name = "TxInstance.findByActivitycaptureser", query = "SELECT t FROM TxInstance t WHERE t.activitycaptureser = :activitycaptureser"),
     @NamedQuery(name = "TxInstance.findByPatientser", query = "SELECT t FROM TxInstance t WHERE t.patientser = :patientser"),
+    @NamedQuery(name = "TxInstance.findByStarted", query = "SELECT t FROM TxInstance t WHERE t.started = :started"),
     @NamedQuery(name = "TxInstance.findByCompleted", query = "SELECT t FROM TxInstance t WHERE t.completed = :completed"),
+    @NamedQuery(name = "TxInstance.findByScheduled", query = "SELECT t FROM TxInstance t WHERE t.scheduled = :scheduled"),
     @NamedQuery(name = "TxInstance.findByCodetype", query = "SELECT t FROM TxInstance t WHERE t.codetype = :codetype"),
     @NamedQuery(name = "TxInstance.findByCpt", query = "SELECT t FROM TxInstance t WHERE t.cpt = :cpt"),
     @NamedQuery(name = "TxInstance.findByShortcomment", query = "SELECT t FROM TxInstance t WHERE t.shortcomment = :shortcomment"),
@@ -50,9 +52,15 @@ public class TxInstance implements Serializable {
     private Integer activitycaptureser;
     @Column(name = "patientser")
     private Integer patientser;
+    @Column(name = "started")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date started;
     @Column(name = "completed")
     @Temporal(TemporalType.TIMESTAMP)
     private Date completed;
+    @Column(name = "scheduled")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date scheduled;
     @Size(max = 255)
     @Column(name = "codetype")
     private String codetype;
@@ -185,6 +193,22 @@ public class TxInstance implements Serializable {
 
     public void setHospital(String hospital) {
         this.hospital = hospital;
+    }
+
+    public Date getStarted() {
+        return started;
+    }
+
+    public void setStarted(Date started) {
+        this.started = started;
+    }
+
+    public Date getScheduled() {
+        return scheduled;
+    }
+
+    public void setScheduled(Date scheduled) {
+        this.scheduled = scheduled;
     }
 
     

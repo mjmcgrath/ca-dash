@@ -16,6 +16,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -126,20 +127,21 @@ public class D3PieChartController implements Serializable{
     }
     
     public void updateChart(String dataSet){
-        List<Object[]> counts;
+        List<Object[]> machinecounts = new ArrayList<>();
+        TreeMap<String, Long> ptcounts;
         jsonData = new JSONArray();
         dstats.clear();
         
         if(dataSet.equals("DR")) {
-            counts = getFacade().DoctorPtCounts(startDate, endDate, selectedFacility, filterString());
+            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, filterString());
             //pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
         } else {
-            counts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
+            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
             //pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
         }
         JSONArray labels = new JSONArray();
 
-        for(Object[] row : counts) {
+        for(Object[] row : machinecounts) {
             String item = "";
             String dr = (String) row[0];
             Long ptCount = (Long) row[1];
