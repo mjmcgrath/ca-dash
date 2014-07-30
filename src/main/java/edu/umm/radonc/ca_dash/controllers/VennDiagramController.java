@@ -96,11 +96,11 @@ public class VennDiagramController {
         JSONArray sets = new JSONArray();
         JSONArray overlaps = new JSONArray();
         //Get IMRT count
-        List<Object[]> imrtCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "imrt", true, false);
+        List<Object[]> imrtCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "imrt", true, false, false);
         //Get IGRT count
-        List<Object[]> igrtCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "igrt", true, false);
+        List<Object[]> igrtCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "igrt", true, false, false);
         //Get IMRT & IGRT count FIXME FIXME
-        List<Object[]> overlapCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "overlap", true, false);
+        List<Object[]> overlapCt = getFacade().getDailyCounts(startDate, endDate, selectedFacility, "overlap", true, false, false);
         //Calc overlap here
         
         

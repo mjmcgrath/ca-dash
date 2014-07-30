@@ -77,8 +77,13 @@
                                 <p:column headerText="Oncologist">
                                     <h:outputText value="#{doctor.key}" />
                                 </p:column>
+                                <p:column headerText="Cumulative">
+                                    <h:outputText value="#{doctor.value.totalPatients}">
+                                        <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
+                                    </h:outputText>
+                                </p:column>
                                 <p:column headerText="Mean">
-                                    <h:outputText value="#{doctor.value.getMean()}">
+                                    <h:outputText value="#{doctor.value.averageDailyPatients.getMean()}">
                                         <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
                                     </h:outputText>
                                 </p:column>

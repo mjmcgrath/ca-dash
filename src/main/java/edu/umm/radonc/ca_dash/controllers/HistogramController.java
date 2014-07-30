@@ -63,6 +63,7 @@ public class HistogramController implements Serializable {
     private String interval;
     private SynchronizedDescriptiveStatistics dstats;
     private boolean patientsFlag;
+     private boolean scheduledFlag;
             
     public HistogramController() {
         histogram = new BarChartModel();
@@ -77,6 +78,7 @@ public class HistogramController implements Serializable {
         selectedFilters = new ArrayList<>();
         selectedFacility = new Long(-1);
         patientsFlag = true;
+        scheduledFlag = false;
     }
     
     private TxInstanceFacade getFacade() {
@@ -138,7 +140,7 @@ public class HistogramController implements Serializable {
     
     
     public void updatePercentile() {
-        dstats = getFacade().getDailyStats(startDate, endDate, selectedFacility, filterString(), includeWeekends, patientsFlag);
+        dstats = getFacade().getDailyStats(startDate, endDate, selectedFacility, filterString(), includeWeekends, patientsFlag, scheduledFlag);
         percentileVal = dstats.getPercentile(percentile);
     }
 
@@ -164,6 +166,14 @@ public class HistogramController implements Serializable {
 
     public void setInterval(String interval) {
         this.interval = interval;
+    }
+
+    public boolean isScheduledFlag() {
+        return scheduledFlag;
+    }
+
+    public void setScheduledFlag(boolean scheduledFlag) {
+        this.scheduledFlag = scheduledFlag;
     }
     
     public void onSelectTimePeriod(){
@@ -237,7 +247,7 @@ public class HistogramController implements Serializable {
     
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
-        dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
+        dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
         String label = "All";
         //Freedman-Diaconis bin width
         double interval = 2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0));

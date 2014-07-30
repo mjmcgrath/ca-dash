@@ -13,6 +13,10 @@
         <ui:define name="filters">
             <h:form id="filters">
                 <label class='hdr'>Mode</label><br/>
+                <p:selectOneButton id="apptTypeSelect" value="#{histogramController.scheduledFlag}">
+                    <f:selectItem itemLabel="Scheduled" itemValue="true"></f:selectItem>
+                    <f:selectItem itemLabel="Actual" itemValue="false"></f:selectItem>
+                </p:selectOneButton>
                 <p:selectOneButton id="dataTypeSelect" value="#{histogramController.patientsFlag}">
                     <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>

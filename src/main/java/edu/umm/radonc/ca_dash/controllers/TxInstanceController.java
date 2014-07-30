@@ -448,7 +448,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> itemsMerged = new ArrayList<>();
         String fs = filterString();
         
-        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true, patientsFlag);
+        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true, patientsFlag, scheduledFlag);
         
         int i;
         outer:
@@ -470,7 +470,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public SynchronizedDescriptiveStatistics getDailySummary() {
-        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends, patientsFlag);
+        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends, patientsFlag, scheduledFlag);
         
     }
     
@@ -478,7 +478,7 @@ public class TxInstanceController implements Serializable {
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
 
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
         
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
@@ -503,20 +503,20 @@ public class TxInstanceController implements Serializable {
     
     public Double percentile(Double p, Long hospital) {
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
         return stats.getPercentile(p);
     }
     
     public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital){
-        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryAbs(int hospital){
-        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
-        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -535,7 +535,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag, scheduledFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -1046,7 +1046,7 @@ public class TxInstanceController implements Serializable {
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
-        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag);
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {

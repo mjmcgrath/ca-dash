@@ -41,7 +41,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         super(TxInstance.class);
     }
 
-    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, String filter, boolean includeWeekends, boolean ptflag) {
+    public List<Object[]> getDailyCounts(Date start, Date end, Long hospitalSer, String filter, boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         //CriteriaQuery cq = getEntityManager().getCriteriaBuilder().createQuery();
         //cq.select(cq.from(Activity.class));cast result list
 
@@ -50,6 +50,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         String weekendString = "";
         String hospString = "";
         String ptString = "";
+        String scheduledString = "completed";
 
         //if(!includeWeekends) {
         weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
@@ -58,6 +59,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (ptflag) {
             ptString = "DISTINCT";
         }
+        
+        if (scheduledFlag) {
+            scheduledString = "scheduled";
+        }
 
         if (hospitalSer > 0) {
             hospString = "AND hospitalser = ? ";
@@ -65,7 +70,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager()
                 .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v5 WHERE "
-                        + " completed IS NOT NULL AND completed >= ? AND completed <= ? "
+                        + " completed IS NOT NULL AND " + scheduledString + " >= ? AND " + scheduledString + " <= ? "
                         + hospString
                         + imrtString
                         + weekendString
@@ -80,23 +85,24 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag) {
+    public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(endDate);
         gc.add(Calendar.DATE, -1);
-        List<Object[]> counts = getDailyCounts(startDate, gc.getTime(), hospital, filter, includeWeekends, ptflag);
+        List<Object[]> counts = getDailyCounts(startDate, gc.getTime(), hospital, filter, includeWeekends, ptflag, scheduledFlag);
         for (Object[] item : counts) {
             stats.addValue(((Long) item[1]).doubleValue());
         }
         return stats;
     }
 
-    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsTr(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsTr(Date startDate, Date endDate, Long hospitalser, String filter, 
+            boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         Calendar cal = new GregorianCalendar();
         TreeMap<Date, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
 
-        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag);
+        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
@@ -126,7 +132,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsAbs(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+    public TreeMap<Date, SynchronizedDescriptiveStatistics> getWeeklySummaryStatsAbs(Date startDate, Date endDate, Long hospitalser, String filter, 
+            boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         Calendar cal = new GregorianCalendar();
         TreeMap<Date, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
 
@@ -135,7 +142,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         startDate = cal.getTime();
 
-        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag);
+        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
@@ -189,13 +196,14 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, 
+            boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         Calendar cal = new GregorianCalendar();
         TreeMap<String, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
 
         List<Object[]> events;
 
-        events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag);
+        events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
 
         cal.setTime(startDate);
 
@@ -232,10 +240,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag) {
+    public List<Object[]> getWeeklyCounts(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         String imrtString = "";
         String hospString = "";
         String ptString = "";
+        String scheduledString = "completed";
         
         imrtString = buildFilterString(filter);
 
@@ -243,14 +252,18 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             hospString = "AND tf.hospitalser = ? ";
         }
         
-         if (ptflag) {
+        if (ptflag) {
             ptString = "DISTINCT";
+        }
+        
+        if(scheduledFlag) {
+            scheduledString = "scheduled";
         }
 
         javax.persistence.Query q = getEntityManager().createNativeQuery(
                 "SELECT date_part('year', tf.completed) AS yr, date_part('month', tf.completed) AS mo, date_part('week', tf.completed) AS wk, count(" + ptString +  " tf.patientser) "
                 + "FROM tx_flat_v5 tf "
-                + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
+                + "WHERE tf.completed IS NOT NULL AND tf." + scheduledString + " >= ? AND tf." + scheduledString + " <= ? "
                 + "AND tf.cpt != '00000' " + imrtString + hospString
                 + "GROUP BY yr, mo, wk ORDER BY yr, mo, wk ASC")
                 .setParameter(1, startDate)
@@ -331,7 +344,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public Map<Date, SynchronizedDescriptiveStatistics> getWeeklyTrailingSummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, boolean includeWeekends, boolean ptflag) {
+    public Map<Date, SynchronizedDescriptiveStatistics> getWeeklyTrailingSummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, 
+            boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         TreeMap<Date, SynchronizedDescriptiveStatistics> retval = new TreeMap();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(endDate);
@@ -340,7 +354,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         while (gc.getTime().compareTo(startDate) > 0) {
             d = gc.getTime();
             gc.add(Calendar.DATE, -7);
-            stats = getDailyStats(gc.getTime(), d, hospitalser, filter, includeWeekends, ptflag);
+            stats = getDailyStats(gc.getTime(), d, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
             retval.put(gc.getTime(), stats);
         }
 
