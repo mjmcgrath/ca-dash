@@ -472,22 +472,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if (filter.contains("imrt")) {
-                filterString = filterString + "(cpt = '77403' OR "
-                        + "cpt = '77408' OR "
-                        + "cpt = '77413' OR "
-                        + "cpt = '77404' OR "
-                        + "cpt = '77409' OR "
-                        + "cpt = '77414' OR "
-                        + "cpt = '77418' OR "
-                        + "cpt = '77416' OR "
-                        + "cpt = 'G0251' OR "
-                        + "cpt = 'G0173')";
+                filterString = filterString + "(cpt = '77418')";
             }
             if (filter.contains("igrt")) {
                 if (!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString = filterString += "cpt = '77021' OR "
+                filterString = filterString += "cpt = '77421' OR "
                         + "cpt = '77014' OR "
                         + "cpt = '0197T' ";
             }
