@@ -40,6 +40,7 @@ public class NavigationController implements Serializable {
     }
 
     public void setActiveTab(int activeTab) {
+
         this.activeTab = activeTab;
     }
     

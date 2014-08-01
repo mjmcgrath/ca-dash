@@ -44,11 +44,12 @@
                 </p:selectOneRadio>
                 <br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectManyCheckbox id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                <p:selectOneRadio id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" />
-                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
-                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
-                </p:selectManyCheckbox><br/>
+                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
+                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
+                </p:selectOneRadio><br/>
                 <p:commandButton value="Enter" actionListener='#{pieChartController.draw("DR")}' update=":physicianWorkload" /> 
             </h:form>
         </ui:define>

@@ -70,7 +70,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         javax.persistence.Query q = getEntityManager()
                 .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v5 WHERE "
-                        + " completed IS NOT NULL AND " + scheduledString + " >= ? AND " + scheduledString + " <= ? "
+                        + scheduledString + " IS NOT NULL AND " + scheduledString + " >= ? AND " + scheduledString + " <= ? "
                         + hospString
                         + imrtString
                         + weekendString
@@ -474,13 +474,39 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             if (filter.contains("imrt")) {
                 filterString = filterString + "(cpt = '77418')";
             }
-            if (filter.contains("igrt")) {
+            else if (filter.contains("non")) {
+                filterString = filterString + "(cpt <> '77418' " +
+                    "AND cpt LIKE '774%' " +
+                    "AND cpt <> '77421' " +
+                    "AND cpt <> '77417' " +
+                    "AND codetype = 'Technical') OR cpt LIKE 'G0%'";
+            }
+            else if (filter.contains("all-tx")) {
+                filterString = filterString + "(cpt LIKE '774%' " +
+                    "AND cpt <> '77421' " +
+                    "AND cpt <> '77417' " +
+                    "AND codetype = 'Technical') OR cpt LIKE 'G0%'";
+            }
+            
+            else if (filter.contains("xray") || filter.contains("conebeam") || filter.contains("visionrt")) {
                 if (!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString = filterString += "cpt = '77421' OR "
-                        + "cpt = '77014' OR "
-                        + "cpt = '0197T' ";
+                if (filter.contains("xray")) {
+                    filterString = filterString += "cpt = '77421'";
+                }
+                if( filter.contains("conebeam") ) {
+                    if(filterString.endsWith("'")) {
+                        filterString += " OR ";
+                    }
+                    filterString += "cpt = '77014'";
+                }
+                if(filter.contains("visionrt")) {
+                    if(filterString.endsWith("'")) {
+                        filterString += " OR ";
+                    }
+                    filterString += "cpt = '0197T' ";
+                }
             }
             if (filter.contains("vmat")) {
                 if (!(filterString.endsWith("("))) {

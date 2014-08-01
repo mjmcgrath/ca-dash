@@ -49,7 +49,7 @@ public class PieChartController implements Serializable{
     private TreeMap<String, DoctorStats> dstatsPerDoc;
     private PieChartModel pieChart;
     private String interval;
-    List<String> selectedFilters;
+    String selectedFilters;
 
     public PieChartController() {
         endDate = new Date();
@@ -64,7 +64,7 @@ public class PieChartController implements Serializable{
         this.dstatsPerDoc = new TreeMap<>();
         this.pieChart = new PieChartModel();
         this.interval = "";
-        selectedFilters = new ArrayList<>();
+        selectedFilters = "all-tx";
     }
 
     
@@ -97,11 +97,11 @@ public class PieChartController implements Serializable{
         this.selectedFacility = selectedFacility;
     }
 
-    public List<String> getSelectedFilters() {
+    public String getSelectedFilters() {
         return selectedFilters;
     }
 
-    public void setSelectedFilters(List<String> selectedFilters) {
+    public void setSelectedFilters(String selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
 
@@ -125,13 +125,13 @@ public class PieChartController implements Serializable{
         return pieChart;
     }
     
-    private String filterString() {
+    /*private String filterString() {
         String retval = "";
         for(String item : selectedFilters ) {
             retval += "," + item;
         }
         return retval;
-    }
+    }*/
     
     public void updateData(String dataset){
     
@@ -147,8 +147,8 @@ public class PieChartController implements Serializable{
         JSONArray labels = new JSONArray();
         
         if(dataSet.equals("DR")) {
-            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, filterString());
-            ptstats = getFacade().doctorStats(startDate, endDate, selectedFacility, filterString());
+            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, selectedFilters);
+            ptstats = getFacade().doctorStats(startDate, endDate, selectedFacility, selectedFilters);
             for(String doctor : ptcounts.keySet()) {
                 Long count = ptcounts.get(doctor);
                 DoctorStats newItem = new DoctorStats();
@@ -167,7 +167,7 @@ public class PieChartController implements Serializable{
             
             pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
         } else {
-            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
+            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, selectedFilters);
             pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
             
             for(Object[] row : machinecounts) {

@@ -57,13 +57,13 @@ public class HistogramController implements Serializable {
     private Date selectedDate;
     private double percentile;
     private double percentileVal;
-    private List<String> selectedFilters;
+    private String selectedFilters;
     private boolean includeWeekends;
     private BarChartModel histogram;
     private String interval;
     private SynchronizedDescriptiveStatistics dstats;
     private boolean patientsFlag;
-     private boolean scheduledFlag;
+    private boolean scheduledFlag;
             
     public HistogramController() {
         histogram = new BarChartModel();
@@ -75,7 +75,7 @@ public class HistogramController implements Serializable {
         gc.add(Calendar.MONTH, -1);
         startDate = gc.getTime();
         interval="1m";
-        selectedFilters = new ArrayList<>();
+        selectedFilters = "all-tx";
         selectedFacility = new Long(-1);
         patientsFlag = true;
         scheduledFlag = false;
@@ -140,15 +140,15 @@ public class HistogramController implements Serializable {
     
     
     public void updatePercentile() {
-        dstats = getFacade().getDailyStats(startDate, endDate, selectedFacility, filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        dstats = getFacade().getDailyStats(startDate, endDate, selectedFacility, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         percentileVal = dstats.getPercentile(percentile);
     }
 
-    public List<String> getSelectedFilters() {
+    public String getSelectedFilters() {
         return selectedFilters;
     }
 
-    public void setSelectedFilters(List<String> selectedFilters) {
+    public void setSelectedFilters(String selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
 
@@ -237,17 +237,17 @@ public class HistogramController implements Serializable {
         }
     }
     
-    private String filterString() {
+    /*private String filterString() {
         String retval = "";
         for(String item : selectedFilters ) {
             retval += "," + item;
         }
         return retval;
-    }
+    }*/
     
     public ChartSeries buildHistogram(Long hospital){
         ChartSeries histo = new ChartSeries();
-        dstats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        dstats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         String label = "All";
         //Freedman-Diaconis bin width
         double interval = 2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0));

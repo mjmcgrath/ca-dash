@@ -7,10 +7,11 @@
     
     <ui:composition template="reportTemplate.xhtml">
         <ui:define name="filters">
-            <!--f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" /-->
+            <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" />
         </ui:define>
 
         <ui:define name="body">
+            <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" />
             <h:graphicImage  name="images/um-pms.png" style="clear:both;"/>
             <hr/>
             <h:graphicImage  name="images/cart-icon.png" style="float:left;padding-left: 30px; padding-right: 30px;"/>

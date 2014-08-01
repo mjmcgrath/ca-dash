@@ -88,7 +88,8 @@ public class TxInstanceController implements Serializable {
     private Integer weeklyChartmax;
     private Integer monthlyChartmax;
     private String interval;
-    private List<String> selectedFilters;
+    //private List<String> selectedFilters;
+    private String selectedFilters;
     private boolean patientsFlag;
     private boolean scheduledFlag;
     
@@ -119,7 +120,7 @@ public class TxInstanceController implements Serializable {
         monthlyDisplayMode = "Summary";
         weeklyChartmax = 0;
         monthlyChartmax = 0;
-        selectedFilters = new ArrayList<>();
+        selectedFilters = "all-tx";
         patientsFlag = true;
         scheduledFlag = false;
         handleDateSelect();
@@ -236,11 +237,11 @@ public class TxInstanceController implements Serializable {
         this.selectedTimeIntervals = selectedTimeSpans;
     }
 
-    public List<String> getSelectedFilters() {
+    public String getSelectedFilters() {
         return selectedFilters;
     }
 
-    public void setSelectedFilters(List<String> selectedFilters) {
+    public void setSelectedFilters(String selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
 
@@ -446,9 +447,9 @@ public class TxInstanceController implements Serializable {
         
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
-        String fs = filterString();
+        //String fs = filterString();
         
-        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), fs, true, patientsFlag, scheduledFlag);
+        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), selectedFilters, true, patientsFlag, scheduledFlag);
         
         int i;
         outer:
@@ -470,7 +471,7 @@ public class TxInstanceController implements Serializable {
     }
     
     public SynchronizedDescriptiveStatistics getDailySummary() {
-        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        return getFacade().getDailyStats(startDate, endDate, new Long (-1), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         
     }
     
@@ -478,7 +479,7 @@ public class TxInstanceController implements Serializable {
         ChartSeries histo = new ChartSeries();
         SynchronizedDescriptiveStatistics stats;
 
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         
         //Freedman-Diaconis bin width
         double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
@@ -503,20 +504,20 @@ public class TxInstanceController implements Serializable {
     
     public Double percentile(Double p, Long hospital) {
         SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        stats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         return stats.getPercentile(p);
     }
     
     public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital){
-        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryAbs(int hospital){
-        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
-        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -535,7 +536,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -590,7 +591,48 @@ public class TxInstanceController implements Serializable {
     }
     
     public List<Object[]> getMonthlyCounts(Long index) {
-        return getFacade().getMonthlyCounts(startDate, endDate, index, filterString(), includeWeekends, patientsFlag);
+        ArrayList<Date> allDates = new ArrayList<>();
+        GregorianCalendar gc = new GregorianCalendar();
+        gc.setTime(startDate);
+        gc.set(Calendar.DAY_OF_MONTH, 1);
+        //gc.setTime(new Date(gc.);
+        while(gc.getTime().compareTo(endDate) < 0) {
+            allDates.add(gc.getTime());
+            gc.add(Calendar.MONTH, 1);
+        }
+        List<Object[]> items;
+        List<Object[]> itemsMerged = new ArrayList<>();
+        
+        items = getFacade().getMonthlyCounts(startDate, endDate, index, selectedFilters, includeWeekends, patientsFlag);
+        //FIXME FIXME FIXME
+        DateFormat wdf = new SimpleDateFormat("yyyy mm");
+        int i;
+        //outer:
+        for(Date d : allDates) {
+            i = 0;
+            Long val = new Long(0);
+            Double yr = 0.0;
+            Double mo = 0.0;
+            int gcy = 0;
+            int gcm = 0;
+            while(i < items.size()) {
+                yr = ((Double)items.get(i)[0]);
+                mo = ((Double)items.get(i)[1]);
+                gc.setTime(d);
+                gcy = gc.get(Calendar.YEAR);
+                gcm = gc.get(Calendar.MONTH) + 1; //stupid java zero-indexed months
+                if(yr.intValue() == gcy && mo.intValue() == gcm) {
+                   val = (Long)items.get(i)[2];
+                   break;
+                } 
+                i++;
+            }
+            ArrayList<Object> o = new  ArrayList<>();
+            o.add(d);
+            o.add(val);
+            itemsMerged.add(o.toArray());
+        }
+        return itemsMerged; 
     }
     
     public void setStartDate(Date startDate) {
@@ -652,10 +694,18 @@ public class TxInstanceController implements Serializable {
         xAx.setLabel("Date");
         if(patientsFlag) {
             yAx.setLabel("Patients");
-            this.dailyChart.setTitle("Patients Treated");
+            if (scheduledFlag) {
+                this.dailyChart.setTitle("Patients Scheduled");
+            } else {
+                this.dailyChart.setTitle("Patients Treated");
+            }
         } else {
             yAx.setLabel("Treatments");
-            this.dailyChart.setTitle("Completed Treatments");
+            if (scheduledFlag) {
+                this.dailyChart.setTitle("Scheduled Treatments");
+            } else {
+                this.dailyChart.setTitle("Completed Treatments");
+            }
         }
         xAx.setTickAngle(45);
         xAx.setTickFormat("%m/%d/%y");
@@ -705,13 +755,13 @@ public class TxInstanceController implements Serializable {
         }
     }
     
-    private String filterString() {
+    /*private String filterString() {
         String retval = "";
         for(String item : selectedFilters ) {
             retval += "," + item;
         }
         return retval;
-    }
+    }*/
     
     public void drawWeekly(DateFormat df) {
         this.weeklyChart.clear();
@@ -722,10 +772,18 @@ public class TxInstanceController implements Serializable {
         Axis xAx = weeklyChart.getAxis(AxisType.X);
         if(patientsFlag) {
             yAx.setLabel("Patients");
-            this.weeklyChart.setTitle("Patients Treated");
+            if (scheduledFlag) {
+                 this.weeklyChart.setTitle("Patients Scheduled");
+            } else {
+                this.weeklyChart.setTitle("Patients Treated"); 
+            }
         } else {
             yAx.setLabel("Treatments");
-            this.weeklyChart.setTitle("Completed Treatments");
+            if (scheduledFlag) {
+                this.weeklyChart.setTitle("Scheduled Treatments");
+            } else {
+                this.weeklyChart.setTitle("Completed Treatments");
+            }
         }
         yAx.setMin(0);
         xAx.setLabel("Date");
@@ -917,10 +975,18 @@ public class TxInstanceController implements Serializable {
         xAx.setTickAngle(45);
         if(patientsFlag) {
             yAx.setLabel("Patients");
-            this.monthlyChart.setTitle("Patients Treated");
+            if(scheduledFlag) {
+                this.monthlyChart.setTitle("Patients Scheduled");
+            } else {
+                this.monthlyChart.setTitle("Patients Treated");
+            }
         } else {
             yAx.setLabel("Treatments");
-            this.monthlyChart.setTitle("Completed Treatments");
+            if(scheduledFlag) {
+                this.monthlyChart.setTitle("ScheduledTreatments");
+            } else {
+                this.monthlyChart.setTitle("Completed Treatments");
+            }
         }
         this.monthlyErrorBars = new JSONArray();
         this.monthlyErrorLabels = new JSONArray();
@@ -944,8 +1010,8 @@ public class TxInstanceController implements Serializable {
                 mSeries.setLabel(hospital);
 
                 for (Object[] event : events) {
-                    String xval = ((Double)(event[0])).intValue() + " " + ((Double) event[1]).intValue();
-                    Long yval = (Long)event[2];
+                    String xval = df.format((Date)(event[0]));
+                    Long yval = (Long)event[1];
                     mSeries.set(xval, yval);
                     if(yval > monthlyChartmax){
                         yAx = monthlyChart.getAxis(AxisType.Y);
@@ -987,6 +1053,7 @@ public class TxInstanceController implements Serializable {
                     }
                     JSONObject errorItem = new JSONObject();
                     try {
+                        if(twoSigma.isNaN()) { twoSigma = 0.0; }
                         errorItem.put("min", twoSigma);
                         errorItem.put("max", twoSigma);
                         errorData.put(errorItem);
@@ -1046,7 +1113,7 @@ public class TxInstanceController implements Serializable {
     }
 
     private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
-        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filterString(), includeWeekends, patientsFlag, scheduledFlag);
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {

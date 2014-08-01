@@ -17,6 +17,7 @@
                 <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
             </p:menu-->
             <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
+            <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(1)}"/>
             <h:form id="filters">
                 <!--label class='hdr'>Zoom</label>
                 <div id="zoomSlider"></div-->
@@ -75,11 +76,12 @@
                 <br/>
                 <label class="hdr">Other: </label><br/>
                 <!--p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
-                <p:selectManyCheckbox id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                <p:selectOneRadio id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" />
-                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
-                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
-                </p:selectManyCheckbox><br/>
+                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
+                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
+                </p:selectOneRadio><br/>
                 <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" widgetVar="submit" /> 
             </h:form>
             

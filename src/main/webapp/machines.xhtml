@@ -40,11 +40,12 @@
                 </p:selectOneRadio>
                 <br/>
                 <label class="hdr">Other: </label><br/>
-                <p:selectManyCheckbox id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                <p:selectOneRadio id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" />
-                    <f:selectItem itemLabel="IGRT" itemValue="igrt" />
-                    <f:selectItem itemLabel="VMAT" itemValue="vmat" />
-                </p:selectManyCheckbox><br/>
+                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
+                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
+                </p:selectOneRadio><br/>
                 <p:commandButton value="Enter" actionListener='#{pieChartController.draw("MA")}' update=":machineUtil" /> 
             </h:form>
         </ui:define>
@@ -65,7 +66,7 @@
             </style>
             <h:panelGroup id="machineUtil" layout="block">
                  <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
-                    <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:800px;" rendered="#{pieChartController.pieChart.data.size() > 0}">
+                    <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:820px;" rendered="#{pieChartController.pieChart.data.size() > 0}">
 
                     </p:chart>
                 <h:outputText value="Total: " rendered="#{pieChartController.pieChart.data.size() > 0}" /> 
