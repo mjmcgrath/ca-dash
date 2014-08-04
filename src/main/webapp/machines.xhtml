@@ -60,23 +60,49 @@
 
                 .jqplot-xaxis-label, .jqplot-yaxis-label {
                     font-family: 'Source Sans Pro', sans-serif; 
-                    font-size: 12pt;
-                    font-weight: bold;
+                    font-size: 12pt!important;
+                    font-weight: bold!important;;
                 }
             </style>
             <h:panelGroup id="machineUtil" layout="block">
-                 <f:event type="preRenderComponent" listener='#{pieChartController.draw("MA")}' />
-                    <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:820px;" rendered="#{pieChartController.pieChart.data.size() > 0}">
+                <f:event type="preRenderView" listener='#{pieChartController.draw("MA")}' />
+                <p:panelGrid rendered="#{pieChartController.pieChart.data.size() > 0}" style="width:100%">
+                    <p:row>
+                        <p:column style="width:60%">
+                            <p:chart type="pie" model="#{pieChartController.pieChart}" widgetVar="pieChartD" style="height:820px;" rendered="#{pieChartController.pieChart.data.size() > 0}"/>
+                        </p:column>
+                        <p:column>
+                            <p:dataTable var="machine" value="#{pieChartController.dstatsPerRTM.entrySet()}">
+                                <p:column headerText="Machine">
+                                    <h:outputText value="#{machine.key}" />
+                                </p:column>
+                                <p:column headerText="Cumulative">
+                                    <h:outputText value="#{machine.value.totalPatients}">
+                                        <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
+                                    </h:outputText>
+                                </p:column>
+                                <p:column headerText="Mean">
+                                    <h:outputText value="#{machine.value.averageDailyPatients.getMean()}">
+                                        <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
+                                    </h:outputText>
+                                </p:column>
 
-                    </p:chart>
-                <h:outputText value="Total: " rendered="#{pieChartController.pieChart.data.size() > 0}" /> 
-                <h:outputText value="#{pieChartController.dstats.sum}" rendered="#{pieChartController.pieChart.data.size() > 0}">
-                    <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" /> 
-                </h:outputText>
-                <h:outputText value=" treatments completed" rendered="#{pieChartController.pieChart.data.size() > 0}" />
-                    <h:panelGroup rendered='#{pieChartController.pieChart == null || pieChartController.pieChart.data.size() == 0}'>
-                        <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
-                    </h:panelGroup>
+                            </p:dataTable>
+                        </p:column>
+                    </p:row>
+                    <p:row>
+                        <p:column  colspan='2'>
+                            <h:outputText value="Total: " /> 
+                            <h:outputText value="#{pieChartController.dstats.sum}" >
+                                <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" /> 
+                            </h:outputText>
+                            <h:outputText value=" treatments delivered" />
+                        </p:column>
+                    </p:row>
+                </p:panelGrid>
+                <h:panelGroup rendered='#{pieChartController.pieChart == null || pieChartController.pieChart.data.size() == 0}'>
+                    <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
+                </h:panelGroup>
             </h:panelGroup>
         </ui:define>
         

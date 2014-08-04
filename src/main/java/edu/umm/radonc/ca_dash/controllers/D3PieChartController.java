@@ -127,35 +127,35 @@ public class D3PieChartController implements Serializable{
     }
     
     public void updateChart(String dataSet){
-        List<Object[]> machinecounts = new ArrayList<>();
-        TreeMap<String, Long> ptcounts;
-        jsonData = new JSONArray();
-        dstats.clear();
-        
-        if(dataSet.equals("DR")) {
-            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, filterString());
-            //pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
-        } else {
-            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
-            //pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
-        }
-        JSONArray labels = new JSONArray();
-
-        for(Object[] row : machinecounts) {
-            String item = "";
-            String dr = (String) row[0];
-            Long ptCount = (Long) row[1];
-            //pieChart.set(dr, ptCount);
-            JSONObject dataItem = new JSONObject();
-            dstats.addValue(ptCount);
-            try{
-                dataItem.put("label", dr);
-                dataItem.put("value", ptCount);
-                jsonData.put(dataItem);
-            }catch(Exception e){
-                //FIXME
-            }
-        }
+//        List<Object[]> machinecounts = new ArrayList<>();
+//        TreeMap<String, Long> ptcounts;
+//        jsonData = new JSONArray();
+//        dstats.clear();
+//        
+//        if(dataSet.equals("DR")) {
+//            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, filterString());
+//            //pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
+//        } else {
+//            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, filterString());
+//            //pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
+//        }
+//        JSONArray labels = new JSONArray();
+//
+//        for(Object[] row : machinecounts) {
+//            String item = "";
+//            String dr = (String) row[0];
+//            Long ptCount = (Long) row[1];
+//            //pieChart.set(dr, ptCount);
+//            JSONObject dataItem = new JSONObject();
+//            dstats.addValue(ptCount);
+//            try{
+//                dataItem.put("label", dr);
+//                dataItem.put("value", ptCount);
+//                jsonData.put(dataItem);
+//            }catch(Exception e){
+//                //FIXME
+//            }
+//        }
     }
     
     public void draw(String dataSet) {

@@ -44,9 +44,9 @@ public class PieChartController implements Serializable{
     private Date endDate;
     private DateFormat df;
     private Long selectedFacility;
-    private boolean imrtOnly;
     private SynchronizedDescriptiveStatistics dstats;
     private TreeMap<String, DoctorStats> dstatsPerDoc;
+    private TreeMap<String, DoctorStats> dstatsPerRTM;
     private PieChartModel pieChart;
     private String interval;
     String selectedFilters;
@@ -62,6 +62,7 @@ public class PieChartController implements Serializable{
         this.selectedFacility = new Long(-1);
         this.dstats = new SynchronizedDescriptiveStatistics();
         this.dstatsPerDoc = new TreeMap<>();
+        this.dstatsPerRTM = new TreeMap<>();
         this.pieChart = new PieChartModel();
         this.interval = "";
         selectedFilters = "all-tx";
@@ -120,6 +121,10 @@ public class PieChartController implements Serializable{
     public TreeMap<String, DoctorStats> getDstatsPerDoc() {
         return dstatsPerDoc;
     }
+
+    public TreeMap<String, DoctorStats> getDstatsPerRTM() {
+        return dstatsPerRTM;
+    }
     
     public PieChartModel getPieChart() {
         return pieChart;
@@ -138,19 +143,22 @@ public class PieChartController implements Serializable{
     }
     
     public void updateChart(String dataSet){
-        List<Object[]> machinecounts = new ArrayList<>();
-        TreeMap<String, Long> ptcounts;
+        TreeMap<String, Long> mtxcounts;
+        TreeMap<String, Long> dptcounts;
+        TreeMap<String, SynchronizedDescriptiveStatistics> mptstats;
         TreeMap<String, SynchronizedDescriptiveStatistics> ptstats;
         pieChart.clear();
         dstats.clear();
         dstatsPerDoc.clear();
+        dstatsPerRTM.clear();
+        
         JSONArray labels = new JSONArray();
         
         if(dataSet.equals("DR")) {
-            ptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, selectedFilters);
+            dptcounts = getFacade().doctorPtCounts(startDate, endDate, selectedFacility, selectedFilters);
             ptstats = getFacade().doctorStats(startDate, endDate, selectedFacility, selectedFilters);
-            for(String doctor : ptcounts.keySet()) {
-                Long count = ptcounts.get(doctor);
+            for(String doctor : dptcounts.keySet()) {
+                Long count = dptcounts.get(doctor);
                 DoctorStats newItem = new DoctorStats();
                 newItem.setTotalPatients(count);
                 newItem.setAverageDailyPatients(ptstats.get(doctor));
@@ -167,17 +175,20 @@ public class PieChartController implements Serializable{
             
             pieChart.setTitle("Physician Workload: " + df.format(startDate) + " - " + df.format(endDate));
         } else {
-            machinecounts = getFacade().MachineTxCounts(startDate, endDate, selectedFacility, selectedFilters);
+            mtxcounts = getFacade().machineTxCounts(startDate, endDate, selectedFacility, selectedFilters);
+            mptstats = getFacade().machineStats(startDate, endDate, selectedFacility, selectedFilters);
             pieChart.setTitle("Tx per Machine: " + df.format(startDate) + " - " + df.format(endDate));
             
-            for(Object[] row : machinecounts) {
-                String item = "";
-                String dr = (String) row[0];
-                Long ptCount = (Long) row[1];
-                pieChart.set(dr, ptCount);
-                dstats.addValue(ptCount);
+            for(String machine : mtxcounts.keySet()) {
+                Long count = mtxcounts.get(machine);
+                DoctorStats newItem = new DoctorStats();
+                newItem.setTotalPatients(count);
+                newItem.setAverageDailyPatients(mptstats.get(machine));
+                dstatsPerRTM.put(machine, newItem);
+                pieChart.set(machine, count);
+                dstats.addValue(count);
                 try{
-                    item = dr + " (" + ptCount + ")";
+                    String item = machine + " (" + count + ")";
                     labels.put(item);
                 }catch(Exception e){
                     //FIXME

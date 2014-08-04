@@ -516,8 +516,49 @@ public class TxInstanceController implements Serializable {
         return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
     }
     
-    public TreeMap<String,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
-        return getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
+        ArrayList<Date> allDates = new ArrayList<>();
+        GregorianCalendar gc = new GregorianCalendar();
+        GregorianCalendar dc = new GregorianCalendar();
+        gc.setTime(startDate);
+        gc.set(Calendar.DAY_OF_MONTH, 1);
+        //gc.setTime(new Date(gc.);
+        while(gc.getTime().compareTo(endDate) < 0) {
+            allDates.add(gc.getTime());
+            gc.add(Calendar.MONTH, 1);
+        }
+        TreeMap<Date,SynchronizedDescriptiveStatistics> items;
+        TreeMap<Date,SynchronizedDescriptiveStatistics> itemsMerged = new TreeMap<>();
+        
+        items = getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+        //FIXME FIXME FIXME
+        DateFormat wdf = new SimpleDateFormat("yyyy mm");
+        int i;
+        //outer:
+        for(Date d : allDates) {
+            i = 0;
+            SynchronizedDescriptiveStatistics val = new SynchronizedDescriptiveStatistics();
+            val.addValue(0.0);
+            int yr = 0;
+            int mo = 0;
+            int gcy = 0;
+            int gcm = 0;
+            for(Date dt : items.keySet()){
+                dc.setTime(dt);
+                yr = dc.get(Calendar.YEAR);
+                mo = dc.get(Calendar.MONTH);
+                gc.setTime(d);
+                gcy = gc.get(Calendar.YEAR);
+                gcm = gc.get(Calendar.MONTH);
+                if(yr == gcy && mo == gcm) {
+                   val = items.get(dt);
+                   break;
+                } 
+                i++;
+            }
+            itemsMerged.put(d,val);
+        }
+        return itemsMerged; 
     }
     
     public List<Object[]> getWeeklyCounts(Long index) {
@@ -1037,13 +1078,13 @@ public class TxInstanceController implements Serializable {
                 ChartSeries mSumSeries = new ChartSeries();
                 
                 mSumSeries.setLabel(hospital);
-                Map<String,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
+                Map<Date,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
                 
                 JSONArray errorData = new JSONArray();
                 JSONArray errorTextData = new JSONArray();
                 
-                for(String key : mSumStats.keySet()) {
-                    String xval = key;
+                for(Date key : mSumStats.keySet()) {
+                    String xval = df.format(key);
                     Double yval = mSumStats.get(key).getMean();
                     Double twoSigma = errorBar(mSumStats.get(key).getStandardDeviation(), mSumStats.get(key).getMean());
                     if( (yval + (yval * twoSigma)) > monthlyChartmax ){

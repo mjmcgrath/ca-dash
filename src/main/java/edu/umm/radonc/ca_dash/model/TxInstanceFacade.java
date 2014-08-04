@@ -196,11 +196,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public TreeMap<String, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, 
+    public TreeMap<Date, SynchronizedDescriptiveStatistics> getMonthlySummaryStats(Date startDate, Date endDate, Long hospitalser, String filter, 
             boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         Calendar cal = new GregorianCalendar();
-        TreeMap<String, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
-
+        TreeMap<Date, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
+        GregorianCalendar oc = new GregorianCalendar();
         List<Object[]> events;
 
         events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
@@ -210,8 +210,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         int mo = cal.get(Calendar.MONTH);
         int yr = cal.get(Calendar.YEAR);
 
-        String currMoYr = yr + "-" + String.format("%02d", mo + 1);
-        String prevMoYr = "";
+        int currYr = yr;
+        int currMo = mo;
+        int prevMo = -1;
+        int prevYr = -1;
         SynchronizedDescriptiveStatistics currStats = new SynchronizedDescriptiveStatistics();
         int i = 0;
         while (cal.getTime().before(endDate) && i < events.size()) {
@@ -220,22 +222,30 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             Date d = (Date) event[0];
             Long count = (Long) event[1];
 
-            prevMoYr = currMoYr;
+            prevMo = currMo;
+            prevYr = currYr;
             cal.setTime(d);
             mo = cal.get(Calendar.MONTH);
             yr = cal.get(Calendar.YEAR);
 
-            currMoYr = yr + "-" + String.format("%02d", mo + 1);
+            currMo = mo;
+            currYr = yr;
 
-            if (!(prevMoYr.equals(currMoYr))) {
-                retval.put(prevMoYr, currStats);
+            if (prevMo != currMo || prevYr != currYr) {
+                oc.set(Calendar.MONTH, prevMo);
+                oc.set(Calendar.YEAR, prevYr);
+                oc.set(Calendar.DAY_OF_MONTH, 1);
+                retval.put(oc.getTime(), currStats);
                 currStats = new SynchronizedDescriptiveStatistics();
             }
 
             currStats.addValue(count);
             i++;
         }
-        retval.put(prevMoYr, currStats);
+        oc.set(Calendar.MONTH, prevMo);
+        oc.set(Calendar.YEAR, prevYr);
+        oc.set(Calendar.DAY_OF_MONTH, 1);
+        retval.put(oc.getTime(), currStats);
 
         return retval;
     }
@@ -361,7 +371,51 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
     
-    public TreeMap<String, SynchronizedDescriptiveStatistics > doctorStats (Date startDate, Date endDate, Long hospital, String filter) {
+    public TreeMap<String, SynchronizedDescriptiveStatistics> machineStats(Date startDate, Date endDate, Long hospital, String filter) {
+        TreeMap<String, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
+                String hospString = "";
+        String filterString = "";
+        if (hospital != null && hospital > 0) {
+            hospString = " AND tf.hospitalser = ? ";
+        }
+
+        filterString = buildFilterString(filter);
+
+        javax.persistence.Query q = getEntityManager().createNativeQuery(
+                "select machine, COUNT(DISTINCT tf.activityinstanceser) "
+                + "FROM tx_flat_v5 tf "
+                + "WHERE tf.completed IS NOT NULL AND tf.completed >= ? AND tf.completed <= ? "
+                + filterString + hospString
+                + "GROUP BY tf.machine, completed;")
+                .setParameter(1, startDate)
+                .setParameter(2, endDate);
+
+        if (hospital != null && hospital > 0) {
+            q.setParameter(3, hospital);
+        }
+        List<Object[]> results = q.getResultList();
+        
+        String currMachine = "";
+        if(!(results.isEmpty())) {
+            currMachine = (String)results.get(0)[0];
+        }
+        SynchronizedDescriptiveStatistics mStats = new SynchronizedDescriptiveStatistics();
+        for(Object[] row : results) {
+            String m = (String)row[0];
+            if( !(m.equals(currMachine)) ) {
+                retval.put(currMachine, mStats);
+                mStats = new SynchronizedDescriptiveStatistics();
+            }
+            mStats.addValue((Long)row[1]);
+            currMachine = m;
+        }
+        retval.put(currMachine, mStats);
+        
+        return retval;
+    }
+    
+    
+    public TreeMap<String, SynchronizedDescriptiveStatistics> doctorStats (Date startDate, Date endDate, Long hospital, String filter) {
         TreeMap<String, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
            String hospString = "";
         String filterString = "";
@@ -442,9 +496,11 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         return retval;
     }
 
-    public List<Object[]> MachineTxCounts(Date startDate, Date endDate, Long hospital, String filter) {
+    public TreeMap<String, Long> machineTxCounts(Date startDate, Date endDate, Long hospital, String filter) {
         String hospString = "";
         String filterString = "";
+        TreeMap<String,Long> retval = new TreeMap<>();
+        
         if (hospital != null && hospital > 0) {
             hospString = " AND tf.hospitalser = ? ";
         }
@@ -463,7 +519,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (hospital != null && hospital > 0) {
             q.setParameter(3, hospital);
         }
-        List<Object[]> retval = q.getResultList();
+        List<Object[]> result = q.getResultList();
+        for(Object[] row : result ) {
+            retval.put((String)row[0], (Long)row[1]);
+        }
         return retval;
     }
 
