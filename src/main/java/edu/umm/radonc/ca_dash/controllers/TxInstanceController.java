@@ -88,8 +88,8 @@ public class TxInstanceController implements Serializable {
     private Integer weeklyChartmax;
     private Integer monthlyChartmax;
     private String interval;
-    //private List<String> selectedFilters;
-    private String selectedFilters;
+    private ArrayList<String> selectedFilters;
+    //private String selectedFilters;
     private boolean patientsFlag;
     private boolean scheduledFlag;
     
@@ -120,7 +120,8 @@ public class TxInstanceController implements Serializable {
         monthlyDisplayMode = "Summary";
         weeklyChartmax = 0;
         monthlyChartmax = 0;
-        selectedFilters = "all-tx";
+        selectedFilters =  new ArrayList<>();
+        selectedFilters.add("all-tx");
         patientsFlag = true;
         scheduledFlag = false;
         handleDateSelect();
@@ -237,11 +238,11 @@ public class TxInstanceController implements Serializable {
         this.selectedTimeIntervals = selectedTimeSpans;
     }
 
-    public String getSelectedFilters() {
+    public List<String> getSelectedFilters() {
         return selectedFilters;
     }
 
-    public void setSelectedFilters(String selectedFilters) {
+    public void setSelectedFilters(ArrayList<String> selectedFilters) {
         this.selectedFilters = selectedFilters;
     }
 
@@ -436,7 +437,7 @@ public class TxInstanceController implements Serializable {
         return getFacade().findAll();
     }
     
-    public List<Object[]> getDailyCounts(int index) {
+    public List<Object[]> getDailyCounts(int index, String filter) {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(startDate);
@@ -449,7 +450,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> itemsMerged = new ArrayList<>();
         //String fs = filterString();
         
-        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), selectedFilters, true, patientsFlag, scheduledFlag);
+        items = getFacade().getDailyCounts(startDate, endDate, new Long(index), filter, true, patientsFlag, scheduledFlag);
         
         int i;
         outer:
@@ -470,53 +471,20 @@ public class TxInstanceController implements Serializable {
         return itemsMerged;
     }
     
-    public SynchronizedDescriptiveStatistics getDailySummary() {
-        return getFacade().getDailyStats(startDate, endDate, new Long (-1), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+    public SynchronizedDescriptiveStatistics getDailySummary(String filter) {
+        return getFacade().getDailyStats(startDate, endDate, new Long (-1), filter, includeWeekends, patientsFlag, scheduledFlag);
         
     }
     
-    public ChartSeries histogram(Long hospital){
-        ChartSeries histo = new ChartSeries();
-        SynchronizedDescriptiveStatistics stats;
-
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
-        
-        //Freedman-Diaconis bin width
-        double interval = 2.0 * (stats.getPercentile(75.0) - stats.getPercentile(25.0)) * Math.pow(stats.getN(),(-1.0/3.0));
-        
-        double[] sortedValues = stats.getSortedValues();
-        double currIntervalStart = 0.0;
-        double currIntervalEnd = interval;
-        int count = 0;
-        for (int i = 0; i < sortedValues.length; i++) {
-            if(sortedValues[i] < currIntervalEnd) {
-                count++;
-            } else {
-                String intervalString = Math.ceil(currIntervalStart) + "-" +  Math.ceil(currIntervalEnd);
-                histo.set(intervalString, count);
-                currIntervalStart = currIntervalEnd;
-                currIntervalEnd += interval;
-                count = 1;
-            }
-        }
-        return histo;
+        public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital, String filter){
+        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
     }
     
-    public Double percentile(Double p, Long hospital) {
-        SynchronizedDescriptiveStatistics stats;
-        stats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
-        return stats.getPercentile(p);
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryAbs(int hospital, String filter){
+        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
     }
     
-    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital){
-        return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
-    }
-    
-    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryAbs(int hospital){
-        return getFacade().getWeeklySummaryStatsAbs(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
-    }
-    
-    public TreeMap<Date,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital){
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getMonthlySummary(int hospital, String filter){
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
         GregorianCalendar dc = new GregorianCalendar();
@@ -530,7 +498,7 @@ public class TxInstanceController implements Serializable {
         TreeMap<Date,SynchronizedDescriptiveStatistics> items;
         TreeMap<Date,SynchronizedDescriptiveStatistics> itemsMerged = new TreeMap<>();
         
-        items = getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+        items = getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy mm");
         int i;
@@ -561,7 +529,7 @@ public class TxInstanceController implements Serializable {
         return itemsMerged; 
     }
     
-    public List<Object[]> getWeeklyCounts(Long index) {
+    public List<Object[]> getWeeklyCounts(Long index, String filter) {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(startDate);
@@ -577,7 +545,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
       
-        items = getFacade().getWeeklyCounts(startDate, endDate, index, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+        items = getFacade().getWeeklyCounts(startDate, endDate, index, filter, includeWeekends, patientsFlag, scheduledFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy ww");
         int i;
@@ -631,7 +599,7 @@ public class TxInstanceController implements Serializable {
         return itemsMerged;
     }
     
-    public List<Object[]> getMonthlyCounts(Long index) {
+    public List<Object[]> getMonthlyCounts(Long index, String filter) {
         ArrayList<Date> allDates = new ArrayList<>();
         GregorianCalendar gc = new GregorianCalendar();
         gc.setTime(startDate);
@@ -644,7 +612,7 @@ public class TxInstanceController implements Serializable {
         List<Object[]> items;
         List<Object[]> itemsMerged = new ArrayList<>();
         
-        items = getFacade().getMonthlyCounts(startDate, endDate, index, selectedFilters, includeWeekends, patientsFlag);
+        items = getFacade().getMonthlyCounts(startDate, endDate, index, filter, includeWeekends, patientsFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy mm");
         int i;
@@ -773,26 +741,27 @@ public class TxInstanceController implements Serializable {
         List<Object[]> events;
         hideDailyTab = true;
         for (Integer fac: selectedFacilities) {
-            String hospital = "All";
-            if( fac > 0 ) {
-                hospital =  hFacade.find(fac).getHospitalname();
-            }
-            if(this.selectedTimeIntervals.contains("Daily")) {
-                ChartSeries series = new ChartSeries();
-                series.setLabel(hospital);
-                events = getDailyCounts(fac);
-                for (Object[] event : events) {
-                    String xval = df.format((Date)event[0]);
-                    Long yval = (Long)event[1];
-                    series.set(xval, yval);
+            for(String filter : selectedFilters) {
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
                 }
-                hospitalChartSeriesMapping.put(curSeries,fac);
+                if(this.selectedTimeIntervals.contains("Daily")) {
+                    ChartSeries series = new ChartSeries();
+                    series.setLabel(hospital + "\n" + filter);
+                    events = getDailyCounts(fac, filter);
+                    for (Object[] event : events) {
+                        String xval = df.format((Date)event[0]);
+                        Long yval = (Long)event[1];
+                        series.set(xval, yval);
+                    }
+                    hospitalChartSeriesMapping.put(curSeries,fac);
 
-                hideDailyTab = false;
-                dailyChart.addSeries(series);
+                    hideDailyTab = false;
+                    dailyChart.addSeries(series);
+                }
+                curSeries++;
             }
-            
-            curSeries++;
         }
     }
     
@@ -836,66 +805,122 @@ public class TxInstanceController implements Serializable {
         List<Object[]> events;
         
         for (Integer fac: selectedFacilities) {
-            String hospital = "All";
-            if( fac > 0 ) {
-                hospital =  hFacade.find(fac).getHospitalname();
-            }
-            
-            GregorianCalendar gc = new GregorianCalendar();
+            for(String filter : selectedFilters) {
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
+                }
 
-            if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
-                ChartSeries wSeries = new ChartSeries();
-                wSeries.setLabel(hospital);
-                events = this.getWeeklyCounts(new Long(fac));
-                
-                for (Object[] event : events) {
-                    Date d = (Date)event[0];
-                    gc.setTime(d);
-                    gc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                    String xval = df.format(gc.getTime());
-                    //if( gc.get(Calendar.MONTH) == Calendar.DECEMBER && gc.get(Calendar.WEEK_OF_YEAR) == 1){
-                    //    xval = (gc.get(Calendar.YEAR) + 1) + " Week " + gc.get(Calendar.WEEK_OF_YEAR);
-                    //}
-                    Long yval = (Long)event[1];
-                    wSeries.set(xval, yval);
-                    if(yval > weeklyChartmax){
-                        weeklyChartmax = yval.intValue();
+                GregorianCalendar gc = new GregorianCalendar();
+
+                if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
+                    ChartSeries wSeries = new ChartSeries();
+                    wSeries.setLabel(hospital + "\n" + filter);
+                    events = this.getWeeklyCounts(new Long(fac), filter);
+
+                    for (Object[] event : events) {
+                        Date d = (Date)event[0];
+                        gc.setTime(d);
+                        gc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                        String xval = df.format(gc.getTime());
+                        //if( gc.get(Calendar.MONTH) == Calendar.DECEMBER && gc.get(Calendar.WEEK_OF_YEAR) == 1){
+                        //    xval = (gc.get(Calendar.YEAR) + 1) + " Week " + gc.get(Calendar.WEEK_OF_YEAR);
+                        //}
+                        Long yval = (Long)event[1];
+                        wSeries.set(xval, yval);
+                        if(yval > weeklyChartmax){
+                            weeklyChartmax = yval.intValue();
+                        }
                     }
+                    hideWeeklyTab = false;
+                    weeklyChart.addSeries(wSeries);
                 }
-                hideWeeklyTab = false;
-                weeklyChart.addSeries(wSeries);
-            }
-            
-            if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
-                ChartSeries wSumSeries = new ChartSeries();
-                wSumSeries.setLabel(hospital);
-                Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummaryAbs(fac);
-                JSONArray errorData = new JSONArray();
-                JSONArray errorTextData = new JSONArray();
-                ArrayList<Date> allMondays = new ArrayList<>();
-                GregorianCalendar wgc = new GregorianCalendar();
-                wgc.setTime(startDate);
-                wgc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
-                while(wgc.getTime().before(endDate)) {
-                    allMondays.add(wgc.getTime());
-                    wgc.add(Calendar.DATE, 7);
+
+                if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
+                    ChartSeries wSumSeries = new ChartSeries();
+                    wSumSeries.setLabel(hospital);
+                    Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummaryAbs(fac, filter);
+                    JSONArray errorData = new JSONArray();
+                    JSONArray errorTextData = new JSONArray();
+                    ArrayList<Date> allMondays = new ArrayList<>();
+                    GregorianCalendar wgc = new GregorianCalendar();
+                    wgc.setTime(startDate);
+                    wgc.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                    while(wgc.getTime().before(endDate)) {
+                        allMondays.add(wgc.getTime());
+                        wgc.add(Calendar.DATE, 7);
+                    }
+
+                    wklyOuter:
+                    for(Date mon : allMondays) {
+                        String xval = df.format(mon);
+                        Double yval = 0.0; 
+                        JSONObject errorItem = new JSONObject();
+                        for(Date key : wSumStats.keySet()) {
+                            if(mon.equals(key)) {
+                                xval = df.format(key);
+                                yval = wSumStats.get(key).getMean();
+                                Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
+                                if( (yval + (yval * twoSigma)) > weeklyChartmax){
+                                    weeklyChartmax = calcChartMax(yval, twoSigma);
+                                    yAx.setMax(weeklyChartmax);
+                                }
+
+                                try {
+                                    errorItem.put("min", twoSigma);
+                                    errorItem.put("max", twoSigma);
+                                    errorData.put(errorItem);
+                                    errorTextData.put("");
+                                } catch (Exception e) {
+                                    System.out.println("error bar generation failed");
+                                }
+                                if(Double.isNaN(yval)) {
+                                    yval = 0.0;
+                                }
+                                wSumSeries.set(xval,yval);
+                                continue wklyOuter;
+                            }
+                        }
+                        try {
+                                    errorItem.put("min", 0.0);
+                                    errorItem.put("max", 0.0);
+                                    errorData.put(errorItem);
+                                    errorTextData.put("");
+                                } catch (Exception e) {
+                                    System.out.println("error bar generation failed");
+                                }
+                        wSumSeries.set(xval,yval);
+                    }
+
+                    this.weeklyErrorBars.put(errorData);
+                    this.weeklyErrorLabels.put(errorTextData);
+                    weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                        "this.cfg.axes.yaxis.numberTicks = 7; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                        "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
+                    weeklyChart.addSeries(wSumSeries);
+                    hideWeeklyTab = false;
                 }
-                
-                wklyOuter:
-                for(Date mon : allMondays) {
-                    String xval = df.format(mon);
-                    Double yval = 0.0; 
-                    JSONObject errorItem = new JSONObject();
-                    for(Date key : wSumStats.keySet()) {
-                        if(mon.equals(key)) {
-                            xval = df.format(key);
-                            yval = wSumStats.get(key).getMean();
-                            Double twoSigma = (2 * (wSumStats.get(key).getStandardDeviation())) / wSumStats.get(key).getMean();
-                            if( (yval + (yval * twoSigma)) > weeklyChartmax){
+
+                if(this.weeklySegmentationMode.equals("Trailing")) {
+                    ChartSeries wTrSumSeries = new ChartSeries();
+                    Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac, filter);
+                    JSONArray errorData = new JSONArray();
+                    JSONArray errorTextData = new JSONArray();
+
+                    for(Date key : wTrSumStats.keySet()) {
+                        String xval = this.df.format(key);
+                        Double yval;
+                        if(this.weeklyDisplayMode.equals("Summary")) {
+                            wTrSumSeries.setLabel(hospital + "\n" + filter);
+                            yval = wTrSumStats.get(key).getMean();
+                            Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
+                            if( (yval + (yval * twoSigma)) > weeklyChartmax ){
                                 weeklyChartmax = calcChartMax(yval, twoSigma);
                                 yAx.setMax(weeklyChartmax);
                             }
-                            
+                            JSONObject errorItem = new JSONObject();
                             try {
                                 errorItem.put("min", twoSigma);
                                 errorItem.put("max", twoSigma);
@@ -904,85 +929,31 @@ public class TxInstanceController implements Serializable {
                             } catch (Exception e) {
                                 System.out.println("error bar generation failed");
                             }
-                            if(Double.isNaN(yval)) {
-                                yval = 0.0;
+                        } else {
+                            //FIXME
+                            if( wTrSumStats.get(key).getMax() > weeklyChartmax){
+
+                                //yAx.setMax(new Double(wTrSumStats.get(key).getMax()).intValue());
                             }
-                            wSumSeries.set(xval,yval);
-                            continue wklyOuter;
+                            wTrSumSeries.setLabel(hospital);
+                            yval = wTrSumStats.get(key).getSum();
                         }
+                        wTrSumSeries.set(xval,yval);
                     }
-                    try {
-                                errorItem.put("min", 0.0);
-                                errorItem.put("max", 0.0);
-                                errorData.put(errorItem);
-                                errorTextData.put("");
-                            } catch (Exception e) {
-                                System.out.println("error bar generation failed");
-                            }
-                    wSumSeries.set(xval,yval);
+
+                    this.weeklyErrorBars.put(errorData);
+                    this.weeklyErrorLabels.put(errorTextData);
+                    weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                        "this.cfg.axes.yaxis.numberTicks = 7; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                        "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
+                    weeklyChart.addSeries(wTrSumSeries);
+                    hideWeeklyTab = false;
                 }
-                
-                this.weeklyErrorBars.put(errorData);
-                this.weeklyErrorLabels.put(errorTextData);
-                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
-                    "this.cfg.axes.yaxis.numberTicks = 7; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
-                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
-                weeklyChart.addSeries(wSumSeries);
-                hideWeeklyTab = false;
+
+                //curSeries++;
             }
-            
-            if(this.weeklySegmentationMode.equals("Trailing")) {
-                ChartSeries wTrSumSeries = new ChartSeries();
-                Map<Date,SynchronizedDescriptiveStatistics> wTrSumStats = this.getTrailingWeeklySummary(fac);
-                JSONArray errorData = new JSONArray();
-                JSONArray errorTextData = new JSONArray();
-                
-                for(Date key : wTrSumStats.keySet()) {
-                    String xval = this.df.format(key);
-                    Double yval;
-                    if(this.weeklyDisplayMode.equals("Summary")) {
-                        wTrSumSeries.setLabel(hospital);
-                        yval = wTrSumStats.get(key).getMean();
-                        Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
-                        if( (yval + (yval * twoSigma)) > weeklyChartmax ){
-                            weeklyChartmax = calcChartMax(yval, twoSigma);
-                            yAx.setMax(weeklyChartmax);
-                        }
-                        JSONObject errorItem = new JSONObject();
-                        try {
-                            errorItem.put("min", twoSigma);
-                            errorItem.put("max", twoSigma);
-                            errorData.put(errorItem);
-                            errorTextData.put("");
-                        } catch (Exception e) {
-                            System.out.println("error bar generation failed");
-                        }
-                    } else {
-                        //FIXME
-                        if( wTrSumStats.get(key).getMax() > weeklyChartmax){
-                            
-                            //yAx.setMax(new Double(wTrSumStats.get(key).getMax()).intValue());
-                        }
-                        wTrSumSeries.setLabel(hospital);
-                        yval = wTrSumStats.get(key).getSum();
-                    }
-                    wTrSumSeries.set(xval,yval);
-                }
-                
-                this.weeklyErrorBars.put(errorData);
-                this.weeklyErrorLabels.put(errorTextData);
-                weeklyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
-                    "this.cfg.axes.yaxis.numberTicks = 7; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
-                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + weeklyErrorBars.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + weeklyErrorLabels.toString() + ";}");
-                weeklyChart.addSeries(wTrSumSeries);
-                hideWeeklyTab = false;
-            }
-            
-            //curSeries++;
         }
     }
     
@@ -1039,82 +1010,85 @@ public class TxInstanceController implements Serializable {
             this.monthlyErrorLabels = new JSONArray();
             
             for (Integer fac: selectedFacilities) {
-                mSeries = new ChartSeries();
-                String hospital = "All";
-                if( fac > 0 ) {
-                    hospital =  hFacade.find(fac).getHospitalname();
-                }
-            
-                //Monthly total
-                events = this.getMonthlyCounts(new Long(fac));
-  
-                mSeries.setLabel(hospital);
-
-                for (Object[] event : events) {
-                    String xval = df.format((Date)(event[0]));
-                    Long yval = (Long)event[1];
-                    mSeries.set(xval, yval);
-                    if(yval > monthlyChartmax){
-                        yAx = monthlyChart.getAxis(AxisType.Y);
-                        monthlyChartmax = calcChartMax(yval.doubleValue(), 0.0);
-                        yAx.setMax(monthlyChartmax);
+                for(String filter : selectedFilters) {
+                    mSeries = new ChartSeries();
+                    String hospital = "All";
+                    if( fac > 0 ) {
+                        hospital =  hFacade.find(fac).getHospitalname();
                     }
+
+                    //Monthly total
+                    events = this.getMonthlyCounts(new Long(fac), filter);
+
+                    mSeries.setLabel(hospital);
+
+                    for (Object[] event : events) {
+                        String xval = df.format((Date)(event[0]));
+                        Long yval = (Long)event[1];
+                        mSeries.set(xval, yval);
+                        if(yval > monthlyChartmax){
+                            yAx = monthlyChart.getAxis(AxisType.Y);
+                            monthlyChartmax = calcChartMax(yval.doubleValue(), 0.0);
+                            yAx.setMax(monthlyChartmax);
+                        }
+                    }
+                    monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                        "this.cfg.axes.yaxis.numberTicks = 7; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                        "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
+                    monthlyChart.addSeries(mSeries);
                 }
-                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
-                    "this.cfg.axes.yaxis.numberTicks = 7; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
-                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
-                monthlyChart.addSeries(mSeries);
             }
         } else {
             //monthly summary
             for (Integer fac: selectedFacilities) {
-                String hospital = "All";
-                if( fac > 0 ) {
-                    hospital =  hFacade.find(fac).getHospitalname();
-                }
-                
-                ChartSeries mSumSeries = new ChartSeries();
-                
-                mSumSeries.setLabel(hospital);
-                Map<Date,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac);
-                
-                JSONArray errorData = new JSONArray();
-                JSONArray errorTextData = new JSONArray();
-                
-                for(Date key : mSumStats.keySet()) {
-                    String xval = df.format(key);
-                    Double yval = mSumStats.get(key).getMean();
-                    Double twoSigma = errorBar(mSumStats.get(key).getStandardDeviation(), mSumStats.get(key).getMean());
-                    if( (yval + (yval * twoSigma)) > monthlyChartmax ){
-                        yAx = monthlyChart.getAxis(AxisType.Y);
-                        monthlyChartmax = calcChartMax(yval, twoSigma);
-                        yAx.setMax(monthlyChartmax);
-                    }
-                    JSONObject errorItem = new JSONObject();
-                    try {
-                        if(twoSigma.isNaN()) { twoSigma = 0.0; }
-                        errorItem.put("min", twoSigma);
-                        errorItem.put("max", twoSigma);
-                        errorData.put(errorItem);
-                        errorTextData.put("");
-                    } catch (JSONException e) {
-                        System.out.println("Error building JSON object containing monthly error bar data");
+                for(String filter : selectedFilters)  {
+                    String hospital = "All";
+                    if( fac > 0 ) {
+                        hospital =  hFacade.find(fac).getHospitalname();
                     }
 
-                    mSumSeries.set(xval,yval);
+                    ChartSeries mSumSeries = new ChartSeries();
+
+                    mSumSeries.setLabel(hospital);
+                    Map<Date,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac, filter);
+
+                    JSONArray errorData = new JSONArray();
+                    JSONArray errorTextData = new JSONArray();
+
+                    for(Date key : mSumStats.keySet()) {
+                        String xval = df.format(key);
+                        Double yval = mSumStats.get(key).getMean();
+                        Double twoSigma = errorBar(mSumStats.get(key).getStandardDeviation(), mSumStats.get(key).getMean());
+                        if( (yval + (yval * twoSigma)) > monthlyChartmax ){
+                            yAx = monthlyChart.getAxis(AxisType.Y);
+                            monthlyChartmax = calcChartMax(yval, twoSigma);
+                            yAx.setMax(monthlyChartmax);
+                        }
+                        JSONObject errorItem = new JSONObject();
+                        try {
+                            if(twoSigma.isNaN()) { twoSigma = 0.0; }
+                            errorItem.put("min", twoSigma);
+                            errorItem.put("max", twoSigma);
+                            errorData.put(errorItem);
+                            errorTextData.put("");
+                        } catch (JSONException e) {
+                            System.out.println("Error building JSON object containing monthly error bar data");
+                        }
+
+                        mSumSeries.set(xval,yval);
+                    }
+
+                    this.monthlyErrorBars.put(errorData);
+                    this.monthlyErrorLabels.put(errorTextData);
+                    monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
+                        "this.cfg.axes.yaxis.numberTicks = 7; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
+                        "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
+                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
+                    monthlyChart.addSeries(mSumSeries);
                 }
-                
-                this.monthlyErrorBars.put(errorData);
-                this.monthlyErrorLabels.put(errorTextData);
-                monthlyChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.fillToZero = true; this.cfg.seriesDefaults.rendererOptions.errorBarWidth = 2; " +
-                    "this.cfg.axes.yaxis.numberTicks = 7; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
-                    "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
-                monthlyChart.addSeries(mSumSeries);
- 
             }
            
        }
@@ -1153,8 +1127,8 @@ public class TxInstanceController implements Serializable {
         }
     }
 
-    private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital) {
-        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
+    private Map<Date, SynchronizedDescriptiveStatistics> getTrailingWeeklySummary(Integer hospital, String filter) {
+        return getFacade().getWeeklyTrailingSummaryStats(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
     }
     
     public SynchronizedDescriptiveStatistics getMonthlySummary() {
