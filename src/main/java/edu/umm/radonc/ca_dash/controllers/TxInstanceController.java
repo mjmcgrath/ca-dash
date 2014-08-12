@@ -238,7 +238,7 @@ public class TxInstanceController implements Serializable {
         this.selectedTimeIntervals = selectedTimeSpans;
     }
 
-    public List<String> getSelectedFilters() {
+    public ArrayList<String> getSelectedFilters() {
         return selectedFilters;
     }
 
@@ -736,7 +736,7 @@ public class TxInstanceController implements Serializable {
                     +"this.cfg.axes.xaxis.renderer = $.jqplot.DateAxisRenderer;"
                     +"console.log(this);"
                 + "}");*/
-        dailyChart.setStacked(true);
+        dailyChart.setStacked(false);
         int curSeries = 0;
         List<Object[]> events;
         hideDailyTab = true;

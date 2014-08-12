@@ -76,12 +76,12 @@
                 <br/>
                 <label class="hdr">Other: </label><br/>
                 <!--p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
-                <p:selectOneRadio id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                <p:selectManyCheckbox id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
                     <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" />
                     <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
                     <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
-                </p:selectOneRadio><br/>
+                </p:selectManyCheckbox><br/>
                 <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" widgetVar="submit" /> 
             </h:form>
             
@@ -108,8 +108,7 @@
                     <!--c:if test="#{txInstanceController.dailyBarChart.series.size() > 0}"-->
                         <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
                         style="height:800px; position:inherit;" />
-                        Mean: <h:outputText value="#{txInstanceController.dailySummary.mean}"><f:convertNumber type="number" maxFractionDigits="2" pattern="#0.00" /></h:outputText><br/>
-                        Std Dev: <h:outputText value="#{txInstanceController.dailySummary.standardDeviation}"><f:convertNumber type="number" maxFractionDigits="2" pattern="#0.00" /></h:outputText>
+                        
                     <!--/c:if>
                     <c:otherwise>
                         <h:outputText value="No Data" />
