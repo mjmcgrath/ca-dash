@@ -748,7 +748,7 @@ public class TxInstanceController implements Serializable {
                 }
                 if(this.selectedTimeIntervals.contains("Daily")) {
                     ChartSeries series = new ChartSeries();
-                    series.setLabel(hospital + "\n" + filter);
+                    series.setLabel(hospital + " - " + filter);
                     events = getDailyCounts(fac, filter);
                     for (Object[] event : events) {
                         String xval = df.format((Date)event[0]);
@@ -815,7 +815,7 @@ public class TxInstanceController implements Serializable {
 
                 if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
                     ChartSeries wSeries = new ChartSeries();
-                    wSeries.setLabel(hospital + "\n" + filter);
+                    wSeries.setLabel(hospital + " - " + filter);
                     events = this.getWeeklyCounts(new Long(fac), filter);
 
                     for (Object[] event : events) {
@@ -913,7 +913,7 @@ public class TxInstanceController implements Serializable {
                         String xval = this.df.format(key);
                         Double yval;
                         if(this.weeklyDisplayMode.equals("Summary")) {
-                            wTrSumSeries.setLabel(hospital + "\n" + filter);
+                            wTrSumSeries.setLabel(hospital + " - " + filter);
                             yval = wTrSumStats.get(key).getMean();
                             Double twoSigma = errorBar(wTrSumStats.get(key).getStandardDeviation(), wTrSumStats.get(key).getMean());
                             if( (yval + (yval * twoSigma)) > weeklyChartmax ){

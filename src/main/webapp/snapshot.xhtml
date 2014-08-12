@@ -1,0 +1,123 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    
+    <ui:composition template="reportTemplate.xhtml">
+        
+        <ui:define name="supplemental_js">
+            <h:outputScript name="js/jqplot.barRenderer.js" />
+            <h:outputScript name="js/util.js" />
+        </ui:define>
+
+        <ui:define name="filters">
+            <!--p:menu>
+                <p:menuitem value="Logout" icon="ui-icon-power" url="#"/>
+            </p:menu-->
+            <!--p:fieldset legend="Filters" toggleable="false" toggleSpeed="500" style="width: 100px;"-->
+            <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(1)}"/>
+            <h:form id="filters">
+                <!--label class='hdr'>Zoom</label>
+                <div id="zoomSlider"></div-->
+                <label class='hdr'>Mode</label><br/>
+                <p:selectOneButton id="apptTypeSelect" value="#{txInstanceController.scheduledFlag}">
+                    <f:selectItem itemLabel="Scheduled" itemValue="true"></f:selectItem>
+                    <f:selectItem itemLabel="Actual" itemValue="false"></f:selectItem>
+                </p:selectOneButton>
+                <p:selectOneButton id="dataTypeSelect" value="#{txInstanceController.patientsFlag}">
+                    <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
+                    <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
+                </p:selectOneButton>
+                <br/><br/>
+                <label class='hdr'>Start Date: </label>
+                <p:calendar value="#{txInstanceController.startDate}" id="startCal">
+                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
+                </p:calendar>
+                <br/>
+                <label class='hdr'>End Date: </label>
+                <p:calendar value="#{txInstanceController.endDate}" id="endCal">
+                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
+                </p:calendar>
+                <br/><br/>
+                 <p:selectOneButton id="selectCal" value="#{txInstanceController.interval}">
+                    <f:selectItem itemLabel="7d" itemValue="1wk" />
+                    <f:selectItem itemLabel="1m" itemValue="1m" />
+                    <f:selectItem itemLabel="3m" itemValue="3m" />
+                    <f:selectItem itemLabel="6m" itemValue="6m" />
+                    <f:selectItem itemLabel="1y" itemValue="1y" />
+                    <f:selectItem itemLabel="2y" itemValue="2y" />
+                    <f:selectItem itemLabel="3y" itemValue="3y" />
+                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton><br/>
+                <p:selectOneButton id="selectQtr" value="#{txInstanceController.interval}">
+                    <f:selectItem itemLabel="Q1" itemValue="Q1" />
+                    <f:selectItem itemLabel="Q2" itemValue="Q2" />
+                    <f:selectItem itemLabel="Q3" itemValue="Q3" />
+                    <f:selectItem itemLabel="Q4" itemValue="Q4" />
+                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                </p:selectOneButton>
+                <br/><br/>
+                <label class='hdr' for="timeInterval">Granularity: </label>
+                <p:selectManyCheckbox id="timeInterval" value="#{txInstanceController.selectedTimeIntervals}" layout="pageDirection">
+                    <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{txInstanceController.disableDailyCheckbox}"/>
+                    <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{txInstanceController.disableWeeklyCheckbox}"/>
+                    <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{txInstanceController.disableMonthlyCheckbox}"/>
+                    <f:selectItem itemLabel="Yearly" itemValue="Yearly" itemDisabled="#{txInstanceController.disableYearlyCheckbox}"/>
+                </p:selectManyCheckbox><br/>
+                <label class='hdr' for="facility">Facility: </label>
+                <p:selectManyCheckbox id="facility" value="#{txInstanceController.selectedFacilities}" layout="pageDirection">
+                    <f:selectItem itemLabel="Aggregate" itemValue="-1" />
+                    <c:forEach items="${hospitalController.items}" var="hospital">
+                        <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
+                    </c:forEach>
+                </p:selectManyCheckbox>
+                <br/>
+                <label class="hdr">Other: </label><br/>
+                <!--p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
+                <p:selectOneRadio id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                    <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
+                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
+                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
+                </p:selectOneRadio><br/>
+                <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" widgetVar="submit" /> 
+            </h:form>
+            
+        </ui:define>
+
+        <ui:define name="body">
+            <f:event type="preRenderComponent" listener="#{txInstanceController.draw}"/>
+            <style>
+                table.jqplot-table-legend { font-size: 1.5em; }
+                .jqplot-title {
+                    font-size: 2em;
+                    font-family: 'Source Sans Pro', sans-serif; 
+                }
+
+                .jqplot-xaxis-label, .jqplot-yaxis-label {
+                    font-family: 'Source Sans Pro', sans-serif; 
+                    font-size: 12pt;
+                    font-weight: bold;
+                }
+            </style>
+            <h:outputText value="Date" />
+            <p:panelGrid columns="3">
+                    <p:row>
+                        <p:column rowspan="2">System Wide Totals</p:column>
+                        <p:column>Scheduled Treatments</p:column>
+                        <p:column>Scheduled Simulations</p:column>
+                    </p:row>
+                <p:row><p:column>5asdfasd</p:column>
+                    
+                    <p:column>5asdfasd</p:column>
+                    <p:column>6sdfasdf</p:column>
+                </p:row>
+                
+            </p:panelGrid>
+        </ui:define>
+        
+    </ui:composition>
+</html>
+
