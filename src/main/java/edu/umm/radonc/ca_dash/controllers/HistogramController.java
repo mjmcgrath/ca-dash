@@ -16,6 +16,7 @@ package edu.umm.radonc.ca_dash.controllers;
 import edu.umm.radonc.ca_dash.model.ActivityAIPC;
 import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
+import edu.umm.radonc.ca_dash.model.util.ColorMap;
 import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -271,6 +272,8 @@ public class HistogramController implements Serializable {
             label = getHospitalFacade().find(hospital.intValue()).getHospitalname();
         }
         histo.setLabel(label);
+        String[] colorset = (String[])ColorMap.getMap().get(label);
+        histogram.setSeriesColors(colorset[0]); 
         return histo;
     }
     
@@ -291,7 +294,6 @@ public class HistogramController implements Serializable {
         xAx.setTickAngle(45);
         yAx.setLabel("Frequency");
         histogram.setShadow(false);
-        histogram.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D"); 
         histogram.addSeries(buildHistogram(selectedFacility));
     }
     
