@@ -89,17 +89,34 @@
             <h:panelGroup id="histoChart" style="display:block">
             <p:panel id="histoControls" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
                 <h:form>
-                    <h:panelGrid columns="2" style="margin-bottom: 5px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
-                        <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right;">
-                            <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
-                        </p:inputText>
-                        <h:outputText id="percentileText" value="th Percentile: #{histogramController.percentileVal}" style="padding: 2px;" >
-                            <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />
-                        </h:outputText>
-
-                        <p:slider for="percentile" step="5">
-                            <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
-                        </p:slider>
+                    <h:panelGrid style="margin-bottom: 5px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
+                        <p:row>
+                            <p:column>
+                                <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right;">
+                                    <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
+                                </p:inputText>
+                            </p:column>
+                            <p:column colspan="2">
+                                <h:outputText value="th Percentile: "></h:outputText>
+                                <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 2px 15px 2px 4px; font-size:1.7em; font-weight: bold;" >
+                                    <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <p:selectOneButton value="#{histogramController.relativeModeFlag}">
+                                    <f:selectItem itemLabel="Absolute" itemValue="false" />
+                                    <f:selectItem itemLabel="Relative" itemValue="true" />
+                                    <p:ajax listener="#{histogramController.drawHistogram}" update=":histo,@(form)"/>
+                                </p:selectOneButton>
+                            </p:column>
+                        </p:row>
+                        <p:row>
+                            <p:column colspan="1">
+                                <p:slider for="percentile" step="5" style="width:70px;">
+                                    <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
+                                </p:slider>
+                            </p:column>
+                        </p:row>
                     </h:panelGrid>
                 </h:form>
             </p:panel>

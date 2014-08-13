@@ -65,6 +65,7 @@ public class HistogramController implements Serializable {
     private SynchronizedDescriptiveStatistics dstats;
     private boolean patientsFlag;
     private boolean scheduledFlag;
+    private boolean relativeModeFlag;
             
     public HistogramController() {
         histogram = new BarChartModel();
@@ -80,6 +81,7 @@ public class HistogramController implements Serializable {
         selectedFacility = new Long(-1);
         patientsFlag = true;
         scheduledFlag = false;
+        relativeModeFlag = false;
     }
     
     private TxInstanceFacade getFacade() {
@@ -176,6 +178,14 @@ public class HistogramController implements Serializable {
     public void setScheduledFlag(boolean scheduledFlag) {
         this.scheduledFlag = scheduledFlag;
     }
+
+    public boolean isRelativeModeFlag() {
+        return relativeModeFlag;
+    }
+
+    public void setRelativeModeFlag(boolean relativeModeFlag) {
+        this.relativeModeFlag = relativeModeFlag;
+    }
     
     public void onSelectTimePeriod(){
         endDate = new Date();
@@ -247,27 +257,34 @@ public class HistogramController implements Serializable {
     }*/
     
     public ChartSeries buildHistogram(Long hospital){
+        double divisor = 1.0;
         ChartSeries histo = new ChartSeries();
         dstats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         String label = "All";
         //Freedman-Diaconis bin width
-        double interval = 2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0));
-        
+        double interval = Math.floor(2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0)));
+        if(relativeModeFlag) {
+            divisor = dstats.getN();
+        }
+        interval = (interval < 1.0) ? 1.0 : interval;
         double[] sortedValues = dstats.getSortedValues();
         double currIntervalStart = 0.0;
         double currIntervalEnd = interval;
-        int count = 0;
+        double count = 0.0;
         for (int i = 0; i < sortedValues.length; i++) {
             if(sortedValues[i] < currIntervalEnd) {
-                count++;
+                count += 1.0;
             } else {
-                String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)Math.ceil(currIntervalEnd));
-                histo.set(intervalString, count);
+                String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)Math.floor(currIntervalEnd) - 1 );
+                histo.set(intervalString, count / divisor);
                 currIntervalStart = currIntervalEnd;
                 currIntervalEnd += interval;
-                count = 1;
+                count = 0.0;
+                i--;
             }
         }
+        String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)(dstats.getMax()));
+        histo.set(intervalString, count / dstats.getN());
         if ( hospital > 0 ) {
             label = getHospitalFacade().find(hospital.intValue()).getHospitalname();
         }
