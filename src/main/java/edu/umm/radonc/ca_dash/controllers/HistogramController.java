@@ -284,7 +284,7 @@ public class HistogramController implements Serializable {
             }
         }
         String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)(dstats.getMax()));
-        histo.set(intervalString, count / dstats.getN());
+        histo.set(intervalString, count / divisor);
         if ( hospital > 0 ) {
             label = getHospitalFacade().find(hospital.intValue()).getHospitalname();
         }

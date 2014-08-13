@@ -92,7 +92,7 @@
                     <h:panelGrid style="margin-bottom: 5px" rendered='#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}' >
                         <p:row>
                             <p:column>
-                                <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right;">
+                                <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right; font-size:1.5em; font-weight: bold;">
                                     <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
                                 </p:inputText>
                             </p:column>
