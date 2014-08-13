@@ -6,6 +6,7 @@ import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.Hospital;
 import edu.umm.radonc.ca_dash.model.TxInstance;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
+import edu.umm.radonc.ca_dash.model.util.ColorMap;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil;
 import edu.umm.radonc.ca_dash.model.util.JsfUtil.PersistAction;
 import java.io.Serializable;
@@ -694,8 +695,8 @@ public class TxInstanceController implements Serializable {
     
     public void drawDaily(DateFormat df) {
         //this.dailyChart.clear();
+        String colorString = "";
         dailyChart.setLegendPosition("ne");
-        dailyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         dailyChart.setShadow(false);
         Axis yAx = dailyChart.getAxis(AxisType.Y);
         Axis xAx = dailyChart.getAxis(AxisType.X);
@@ -740,12 +741,15 @@ public class TxInstanceController implements Serializable {
         int curSeries = 0;
         List<Object[]> events;
         hideDailyTab = true;
+        String[] colors;
         for (Integer fac: selectedFacilities) {
+            int colorIndex = 0;
+            String hospital = "All";
+            if( fac > 0 ) {
+                hospital =  hFacade.find(fac).getHospitalname();
+            }
+            colors = (String[])ColorMap.getMap().get(hospital);
             for(String filter : selectedFilters) {
-                String hospital = "All";
-                if( fac > 0 ) {
-                    hospital =  hFacade.find(fac).getHospitalname();
-                }
                 if(this.selectedTimeIntervals.contains("Daily")) {
                     ChartSeries series = new ChartSeries();
                     series.setLabel(hospital + " - " + filter);
@@ -759,10 +763,14 @@ public class TxInstanceController implements Serializable {
 
                     hideDailyTab = false;
                     dailyChart.addSeries(series);
+                    colorString += colors[colorIndex] +", ";
+                    colorIndex++;
                 }
                 curSeries++;
             }
         }
+        colorString = colorString.substring(0, colorString.length() - 2);
+        dailyChart.setSeriesColors(colorString);
     }
     
     /*private String filterString() {
@@ -776,6 +784,7 @@ public class TxInstanceController implements Serializable {
     public void drawWeekly(DateFormat df) {
         this.weeklyChart.clear();
         weeklyChart.setLegendPosition("ne");
+        String colorString = "";
         weeklyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         weeklyChart.setShadow(false);
         Axis yAx = weeklyChart.getAxis(AxisType.Y);
