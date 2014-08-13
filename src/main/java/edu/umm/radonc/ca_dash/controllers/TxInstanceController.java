@@ -785,7 +785,6 @@ public class TxInstanceController implements Serializable {
         this.weeklyChart.clear();
         weeklyChart.setLegendPosition("ne");
         String colorString = "";
-        weeklyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
         weeklyChart.setShadow(false);
         Axis yAx = weeklyChart.getAxis(AxisType.Y);
         Axis xAx = weeklyChart.getAxis(AxisType.X);
@@ -812,14 +811,15 @@ public class TxInstanceController implements Serializable {
         weeklyChartmax = 0;
         //int curSeries = 0;
         List<Object[]> events;
-        
+        String[] colors;
         for (Integer fac: selectedFacilities) {
+            int colorIndex = 0;
+            String hospital = "All";
+            if( fac > 0 ) {
+                hospital =  hFacade.find(fac).getHospitalname();
+            }
+            colors = (String[])ColorMap.getMap().get(hospital);
             for(String filter : selectedFilters) {
-                String hospital = "All";
-                if( fac > 0 ) {
-                    hospital =  hFacade.find(fac).getHospitalname();
-                }
-
                 GregorianCalendar gc = new GregorianCalendar();
 
                 if (this.selectedTimeIntervals.contains("Weekly") && this.weeklyDisplayMode.equals("Raw") &&  this.weeklySegmentationMode.equals("Absolute") ) {
@@ -847,7 +847,7 @@ public class TxInstanceController implements Serializable {
 
                 if(this.weeklyDisplayMode.equals("Summary") &&  this.weeklySegmentationMode.equals("Absolute")) {
                     ChartSeries wSumSeries = new ChartSeries();
-                    wSumSeries.setLabel(hospital);
+                    wSumSeries.setLabel(hospital + " - " + filter);
                     Map<Date,SynchronizedDescriptiveStatistics> wSumStats = this.getWeeklySummaryAbs(fac, filter);
                     JSONArray errorData = new JSONArray();
                     JSONArray errorTextData = new JSONArray();
@@ -960,10 +960,14 @@ public class TxInstanceController implements Serializable {
                     weeklyChart.addSeries(wTrSumSeries);
                     hideWeeklyTab = false;
                 }
+                colorString += colors[colorIndex] +", ";
+                colorIndex++;
 
                 //curSeries++;
             }
         }
+        colorString = colorString.substring(0, colorString.length() - 2);
+        weeklyChart.setSeriesColors(colorString);
     }
     
     private Integer roundUpToNearestMultipleOfSix(Integer i) {
@@ -987,7 +991,7 @@ public class TxInstanceController implements Serializable {
     public void drawMonthly(DateFormat df) {
         this.monthlyChart.clear();
         monthlyChart.setLegendPosition("ne");
-        monthlyChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, 33460D,49182D");
+        String colorString = "";
         monthlyChart.setShadow(false);
         Axis yAx = monthlyChart.getAxis(AxisType.Y);
         Axis xAx = monthlyChart.getAxis(AxisType.X);
@@ -1013,23 +1017,24 @@ public class TxInstanceController implements Serializable {
         this.monthlyErrorLabels = new JSONArray();
         ChartSeries mSeries;
         List<Object[]> events;
-        
+        String[] colors;
         if (this.monthlyDisplayMode.equals("Raw")) {
             this.monthlyErrorBars = new JSONArray();
             this.monthlyErrorLabels = new JSONArray();
-            
+
             for (Integer fac: selectedFacilities) {
+                int colorIndex = 0;
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
+                }
+                colors = (String[])ColorMap.getMap().get(hospital);
                 for(String filter : selectedFilters) {
                     mSeries = new ChartSeries();
-                    String hospital = "All";
-                    if( fac > 0 ) {
-                        hospital =  hFacade.find(fac).getHospitalname();
-                    }
-
                     //Monthly total
                     events = this.getMonthlyCounts(new Long(fac), filter);
 
-                    mSeries.setLabel(hospital);
+                    mSeries.setLabel(hospital + " - " + filter);
 
                     for (Object[] event : events) {
                         String xval = df.format((Date)(event[0]));
@@ -1047,20 +1052,23 @@ public class TxInstanceController implements Serializable {
                         "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
                         "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
                     monthlyChart.addSeries(mSeries);
+                    colorString += colors[colorIndex] +", ";
+                    colorIndex++;
                 }
             }
         } else {
             //monthly summary
             for (Integer fac: selectedFacilities) {
+                int colorIndex = 0;
+                String hospital = "All";
+                if( fac > 0 ) {
+                    hospital =  hFacade.find(fac).getHospitalname();
+                }
+                colors = (String[])ColorMap.getMap().get(hospital);
                 for(String filter : selectedFilters)  {
-                    String hospital = "All";
-                    if( fac > 0 ) {
-                        hospital =  hFacade.find(fac).getHospitalname();
-                    }
-
                     ChartSeries mSumSeries = new ChartSeries();
 
-                    mSumSeries.setLabel(hospital);
+                    mSumSeries.setLabel(hospital + " - " + filter);
                     Map<Date,SynchronizedDescriptiveStatistics> mSumStats = this.getMonthlySummary(fac, filter);
 
                     JSONArray errorData = new JSONArray();
@@ -1097,11 +1105,15 @@ public class TxInstanceController implements Serializable {
                         "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
                         "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
                     monthlyChart.addSeries(mSumSeries);
+                    colorString += colors[colorIndex] +", ";
+                    colorIndex++;
                 }
             }
            
        }
        hideMonthlyTab = false;
+       colorString = colorString.substring(0, colorString.length() - 2);
+       monthlyChart.setSeriesColors(colorString);
     }
     
     private Double errorBar(Double stddev, Double mean) {
