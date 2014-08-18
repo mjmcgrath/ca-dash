@@ -1050,7 +1050,8 @@ public class TxInstanceController implements Serializable {
                         "this.cfg.axes.yaxis.numberTicks = 7; " +
                         "this.cfg.seriesDefaults.rendererOptions.errorBarColor = 'black';" + 
                         "this.cfg.seriesDefaults.rendererOptions.errorData = " + monthlyErrorBars.toString() + "; " +
-                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";}");
+                        "this.cfg.seriesDefaults.rendererOptions.errorTextData = " + monthlyErrorLabels.toString() + ";"
+                        + " }");
                     monthlyChart.addSeries(mSeries);
                     colorString += colors[colorIndex] +", ";
                     colorIndex++;

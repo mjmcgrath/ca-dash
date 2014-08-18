@@ -8,6 +8,7 @@
     <ui:composition template="reportTemplate.xhtml">
         <ui:define name="supplemental_js">
             <h:outputScript name="js/jqplot.barRenderer.js" />
+            <h:outputScript name="js/util.js" />
         </ui:define>
 
         <ui:define name="filters">
@@ -120,7 +121,7 @@
                     </h:panelGrid>
                 </h:form>
             </p:panel>
-            <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="barChartD" style="height:800px;" rendered="#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}" />
+            <p:chart type="bar" id="histo" model="#{histogramController.histogram}" widgetVar="histo" rendered="#{histogramController.histogram.series.size() > 0 &amp;&amp; histogramController.histogram.series.get(0).data.size() > 0}" />
                  <h:panelGroup style="display:block"  rendered="#{histogramController.histogram.series.get(0).data.size() == 0}">
                 <h1 class="nodataerr"><h:outputText value="No data for specified date range." /></h1>
                  </h:panelGroup>

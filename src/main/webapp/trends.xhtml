@@ -10,6 +10,7 @@
         <ui:define name="supplemental_js">
             <h:outputScript name="js/jqplot.barRenderer.js" />
             <h:outputScript name="js/util.js" />
+
         </ui:define>
 
         <ui:define name="filters">
@@ -82,7 +83,7 @@
                     <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
                     <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
                 </p:selectManyCheckbox><br/>
-                <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" update=":charts" widgetVar="submit" /> 
+                <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" onclick="jqResizeCharts()" update=":charts" widgetVar="submit" /> 
             </h:form>
             
         </ui:define>
@@ -106,9 +107,7 @@
                 <c:if test="#{txInstanceController.dailyBarChart.series.size() > 0 || !(txInstanceController.hideDailyTab)}">
                 <p:tab title="Daily" disabled="#{txInstanceController.hideDailyTab}">
                     <!--c:if test="#{txInstanceController.dailyBarChart.series.size() > 0}"-->
-                        <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD"
-                        style="height:800px; position:inherit;" />
-                        
+                        <p:chart type="bar" id="dailyBarChart" model="#{txInstanceController.dailyBarChart}" widgetVar="barChartD" />
                     <!--/c:if>
                     <c:otherwise>
                         <h:outputText value="No Data" />
@@ -162,7 +161,7 @@
                         <!--p:commandButton value="Save Image" id="wImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" style="height:800px;" />
+                    <p:chart type="bar" id="weeklyBarChart" model="#{txInstanceController.weeklyBarChart}" widgetVar="barChartW"/>
                 </p:tab>
                 </c:if>
                 <c:if test="#{txInstanceController.monthlyBarChart.series.size() > 0}">
@@ -178,7 +177,7 @@
                         <!--p:commandButton value="Save Image" id="mImageSave"
                            icon="ui-icon-disk" /-->
                     </p:panel>
-                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" style="height:800px;"/>
+                    <p:chart type="bar" id="monthlyBarChart" model="#{txInstanceController.monthlyBarChart}" widgetVar="barChartM"/>
                 </p:tab>
                 </c:if>
                 <p:tab title="Raw Data">
@@ -236,8 +235,11 @@
             </p:dataTable>
                 </p:tab>
             </p:tabView>
+            <script>
+                    window.onresize = onWindowResize;
+
+            </script>
         </ui:define>
-        
     </ui:composition>
 </html>
 
