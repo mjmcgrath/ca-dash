@@ -6,6 +6,7 @@
 
 package edu.umm.radonc.ca_dash.controllers;
 
+import edu.umm.radonc.ca_dash.model.DoctorStats;
 import edu.umm.radonc.ca_dash.model.FiscalDate;
 import edu.umm.radonc.ca_dash.model.TxInstanceFacade;
 import java.io.Serializable;
@@ -18,12 +19,12 @@ import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TreeMap;
 import javax.ejb.EJB;
+import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.JSONArray;
 import org.primefaces.model.chart.PieChartModel;
-import edu.umm.radonc.ca_dash.model.DoctorStats;
 
 
 /**
@@ -31,7 +32,7 @@ import edu.umm.radonc.ca_dash.model.DoctorStats;
  * @author michaelmcgrath
  */
 @Named("pieChartController")
-@ViewScoped
+@SessionScoped
 public class PieChartController implements Serializable{
     
     @EJB

@@ -27,11 +27,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.ejb.EJB;
 import javax.ejb.EJBException;
+import javax.faces.bean.SessionScoped;
 import javax.faces.component.UIComponent;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.faces.view.ViewScoped;
+import javax.inject.Inject;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.*;
@@ -65,6 +68,7 @@ public class TxInstanceController implements Serializable {
     private Date startDate;
     private Date endDate;
     private DateFormat df;
+    //@Inject private DateBean date;
     private List<Integer> selectedFacilities;
     private List<String> selectedTimeIntervals;
     private Date selectedDate;
@@ -97,10 +101,25 @@ public class TxInstanceController implements Serializable {
     public TxInstanceController() {
         df = new SimpleDateFormat("MM/dd/yy");
         GregorianCalendar gc = new GregorianCalendar();
-        endDate = new Date();
-        gc.setTime(endDate);
-        gc.add(Calendar.MONTH, -1);
-        startDate = gc.getTime();
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        
+        if(sessionMap.containsKey("endDate")) {
+            endDate = (Date) sessionMap.get("endDate");
+        } else {
+            endDate = new Date();
+            sessionMap.put("endDate", endDate);
+        }
+        
+        if(sessionMap.containsKey("startDate")) {
+            startDate = (Date) sessionMap.get("startDate");
+        } else {
+            gc.setTime(endDate);
+            gc.add(Calendar.MONTH, -1);
+            startDate = gc.getTime();
+            sessionMap.put("startDate", startDate);
+        }
+        
         dailyChart = new BarChartModel();
 
         weeklyChart = new BarChartModel();
@@ -477,7 +496,7 @@ public class TxInstanceController implements Serializable {
         
     }
     
-        public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital, String filter){
+    public TreeMap<Date,SynchronizedDescriptiveStatistics> getWeeklySummaryTr(int hospital, String filter){
         return getFacade().getWeeklySummaryStatsTr(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
     }
     
@@ -646,11 +665,17 @@ public class TxInstanceController implements Serializable {
     }
     
     public void setStartDate(Date startDate) {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
         this.startDate = startDate;
+        sessionMap.put("startDate", startDate);
     }
     
     public void setEndDate(Date endDate) {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
         this.endDate = endDate;
+        sessionMap.put("endDate", endDate);
     }
     
     public Date getStartDate() {

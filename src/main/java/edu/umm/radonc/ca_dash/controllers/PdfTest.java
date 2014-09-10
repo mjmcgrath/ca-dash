@@ -42,7 +42,7 @@ public class PdfTest {
       private byte[] getPdfStream() {
       byte[] pdf = null;
       ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      String html = "<!DOCTYPE HTML><html><body><table><tr><td>Table</td><td>Table 2</td></tr></table></body></html>";
+      String html = "<!DOCTYPE HTML><html><body><img src='images/um-pms.png' /><table><tr><td>Table</td><td>Table 2</td></tr></table></body></html>";
       try {
               ITextRenderer itextRenderer = new ITextRenderer();
               itextRenderer.setDocumentFromString(html);
