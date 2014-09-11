@@ -17,9 +17,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import javax.ejb.EJB;
 import javax.enterprise.context.SessionScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
@@ -54,18 +57,36 @@ public class PieChartController implements Serializable{
 
     public PieChartController() {
         endDate = new Date();
+        this.interval = "";
+        
         GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(endDate);
-        gc.add(Calendar.MONTH, -1);
-        startDate = gc.getTime();
-        interval="1m";
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        
+        if(sessionMap.containsKey("endDate")) {
+            endDate = (Date) sessionMap.get("endDate");
+        } else {
+            endDate = new Date();
+            sessionMap.put("endDate", endDate);
+        }
+        
+        if(sessionMap.containsKey("startDate")) {
+            startDate = (Date) sessionMap.get("startDate");
+        } else {
+            gc.setTime(endDate);
+            gc.add(Calendar.MONTH, -1);
+            startDate = gc.getTime();
+            sessionMap.put("startDate", startDate);
+            this.interval="1m";
+        }
+
         this.df =  new SimpleDateFormat("MM/dd/YYYY");
         this.selectedFacility = new Long(-1);
         this.dstats = new SynchronizedDescriptiveStatistics();
         this.dstatsPerDoc = new TreeMap<>();
         this.dstatsPerRTM = new TreeMap<>();
         this.pieChart = new PieChartModel();
-        this.interval = "";
+
         selectedFilters = "all-tx";
     }
 
@@ -79,16 +100,22 @@ public class PieChartController implements Serializable{
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
-        this.startDate = startDate;
-    }
-
     public Date getEndDate() {
         return endDate;
     }
 
+    public void setStartDate(Date startDate) {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
+        this.startDate = startDate;
+        sessionMap.put("startDate", startDate);
+    }
+    
     public void setEndDate(Date endDate) {
+        ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+        Map<String, Object> sessionMap = externalContext.getSessionMap();
         this.endDate = endDate;
+        sessionMap.put("endDate", endDate);
     }
 
     public Long getSelectedFacility() {

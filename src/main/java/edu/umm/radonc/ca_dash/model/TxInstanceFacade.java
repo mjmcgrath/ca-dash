@@ -242,8 +242,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             currStats.addValue(count);
             i++;
         }
-        oc.set(Calendar.MONTH, prevMo);
-        oc.set(Calendar.YEAR, prevYr);
+        oc.set(Calendar.MONTH, currMo);
+        oc.set(Calendar.YEAR, currYr);
         oc.set(Calendar.DAY_OF_MONTH, 1);
         retval.put(oc.getTime(), currStats);
 

@@ -510,6 +510,7 @@ public class TxInstanceController implements Serializable {
         GregorianCalendar dc = new GregorianCalendar();
         gc.setTime(startDate);
         gc.set(Calendar.DAY_OF_MONTH, 1);
+        Date monthStart = gc.getTime();
         //gc.setTime(new Date(gc.);
         while(gc.getTime().compareTo(endDate) < 0) {
             allDates.add(gc.getTime());
@@ -518,7 +519,7 @@ public class TxInstanceController implements Serializable {
         TreeMap<Date,SynchronizedDescriptiveStatistics> items;
         TreeMap<Date,SynchronizedDescriptiveStatistics> itemsMerged = new TreeMap<>();
         
-        items = getFacade().getMonthlySummaryStats(startDate, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
+        items = getFacade().getMonthlySummaryStats(monthStart, endDate, new Long(hospital), filter, includeWeekends, patientsFlag, scheduledFlag);
         //FIXME FIXME FIXME
         DateFormat wdf = new SimpleDateFormat("yyyy mm");
         int i;
