@@ -50,7 +50,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         String weekendString = "";
         String hospString = "";
         String ptString = "";
-        String scheduledString = "completed";
+        String scheduledString = "actualstartdate";
 
         //if(!includeWeekends) {
         weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
@@ -61,21 +61,45 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
         
         if (scheduledFlag) {
-            scheduledString = "scheduled";
+            scheduledString = "scheduledstarttime";
         }
 
         if (hospitalSer > 0) {
-            hospString = "AND hospitalser = ? ";
+            hospString = "and (dp.hospitalser = ?) ";
         }
+        
+        /*
+        
+select date_trunc('day', scheduledstarttime) as completed, COUNT(DISTINCT scheduledactivity.patientser) 
+from scheduledactivity 
+inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser
+inner join activity on activity.activityser=activityinstance.activityser
+where activitycode not in ('Physics QA')
+and patientser is not null and scheduledactivity.activityinstanceser 
+in (select activityinstanceser from attendee where objectstatus='Active' 
+and activityinstanceser in 
+(select activityinstanceser from scheduledactivity where scheduledstarttime between $P{Start_Date} and $P{End_Date})
+and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398))
+GROUP BY scheduled ORDER BY scheduled
+        
+        
+        */
 
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v5 WHERE "
-                        + scheduledString + " IS NOT NULL AND " + scheduledString + " >= ? AND " + scheduledString + " <= ? "
-                        + hospString
+                .createNativeQuery("select date_trunc('day'," + scheduledString + ") as completed, COUNT(" + ptString + " patientser) FROM scheduledactivity.patientser) "+
+                    "from scheduledactivity  " +
+                    "inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser " +
+                    "inner join activity on activity.activityser=activityinstance.activityser " +
+                    "JOIN department dp ON dp.departmentser = activityinstance.departmentser\n" +
+                    "where activitycode not in ('Physics QA')\n" +
+                    "in (select activityinstanceser from attendee where objectstatus='Active' \n" +
+                    "and activityinstanceser in \n" +
+                    "(select activityinstanceser from scheduledactivity where " + scheduledString + " between ? and ? " +
+                    "and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398))\n" +
+                    hospString +
+                    "GROUP BY scheduled ORDER BY scheduled" 
                         + imrtString
-                        + weekendString
-                        + "GROUP BY completed "
-                        + "ORDER BY completed ASC")
+                        + weekendString)
                 .setParameter(1, start)
                 .setParameter(2, end);
         if (hospitalSer > 0) {
