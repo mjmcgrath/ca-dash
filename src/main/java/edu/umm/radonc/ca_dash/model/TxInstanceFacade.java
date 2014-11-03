@@ -46,12 +46,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         //cq.select(cq.from(Activity.class));cast result list
 
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
-        String imrtString = buildFilterString(filter);
+        String imrtString = "";
         String weekendString = "";
         String hospString = "";
         String ptString = "";
         String scheduledString = "actualstartdate";
-
+        String imrtJoin = "inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser\n" +
+                        "inner join activity on activity.activityser=activityinstance.activityser";
         //if(!includeWeekends) {
         weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
         //}
@@ -68,6 +69,13 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             hospString = "and (dp.hospitalser = ?) ";
         }
         
+        if (filter != null && !"".equals(filter)  && !"all-tx".equals(filter)) {
+            imrtJoin = "join actinstproccode on actinstproccode.activityinstanceser=scheduledactivity.activityinstanceser\n" +
+                "inner join activityinstance on activityinstance.activityinstanceser = actinstproccode.activityinstanceser\n" +
+                "inner join activity on activity.activityser=activityinstance.activityser\n" +
+                "inner join procedurecode on procedurecode.procedurecodeser = actinstproccode.procedurecodeser";
+            imrtString = buildFilterStringDaily(filter);
+        }
         /*
         
 select date_trunc('day', scheduledstarttime) as completed, COUNT(DISTINCT scheduledactivity.patientser) 
@@ -86,20 +94,21 @@ GROUP BY scheduled ORDER BY scheduled
         */
 
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("select date_trunc('day'," + scheduledString + ") as completed, COUNT(" + ptString + " patientser) FROM scheduledactivity.patientser) "+
+                .createNativeQuery("select date_trunc('day'," + scheduledString + ") as completed, COUNT(" + ptString + " patientser)"+
                     "from scheduledactivity  " +
-                    "inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser " +
-                    "inner join activity on activity.activityser=activityinstance.activityser " +
-                    "JOIN department dp ON dp.departmentser = activityinstance.departmentser\n" +
+                    imrtJoin +
+                    "\n JOIN department dp ON dp.departmentser = activityinstance.departmentser\n" +
                     "where activitycode not in ('Physics QA')\n" +
-                    "in (select activityinstanceser from attendee where objectstatus='Active' \n" +
+                    "and patientser is not null and scheduledactivity.activityinstanceser\n" +
+                    "in (\n" +
+                    "select activityinstanceser from attendee where objectstatus='Active' \n" +
                     "and activityinstanceser in \n" +
-                    "(select activityinstanceser from scheduledactivity where " + scheduledString + " between ? and ? " +
-                    "and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398))\n" +
+                    "(select activityinstanceser from scheduledactivity where " + scheduledString  + " between ? and ? ) \n" +
+                    "and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398) \n" +
+                    ")\n" +
                     hospString +
-                    "GROUP BY scheduled ORDER BY scheduled" 
-                        + imrtString
-                        + weekendString)
+                    imrtString + 
+                    "GROUP BY completed ORDER BY completed") 
                 .setParameter(1, start)
                 .setParameter(2, end);
         if (hospitalSer > 0) {
@@ -601,6 +610,63 @@ GROUP BY scheduled ORDER BY scheduled
             if (filter.equals("overlap")) {
                 //FIXME -- what are the CPT codes that indicate IGRT AND IMRT
                 filterString = filterString + "(cpt = '77414')";
+            }
+            filterString += ") ";
+        }
+        return filterString;
+    }
+    
+    private String buildFilterStringDaily(String filter) {
+        String filterString = "";
+        if (filter != null && !"".equals(filter)) {
+            filterString += " AND (";
+            if (filter.contains("imrt")) {
+                filterString = filterString + "(procedurecode = '77418')";
+            }
+            else if (filter.contains("non")) {
+                filterString = filterString + "(procedurecode <> '77418' " +
+                    "AND procedurecode LIKE '774%' " +
+                    "AND procedurecode <> '77421' " +
+                    "AND procedurecode <> '77417' " +
+                    "AND codetype = 'Technical') OR procedurecode LIKE 'G0%'";
+            }
+            else if (filter.contains("all-tx")) {
+                filterString = filterString + "(procedurecode LIKE '774%' " +
+                    "AND procedurecode <> '77421' " +
+                    "AND procedurecode <> '77417' " +
+                    "AND codetype = 'Technical') OR procedurecode LIKE 'G0%'";
+            }
+            
+            else if (filter.contains("xray") || filter.contains("conebeam") || filter.contains("visionrt")) {
+                if (!(filterString.endsWith("("))) {
+                    filterString += " OR ";
+                }
+                if (filter.contains("xray")) {
+                    filterString = filterString += "procedurecode = '77421'";
+                }
+                if( filter.contains("conebeam") ) {
+                    if(filterString.endsWith("'")) {
+                        filterString += " OR ";
+                    }
+                    filterString += "procedurecode = '77014'";
+                }
+                if(filter.contains("visionrt")) {
+                    if(filterString.endsWith("'")) {
+                        filterString += " OR ";
+                    }
+                    filterString += "procedurecode = '0197T' ";
+                }
+            }
+            if (filter.contains("vmat")) {
+                if (!(filterString.endsWith("("))) {
+                    //FIXME
+                    filterString += " OR ";
+                }
+                filterString += "(activitycode = 'Rapid Arc' AND procedurecode = '77418') "; //FIXME!
+            }
+            if (filter.equals("overlap")) {
+                //FIXME -- what are the CPT codes that indicate IGRT AND IMRT
+                filterString = filterString + "(procedurecode = '77414')";
             }
             filterString += ") ";
         }
