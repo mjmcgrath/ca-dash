@@ -28,6 +28,9 @@ import javax.inject.Named;
 import org.apache.commons.math.stat.descriptive.SynchronizedDescriptiveStatistics;
 import org.json.JSONArray;
 import org.primefaces.model.chart.PieChartModel;
+import java.lang.Math;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 
 /**
@@ -47,6 +50,7 @@ public class PieChartController implements Serializable{
     private Date startDate;
     private Date endDate;
     private DateFormat df;
+    private DecimalFormat decf;
     private Long selectedFacility;
     private SynchronizedDescriptiveStatistics dstats;
     private TreeMap<String, DoctorStats> dstatsPerDoc;
@@ -81,6 +85,8 @@ public class PieChartController implements Serializable{
         }
 
         this.df =  new SimpleDateFormat("MM/dd/YYYY");
+        this.decf = new DecimalFormat("###.###");
+        this.decf.setRoundingMode(RoundingMode.HALF_UP);
         this.selectedFacility = new Long(-1);
         this.dstats = new SynchronizedDescriptiveStatistics();
         this.dstatsPerDoc = new TreeMap<>();
@@ -191,10 +197,10 @@ public class PieChartController implements Serializable{
                 newItem.setTotalPatients(count);
                 newItem.setAverageDailyPatients(ptstats.get(doctor));
                 dstatsPerDoc.put(doctor, newItem);
-                pieChart.set(doctor, count);
+                pieChart.set(doctor, newItem.getAverageDailyPatients().getMean());
                 dstats.addValue(count);
                 try{
-                    String item = doctor + " (" + count + ")";
+                    String item = doctor + "<br/>( mean: " + Math.round(newItem.getAverageDailyPatients().getMean()) + ", &#963;: " +  decf.format(newItem.getAverageDailyPatients().getStandardDeviation())  + " )";
                     labels.put(item);
                 }catch(Exception e){
                     //FIXME
@@ -213,10 +219,10 @@ public class PieChartController implements Serializable{
                 newItem.setTotalPatients(count);
                 newItem.setAverageDailyPatients(mptstats.get(machine));
                 dstatsPerRTM.put(machine, newItem);
-                pieChart.set(machine, count);
+                pieChart.set(machine, newItem.getAverageDailyPatients().getMean());
                 dstats.addValue(count);
                 try{
-                    String item = machine + " (" + count + ")";
+                    String item = machine + "<br/>( mean: " + Math.round(newItem.getAverageDailyPatients().getMean()) + ", &#963;: " +  decf.format(newItem.getAverageDailyPatients().getStandardDeviation())  + " )";
                     labels.put(item);
                 }catch(Exception e){
                     //FIXME
@@ -231,7 +237,7 @@ public class PieChartController implements Serializable{
         //pieChart.setDataFormat("value");
         pieChart.setSeriesColors("8C3130, E0AB5D, 4984D0, 2C2A29, A2B85C, BBBEC3, D8C9B6, BD8A79, 3C857A, CD3935");
         pieChart.setExtender("function(){ this.cfg.seriesDefaults.rendererOptions.dataLabels = " + labels.toString() + "; " +
-                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.2; " +
+                    "this.cfg.seriesDefaults.rendererOptions.dataLabelPositionFactor = 1.21; " +
                     "this.cfg.seriesDefaults.rendererOptions.diameter = 600; " +
                     "this.cfg.seriesDefaults.rendererOptions.dataLabelThreshold = 0.5;" +
                     "this.cfg.sliceMargin = 3; " +

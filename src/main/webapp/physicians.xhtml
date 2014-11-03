@@ -88,6 +88,11 @@
                                         <f:convertNumber type="number" maxFractionDigits="0" pattern="#0" />     
                                     </h:outputText>
                                 </p:column>
+                                <p:column headerText="Std. Dev.">
+                                    <h:outputText value="#{doctor.value.averageDailyPatients.getStandardDeviation()}">
+                                        <f:convertNumber type="number" maxFractionDigits="3" pattern="#0" />     
+                                    </h:outputText>
+                                </p:column>
 
                             </p:dataTable>
                         </p:column>
