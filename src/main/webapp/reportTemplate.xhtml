@@ -17,6 +17,11 @@
     </h:head>
 
     <h:body>
+        <p:dialog header="Refreshing Data ..." widgetVar="loadingDlg" modal="true" closable="false" resizable="false" height="50">
+            <br/>
+            <h:graphicImage  name="images/ajax-loader.gif"/>
+        </p:dialog> 
+        <p:ajaxStatus onstart="PF('loadingDlg').show()" onsuccess="PF('loadingDlg').hide()" />
         <p:layout fullPage="true">
             <p:layoutUnit position="west" header="CART" collapsible="true" size="250">
                 <p:tabView id="navTV" >

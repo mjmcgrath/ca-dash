@@ -73,3 +73,7 @@ label.hdr {
 #navTV\:navMenu {
     background: #FFF;
 }
+
+.ui-dialog .ui-dialog-content {
+    background: #FFF;
+}
