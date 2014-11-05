@@ -55,19 +55,28 @@
             <description/>
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint>
-    <login-config>
+    </security-constraint-->
+    <!--login-config>
         <auth-method>BASIC</auth-method>
-        <realm-name>jdbcRealm</realm-name>
+        <realm-name>ADRealm</realm-name>
     </login-config>
     <security-role>
         <description/>
-        <role-name>admin</role-name>
-    </security-role>
-    <security-role>
-        <description/>
         <role-name>user</role-name>
-    </security-role-->
+    </security-role>
+    <security-constraint>
+        <display-name>SecurityConstraint</display-name>
+        <web-resource-collection>
+            <web-resource-name>SecuredFolder</web-resource-name>
+            <url-pattern>/faces/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>user</role-name>
+        </auth-constraint>
+        <user-data-constraint>
+            <transport-guarantee>NONE</transport-guarantee>
+        </user-data-constraint>
+    </security-constraint-->
     <resource-ref>
         <res-ref-name>jdbc/clinicalactivity</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>

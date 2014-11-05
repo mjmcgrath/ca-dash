@@ -7,7 +7,7 @@
   </security-role-mapping>
   <security-role-mapping>
     <role-name>user</role-name>
-    <group-name>user</group-name>
+    <group-name>SignaturesAdmin-UMMC</group-name>
   </security-role-mapping>
   <class-loader delegate="true"/>
   <jsp-config>
