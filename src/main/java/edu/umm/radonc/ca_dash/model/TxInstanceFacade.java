@@ -53,7 +53,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         String scheduledString = "completed";
 
         //if(!includeWeekends) {
-        weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
+        weekendString = " AND date_part('dow', " + scheduledString + " ) <> 0 AND date_part('dow', " + scheduledString + " ) <> 6 ";
         //}
 
         if (ptflag) {
@@ -61,7 +61,8 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
         
         if (scheduledFlag) {
-            scheduledString = "scheduled";
+            scheduledString = "scheduledstarttime";
+            weekendString = " AND date_part('dow', " + scheduledString + " ) <> 0 AND date_part('dow', " + scheduledString + " ) <> 6 "; 
         }
 
         if (hospitalSer > 0) {
@@ -69,13 +70,21 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         }
 
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("SELECT completed, COUNT (" + ptString + " patientser) FROM tx_flat_v5 WHERE "
-                        + scheduledString + " IS NOT NULL AND " + scheduledString + " >= ? AND " + scheduledString + " <= ? "
-                        + hospString
-                        + imrtString
-                        + weekendString
-                        + "GROUP BY completed "
-                        + "ORDER BY completed ASC")
+                .createNativeQuery("select date_trunc('day'," + scheduledString + ") as completed, COUNT(" + ptString + " patientser)"+
+                    "from scheduledactivity  " +
+                    imrtJoin +
+                    "\n JOIN department dp ON dp.departmentser = activityinstance.departmentser\n" +
+                    "where activitycode not in ('Physics QA')\n" +
+                    "and patientser is not null and scheduledactivity.activityinstanceser\n" +
+                    "in (\n" +
+                    "select activityinstanceser from attendee where objectstatus='Active' \n" +
+                    "and activityinstanceser in \n" +
+                    "(select activityinstanceser from scheduledactivity where " + scheduledString  + " between ? and ? " + weekendString + " ) \n" +
+                    "and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398) \n" +
+                    ")\n" +
+                    hospString +
+                    imrtString + 
+                    "GROUP BY completed ORDER BY completed") 
                 .setParameter(1, start)
                 .setParameter(2, end);
         if (hospitalSer > 0) {
