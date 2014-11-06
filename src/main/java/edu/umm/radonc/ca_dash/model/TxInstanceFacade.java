@@ -46,70 +46,35 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         //cq.select(cq.from(Activity.class));cast result list
 
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
-        String imrtString = "";
+        String imrtString = buildFilterString(filter);
         String weekendString = "";
         String hospString = "";
-        String ptString = "";
-        String scheduledString = "actualstartdate";
-        String imrtJoin = "inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser\n" +
-                        "inner join activity on activity.activityser=activityinstance.activityser";
+        String ptString = "activityinstanceser";
+        String scheduledString = "started";
+
         //if(!includeWeekends) {
-        weekendString = " AND date_part('dow', " + scheduledString + " ) <> 0 AND date_part('dow', " + scheduledString + " ) <> 6 ";
+        weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
         //}
 
         if (ptflag) {
-            ptString = "DISTINCT";
+            ptString = "patientser";
         }
         
         if (scheduledFlag) {
-            scheduledString = "scheduledstarttime";
-            weekendString = " AND date_part('dow', " + scheduledString + " ) <> 0 AND date_part('dow', " + scheduledString + " ) <> 6 "; 
+            scheduledString = "scheduled";
         }
 
         if (hospitalSer > 0) {
-            hospString = "and (dp.hospitalser = ?) ";
+            hospString = "AND hospitalser = ? ";
         }
-        
-        if (filter != null && !"".equals(filter)  && !"all-tx".equals(filter)) {
-            imrtJoin = "join actinstproccode on actinstproccode.activityinstanceser=scheduledactivity.activityinstanceser\n" +
-                "inner join activityinstance on activityinstance.activityinstanceser = actinstproccode.activityinstanceser\n" +
-                "inner join activity on activity.activityser=activityinstance.activityser\n" +
-                "inner join procedurecode on procedurecode.procedurecodeser = actinstproccode.procedurecodeser";
-            imrtString = buildFilterStringDaily(filter);
-        }
-        /*
-        
-select date_trunc('day', scheduledstarttime) as completed, COUNT(DISTINCT scheduledactivity.patientser) 
-from scheduledactivity 
-inner join activityinstance on activityinstance.activityinstanceser=scheduledactivity.activityinstanceser
-inner join activity on activity.activityser=activityinstance.activityser
-where activitycode not in ('Physics QA')
-and patientser is not null and scheduledactivity.activityinstanceser 
-in (select activityinstanceser from attendee where objectstatus='Active' 
-and activityinstanceser in 
-(select activityinstanceser from scheduledactivity where scheduledstarttime between $P{Start_Date} and $P{End_Date})
-and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398))
-GROUP BY scheduled ORDER BY scheduled
-        
-        
-        */
 
         javax.persistence.Query q = getEntityManager()
-                .createNativeQuery("select date_trunc('day'," + scheduledString + ") as completed, COUNT(" + ptString + " patientser)"+
-                    "from scheduledactivity  " +
-                    imrtJoin +
-                    "\n JOIN department dp ON dp.departmentser = activityinstance.departmentser\n" +
-                    "where activitycode not in ('Physics QA')\n" +
-                    "and patientser is not null and scheduledactivity.activityinstanceser\n" +
-                    "in (\n" +
-                    "select activityinstanceser from attendee where objectstatus='Active' \n" +
-                    "and activityinstanceser in \n" +
-                    "(select activityinstanceser from scheduledactivity where " + scheduledString  + " between ? and ? " + weekendString + " ) \n" +
-                    "and resourceser in (1034,1564,1392,2285,4737,4736,2689,2692,2453,2398) \n" +
-                    ")\n" +
-                    hospString +
-                    imrtString + 
-                    "GROUP BY completed ORDER BY completed") 
+                .createNativeQuery("SELECT " + scheduledString + ", COUNT ( DISTINCT " + ptString + " ) FROM tx_flat_v5 WHERE "
+                        + scheduledString + " between ? AND ? "
+                        + hospString
+                        + imrtString
+                        + "GROUP BY " + scheduledString
+                        + " ORDER BY " + scheduledString + " ASC")
                 .setParameter(1, start)
                 .setParameter(2, end);
         if (hospitalSer > 0) {
@@ -118,7 +83,7 @@ GROUP BY scheduled ORDER BY scheduled
         List<Object[]> retval = q.getResultList();
         return retval;
     }
-
+    
     public SynchronizedDescriptiveStatistics getDailyStats(Date startDate, Date endDate, Long hospital, String filter, boolean includeWeekends, boolean ptflag, boolean scheduledFlag) {
         SynchronizedDescriptiveStatistics stats = new SynchronizedDescriptiveStatistics();
         GregorianCalendar gc = new GregorianCalendar();
@@ -575,10 +540,10 @@ GROUP BY scheduled ORDER BY scheduled
                     "AND codetype = 'Technical') OR cpt LIKE 'G0%'";
             }
             else if (filter.contains("all-tx")) {
-                filterString = filterString + "(cpt LIKE '774%' " +
+                filterString = filterString +  " true ";  /*filterString + "(cpt LIKE '774%' " +
                     "AND cpt <> '77421' " +
                     "AND cpt <> '77417' " +
-                    "AND codetype = 'Technical') OR cpt LIKE 'G0%'";
+                    "AND codetype = 'Technical') OR cpt LIKE 'G0%'";*/
             }
             
             else if (filter.contains("xray") || filter.contains("conebeam") || filter.contains("visionrt")) {
