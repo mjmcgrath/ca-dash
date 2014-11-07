@@ -387,6 +387,11 @@ public class TxInstanceController implements Serializable {
         }
     }
     
+    public void handleModeSelect() {
+        this.selectedFilters.clear();
+        this.selectedFilters.add("all-tx");
+    }
+    
     public void handleDateSelect() {
         long diff = endDate.getTime() - startDate.getTime();
         long diffDays = diff / (24 * 60 * 60 * 1000);

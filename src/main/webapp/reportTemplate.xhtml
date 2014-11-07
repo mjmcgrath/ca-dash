@@ -17,6 +17,11 @@
     </h:head>
 
     <h:body>
+        <style>
+            .ui-dialog .ui-dialog-content {
+                background: #FFF;
+            }
+        </style>
         <p:dialog header="Refreshing Data ..." widgetVar="loadingDlg" modal="true" closable="false" resizable="false" height="50">
             <br/>
             <h:graphicImage  name="images/ajax-loader.gif"/>

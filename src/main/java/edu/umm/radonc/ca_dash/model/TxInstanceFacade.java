@@ -46,7 +46,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         //cq.select(cq.from(Activity.class));cast result list
 
         //CriteriaBuilder cb = getEntityManager().getCriteriaBuilder()
-        String imrtString = buildFilterString(filter);
+        String imrtString = "";
         String weekendString = "";
         String hospString = "";
         String ptString = "activityinstanceser";
@@ -66,6 +66,10 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
 
         if (hospitalSer > 0) {
             hospString = "AND hospitalser = ? ";
+        }
+        
+        if(filter != null && !filter.isEmpty() && !filter.contains("all-tx")) {
+            imrtString = buildFilterString(filter);
         }
 
         javax.persistence.Query q = getEntityManager()

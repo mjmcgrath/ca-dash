@@ -250,38 +250,37 @@ public class PieChartController implements Serializable{
     }
     
      public void onSelectTimePeriod(){
-        endDate = new Date();
         GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(endDate);
+        gc.setTime(startDate);
         
         switch(interval) {
             case "1wk":
-                gc.add(Calendar.DATE, -7);
-                startDate = gc.getTime();
+                gc.add(Calendar.DATE, 7);
+                endDate = gc.getTime();
                 break;
             case "1m":
-                gc.add(Calendar.MONTH, -1);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 1);
+                endDate = gc.getTime();
                 break;
             case "3m":
-                gc.add(Calendar.MONTH, -3);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
                 break;
             case "6m":
-                gc.add(Calendar.MONTH, -6);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 6);
+                endDate = gc.getTime();
                 break;
             case "1y":
-                gc.add(Calendar.YEAR, -1);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 1);
+                endDate = gc.getTime();
                 break;
             case "2y":
-                gc.add(Calendar.YEAR, -2);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 2);
+                endDate = gc.getTime();
                 break;
             case "3y":
-                gc.add(Calendar.YEAR, -3);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 3);
+                endDate = gc.getTime();
                 break;
             case "Q1":
                 gc.setTime(FiscalDate.getQuarter(1));

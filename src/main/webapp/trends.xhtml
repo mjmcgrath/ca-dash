@@ -24,6 +24,7 @@
                 <div id="zoomSlider"></div-->
                 <label class='hdr'>Mode</label><br/>
                 <p:selectOneButton id="apptTypeSelect" value="#{txInstanceController.scheduledFlag}">
+                    <p:ajax event="change" listener="#{txInstanceController.handleModeSelect}" update="@(form)" /> 
                     <f:selectItem itemLabel="Scheduled" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="Actual" itemValue="false"></f:selectItem>
                 </p:selectOneButton>
@@ -79,9 +80,9 @@
                 <!--p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
                 <p:selectManyCheckbox id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
                     <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
-                    <f:selectItem itemLabel="IMRT" itemValue="imrt" />
-                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" />
-                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" />
+                    <f:selectItem itemLabel="IMRT" itemValue="imrt" itemDisabled="#{txInstanceController.scheduledFlag}" />
+                    <f:selectItem itemLabel="Non-IMRT" itemValue="non" itemDisabled="#{txInstanceController.scheduledFlag}"/>
+                    <f:selectItem itemLabel="IGRT" itemValue="xray,conebeam,visionrt" itemDisabled="#{txInstanceController.scheduledFlag}"/>
                 </p:selectManyCheckbox><br/>
                 <p:commandButton id="submit" value="Enter" actionListener="#{txInstanceController.draw}" onclick="jqResizeCharts()" update=":charts" widgetVar="submit" /> 
             </h:form>

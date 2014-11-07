@@ -213,39 +213,42 @@ public class HistogramController implements Serializable {
         this.relativeModeFlag = relativeModeFlag;
     }
     
+    public void handleModeSelect() {
+        this.selectedFilters = "all-tx";
+    }
+    
     public void onSelectTimePeriod(){
-        endDate = new Date();
         GregorianCalendar gc = new GregorianCalendar();
-        gc.setTime(endDate);
+        gc.setTime(startDate);
         
         switch(interval) {
             case "1wk":
-                gc.add(Calendar.DATE, -7);
-                startDate = gc.getTime();
+                gc.add(Calendar.DATE, 7);
+                endDate = gc.getTime();
                 break;
             case "1m":
-                gc.add(Calendar.MONTH, -1);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 1);
+                endDate = gc.getTime();
                 break;
             case "3m":
-                gc.add(Calendar.MONTH, -3);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 3);
+                endDate = gc.getTime();
                 break;
             case "6m":
-                gc.add(Calendar.MONTH, -6);
-                startDate = gc.getTime();
+                gc.add(Calendar.MONTH, 6);
+                endDate = gc.getTime();
                 break;
             case "1y":
-                gc.add(Calendar.YEAR, -1);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 1);
+                endDate = gc.getTime();
                 break;
             case "2y":
-                gc.add(Calendar.YEAR, -2);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 2);
+                endDate = gc.getTime();
                 break;
             case "3y":
-                gc.add(Calendar.YEAR, -3);
-                startDate = gc.getTime();
+                gc.add(Calendar.YEAR, 3);
+                endDate = gc.getTime();
                 break;
             case "Q1":
                 gc.setTime(FiscalDate.getQuarter(1));
@@ -288,14 +291,14 @@ public class HistogramController implements Serializable {
         dstats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         String label = "All";
         //Freedman-Diaconis bin width
-        double interval = Math.floor(2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0)));
+        double binInterval = Math.floor(2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0)));
         if(relativeModeFlag) {
             divisor = dstats.getN();
         }
-        interval = (interval < 1.0) ? 1.0 : interval;
+        binInterval = (binInterval < 1.0) ? 1.0 : binInterval;
         double[] sortedValues = dstats.getSortedValues();
         double currIntervalStart = 0.0;
-        double currIntervalEnd = interval;
+        double currIntervalEnd = binInterval;
         double count = 0.0;
         for (int i = 0; i < sortedValues.length; i++) {
             if(sortedValues[i] < currIntervalEnd) {
@@ -304,7 +307,7 @@ public class HistogramController implements Serializable {
                 String intervalString = String.format("%d", (int)Math.ceil(currIntervalStart)) + " - " +  String.format("%d", (int)Math.floor(currIntervalEnd) - 1 );
                 histo.set(intervalString, count / divisor);
                 currIntervalStart = currIntervalEnd;
-                currIntervalEnd += interval;
+                currIntervalEnd += binInterval;
                 count = 0.0;
                 i--;
             }
