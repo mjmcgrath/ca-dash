@@ -69,13 +69,15 @@ public class HistogramController implements Serializable {
     private boolean patientsFlag;
     private boolean scheduledFlag;
     private boolean relativeModeFlag;
-            
+    private double binInterval;
+    
     public HistogramController() {
         histogram = new BarChartModel();
         percentile = 50.0;
         dstats = new SynchronizedDescriptiveStatistics();
         endDate = new Date();
         interval="";
+        binInterval = -1;
         GregorianCalendar gc = new GregorianCalendar();
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sessionMap = externalContext.getSessionMap();
@@ -291,7 +293,7 @@ public class HistogramController implements Serializable {
         dstats = getFacade().getDailyStats(startDate, endDate, hospital, selectedFilters, includeWeekends, patientsFlag, scheduledFlag);
         String label = "All";
         //Freedman-Diaconis bin width
-        double binInterval = Math.floor(2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0)));
+        binInterval = Math.floor(2.0 * (dstats.getPercentile(75.0) - dstats.getPercentile(25.0)) * Math.pow(dstats.getN(),(-1.0/3.0)));
         if(relativeModeFlag) {
             divisor = dstats.getN();
         }

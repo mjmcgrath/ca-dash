@@ -106,7 +106,7 @@
                                     <f:selectItem itemLabel="Relative" itemValue="true" />
                                     <p:ajax listener="#{histogramController.drawHistogram}" update=":histo,@(form)"/>
                                 </p:selectOneButton>
-                                <p:slider for="percentile" step="5" style="width:70px;">
+                                <p:slider for="percentile" step="5" style="width:70px;" minValue="1">
                                     <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
                                 </p:slider>
                             </p:ribbonGroup>
