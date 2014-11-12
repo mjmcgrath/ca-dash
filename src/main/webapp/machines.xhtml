@@ -9,10 +9,14 @@
         <ui:define name="filters">
             <h:form id="filters">
                 <label class='hdr'>Start Date: </label>
-                <p:calendar value="#{pieChartController.startDate}" id="startCal" />
+                <p:calendar value="#{pieChartController.startDate}" id="startCal">
+                    <p:ajax event="dateSelect" global="false" update="@(form)" />
+                </p:calendar>
                 <br/>
                 <label class='hdr'>End Date: </label>
-                <p:calendar value="#{pieChartController.endDate}" id="endCal" />
+                <p:calendar value="#{pieChartController.endDate}" id="endCal">
+                    <p:ajax event="dateSelect" global="false" update="@(form)" />
+                </p:calendar>
                 <br/><br/>
                 <p:selectOneButton id="selectCal" value="#{pieChartController.interval}">
                     <f:selectItem itemLabel="7d" itemValue="1wk" />
@@ -22,17 +26,18 @@
                     <f:selectItem itemLabel="1y" itemValue="1y" />
                     <f:selectItem itemLabel="2y" itemValue="2y" />
                     <f:selectItem itemLabel="3y" itemValue="3y" />
-                    <p:ajax event="change" listener="#{pieChartController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{pieChartController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton><br/>
                 <p:selectOneButton id="selectQtr" value="#{pieChartController.interval}">
                     <f:selectItem itemLabel="Q1" itemValue="Q1" />
                     <f:selectItem itemLabel="Q2" itemValue="Q2" />
                     <f:selectItem itemLabel="Q3" itemValue="Q3" />
                     <f:selectItem itemLabel="Q4" itemValue="Q4" />
-                    <p:ajax event="change" listener="#{pieChartController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{pieChartController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton>
                 <label class='hdr' for="facility">Facility: </label>
                 <p:selectOneRadio id="facility" value="#{pieChartController.selectedFacility}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" />
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
@@ -41,6 +46,7 @@
                 <br/>
                 <label class="hdr">Other: </label><br/>
                 <p:selectOneRadio id="txfilters" value="#{pieChartController.selectedFilters}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" />
                     <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" />
                     <f:selectItem itemLabel="Non-IMRT" itemValue="non" />

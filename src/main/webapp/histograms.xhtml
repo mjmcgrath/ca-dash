@@ -16,19 +16,24 @@
             <h:form id="filters">
                 <label class='hdr'>Mode</label><br/>
                 <p:selectOneButton id="apptTypeSelect" value="#{histogramController.scheduledFlag}">
-                    <p:ajax event="change" listener="#{histogramController.handleModeSelect}" update="@(form)" />
+                    <p:ajax event="change" global="false" listener="#{histogramController.handleModeSelect}" update="@(form)" />
                     <f:selectItem itemLabel="Scheduled" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="Actual" itemValue="false"></f:selectItem>
                 </p:selectOneButton>
                 <p:selectOneButton id="dataTypeSelect" value="#{histogramController.patientsFlag}">
+                    <p:ajax event="change" global="false" update="@(form)" />
                     <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
                 </p:selectOneButton><br/>
                 <label class='hdr'>Start Date: </label>
-                <p:calendar value="#{histogramController.startDate}" id="startCal" />
+                <p:calendar value="#{histogramController.startDate}" id="startCal">
+                    <p:ajax event="dateSelect" global="false" update="@(form)" />
+                </p:calendar>
                 <br/>
                 <label class='hdr'>End Date: </label>
-                <p:calendar value="#{histogramController.endDate}" id="endCal" />
+                <p:calendar value="#{histogramController.endDate}" id="endCal">
+                    <p:ajax event="dateSelect" global="false" update="@(form)" />
+                </p:calendar>
                 <br/><br/>
                 <p:selectOneButton id="selectCal" value="#{histogramController.interval}">
                     <f:selectItem itemLabel="7d" itemValue="1wk" />
@@ -38,17 +43,18 @@
                     <f:selectItem itemLabel="1y" itemValue="1y" />
                     <f:selectItem itemLabel="2y" itemValue="2y" />
                     <f:selectItem itemLabel="3y" itemValue="3y" />
-                    <p:ajax event="change" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton><br/>
                 <p:selectOneButton id="selectQtr" value="#{histogramController.interval}">
                     <f:selectItem itemLabel="Q1" itemValue="Q1" />
                     <f:selectItem itemLabel="Q2" itemValue="Q2" />
                     <f:selectItem itemLabel="Q3" itemValue="Q3" />
                     <f:selectItem itemLabel="Q4" itemValue="Q4" />
-                    <p:ajax event="change" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{histogramController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton>
                 <label class='hdr' for="facility">Facility: </label>
                 <p:selectOneRadio id="facility" value="#{histogramController.selectedFacility}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" />
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
@@ -59,6 +65,7 @@
                 <label class="hdr">Other: </label><br/>
                 <!--p:selectBooleanCheckbox value="#{histogramController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
                 <p:selectOneRadio id="txfilters" value="#{histogramController.selectedFilters}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" />
                     <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" itemDisabled="#{histogramController.scheduledFlag}"/>
                     <f:selectItem itemLabel="Non-IMRT" itemValue="non" itemDisabled="#{histogramController.scheduledFlag}"/>
@@ -86,6 +93,20 @@
                     font-size: 12pt;
                     font-weight: bold;
                 }
+                div.ui-ribbon-group-content .ui-state-default, 
+                div.ui-ribbon-group-content .ui-widget-content .ui-state-default, 
+                div.ui-ribbon-group-content .ui-widget-header .ui-state-default {
+                    color: #444
+                }
+                div.ui-ribbon-group-content .ui-state-hover, 
+                div.ui-ribbon-group-content .ui-widget-content .ui-state-hover, 
+                div.ui-ribbon-group-content .ui-widget-header .ui-state-hover, 
+                div.ui-ribbon-group-content .ui-state-focus, .ui-widget-content 
+                div.ui-ribbon-group-content .ui-state-focus, 
+                div.ui-ribbon-group-content .ui-widget-header 
+                div.ui-ribbon-group-content .ui-state-focus {
+                    color: #000
+                }
             </style>
             <f:event type="preRenderComponent" listener="#{histogramController.drawHistogram}"/>
             <h:panelGroup id="histoChart" style="display:block">
@@ -95,7 +116,7 @@
                         <p:tab title="Main">
                             <p:ribbonGroup label="Options">
                                 <p:inputText id="percentile" value="#{histogramController.percentile}" style="width:60px;text-align:right; font-size:1.5em; font-weight: bold;">
-                                    <p:ajax event="change" listener="#{histogramController.updatePercentile()}" update="percentileText" />
+                                    <p:ajax event="change" listener="#{histogramController.updatePercentile()}" global="false" update="percentileText" />
                                 </p:inputText>
                                 <h:outputText value="th Percentile: "></h:outputText>
                                 <h:outputText id="percentileText" value="#{histogramController.percentileVal}" style="padding: 2px 15px 2px 4px; font-size:1.7em; font-weight: bold;" >
@@ -107,7 +128,7 @@
                                     <p:ajax listener="#{histogramController.drawHistogram}" update=":histo,@(form)"/>
                                 </p:selectOneButton>
                                 <p:slider for="percentile" step="5" style="width:70px;" minValue="1">
-                                    <p:ajax listener="#{histogramController.updatePercentile()}" update="percentileText" process="percentile" />
+                                    <p:ajax listener="#{histogramController.updatePercentile()}" global="false" update="percentileText" process="percentile" />
                                 </p:slider>
                             </p:ribbonGroup>
                         </p:tab>

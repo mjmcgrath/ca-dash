@@ -24,23 +24,24 @@
                 <div id="zoomSlider"></div-->
                 <label class='hdr'>Mode</label><br/>
                 <p:selectOneButton id="apptTypeSelect" value="#{txInstanceController.scheduledFlag}">
-                    <p:ajax event="change" listener="#{txInstanceController.handleModeSelect}" update="@(form)" /> 
+                    <p:ajax event="change" global="false" listener="#{txInstanceController.handleModeSelect}" update="@(form)" /> 
                     <f:selectItem itemLabel="Scheduled" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="Actual" itemValue="false"></f:selectItem>
                 </p:selectOneButton>
                 <p:selectOneButton id="dataTypeSelect" value="#{txInstanceController.patientsFlag}">
+                    <p:ajax event="change" global="false" update="@(form)" /> 
                     <f:selectItem itemLabel="#Pt" itemValue="true"></f:selectItem>
                     <f:selectItem itemLabel="#Tx" itemValue="false"></f:selectItem>
                 </p:selectOneButton>
                 <br/><br/>
                 <label class='hdr'>Start Date: </label>
                 <p:calendar value="#{txInstanceController.startDate}" id="startCal">
-                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
+                    <p:ajax event="dateSelect" global="false" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
                 </p:calendar>
                 <br/>
                 <label class='hdr'>End Date: </label>
                 <p:calendar value="#{txInstanceController.endDate}" id="endCal">
-                    <p:ajax event="dateSelect" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
+                    <p:ajax event="dateSelect" global="false" listener="#{txInstanceController.handleDateSelect}" update="@(form)" /> 
                 </p:calendar>
                 <br/><br/>
                  <p:selectOneButton id="selectCal" value="#{txInstanceController.interval}">
@@ -51,18 +52,19 @@
                     <f:selectItem itemLabel="1y" itemValue="1y" />
                     <f:selectItem itemLabel="2y" itemValue="2y" />
                     <f:selectItem itemLabel="3y" itemValue="3y" />
-                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton><br/>
                 <p:selectOneButton id="selectQtr" value="#{txInstanceController.interval}">
                     <f:selectItem itemLabel="Q1" itemValue="Q1" />
                     <f:selectItem itemLabel="Q2" itemValue="Q2" />
                     <f:selectItem itemLabel="Q3" itemValue="Q3" />
                     <f:selectItem itemLabel="Q4" itemValue="Q4" />
-                    <p:ajax event="change" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
+                    <p:ajax event="change" global="false" listener="#{txInstanceController.onSelectTimePeriod}" update="@form"/>
                 </p:selectOneButton>
                 <br/><br/>
                 <label class='hdr' for="timeInterval">Granularity: </label>
                 <p:selectManyCheckbox id="timeInterval" value="#{txInstanceController.selectedTimeIntervals}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" /> 
                     <f:selectItem itemLabel="Daily" itemValue="Daily" itemDisabled="#{txInstanceController.disableDailyCheckbox}"/>
                     <f:selectItem itemLabel="Weekly" itemValue="Weekly" itemDisabled="#{txInstanceController.disableWeeklyCheckbox}"/>
                     <f:selectItem itemLabel="Monthly" itemValue="Monthly" itemDisabled="#{txInstanceController.disableMonthlyCheckbox}"/>
@@ -70,6 +72,7 @@
                 </p:selectManyCheckbox><br/>
                 <label class='hdr' for="facility">Facility: </label>
                 <p:selectManyCheckbox id="facility" value="#{txInstanceController.selectedFacilities}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" /> 
                     <f:selectItem itemLabel="Aggregate" itemValue="-1" />
                     <c:forEach items="${hospitalController.items}" var="hospital">
                         <f:selectItem itemLabel="#{hospital.hospitalname}" itemValue="#{hospital.hospitalser}" />
@@ -79,6 +82,7 @@
                 <label class="hdr">Other: </label><br/>
                 <!--p:selectBooleanCheckbox value="#{txInstanceController.includeWeekends}" /> <h:outputText value="Include Weekends" style="padding-left: 5px;"/><br/><br/-->
                 <p:selectManyCheckbox id="txfilters" value="#{txInstanceController.selectedFilters}" layout="pageDirection">
+                    <p:ajax event="change" global="false" update="@(form)" /> 
                     <f:selectItem itemLabel="All Tx" itemValue="all-tx" />
                     <f:selectItem itemLabel="IMRT" itemValue="imrt" itemDisabled="#{txInstanceController.scheduledFlag}" />
                     <f:selectItem itemLabel="Non-IMRT" itemValue="non" itemDisabled="#{txInstanceController.scheduledFlag}"/>

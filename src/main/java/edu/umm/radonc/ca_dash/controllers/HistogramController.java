@@ -153,7 +153,13 @@ public class HistogramController implements Serializable {
     }
 
     public void setPercentile(double percentile) {
-        this.percentile = percentile;
+        if(percentile < 1) {
+            this.percentile = 1;
+        } else if (percentile >= 100) {
+            this.percentile = 99.9;
+        } else {
+            this.percentile = percentile;
+        }
     }
     
     public double getPercentileVal() {
@@ -286,6 +292,13 @@ public class HistogramController implements Serializable {
         }
         return retval;
     }*/
+    
+    public ChartSeries multiHistogram(List<Long> hospitals) {
+        for (Long hospital : hospitals) {
+            buildHistogram( hospital );
+        }
+        return null;
+    }
     
     public ChartSeries buildHistogram(Long hospital){
         double divisor = 1.0;
