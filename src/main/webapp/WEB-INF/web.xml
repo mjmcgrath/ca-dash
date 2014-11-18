@@ -56,7 +56,7 @@
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
     </security-constraint-->
-    <!--login-config>
+    <login-config>
         <auth-method>BASIC</auth-method>
         <realm-name>ADRealm</realm-name>
     </login-config>
@@ -76,7 +76,7 @@
         <user-data-constraint>
             <transport-guarantee>NONE</transport-guarantee>
         </user-data-constraint>
-    </security-constraint-->
+    </security-constraint>
     <resource-ref>
         <res-ref-name>jdbc/clinicalactivity</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>

@@ -78,6 +78,7 @@ public class HistogramController implements Serializable {
         endDate = new Date();
         interval="";
         binInterval = -1;
+        includeWeekends = false;
         GregorianCalendar gc = new GregorianCalendar();
         ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
         Map<String, Object> sessionMap = externalContext.getSessionMap();

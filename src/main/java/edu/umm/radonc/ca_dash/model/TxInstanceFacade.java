@@ -52,9 +52,9 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         String ptString = "activityinstanceser";
         String scheduledString = "started";
 
-        //if(!includeWeekends) {
-        weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
-        //}
+        if(!includeWeekends) {
+            weekendString = " AND date_part('dow', completed) <> 0 AND date_part('dow', completed) <> 6 ";
+        }
 
         if (ptflag) {
             ptString = "patientser";
@@ -77,6 +77,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                         + scheduledString + " between ? AND ? "
                         + hospString
                         + imrtString
+                        + weekendString
                         + "GROUP BY " + scheduledString
                         + " ORDER BY " + scheduledString + " ASC")
                 .setParameter(1, start)
@@ -105,7 +106,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         Calendar cal = new GregorianCalendar();
         TreeMap<Date, SynchronizedDescriptiveStatistics> retval = new TreeMap<>();
 
-        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
+        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, false, ptflag, scheduledFlag);
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
@@ -145,7 +146,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         cal.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY);
         startDate = cal.getTime();
 
-        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
+        List<Object[]> events = getDailyCounts(startDate, endDate, hospitalser, filter, false, ptflag, scheduledFlag);
 
         DateFormat df = new SimpleDateFormat("MM/dd/yy");
         cal.setTime(startDate);
@@ -206,7 +207,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         GregorianCalendar oc = new GregorianCalendar();
         List<Object[]> events;
 
-        events = getDailyCounts(startDate, endDate, hospitalser, filter, includeWeekends, ptflag, scheduledFlag);
+        events = getDailyCounts(startDate, endDate, hospitalser, filter, false, ptflag, scheduledFlag);
 
         cal.setTime(startDate);
 
