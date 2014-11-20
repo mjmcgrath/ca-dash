@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+   <f:view contentType="text/html">
+    <h:head>
+        <title><ui:insert name="title">RO-CART</ui:insert></title>
+        <h:outputStylesheet name="css/style.css" />
+        <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css' />
+        <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css' />
+        <h:outputStylesheet library="css" name="style.css"/>
+        <ui:insert name="supplemental_css"></ui:insert>
+        <ui:insert name="supplemental_js"></ui:insert>
+    </h:head>
+
+    <h:body>
+        <style>
+            .ui-dialog .ui-dialog-content {
+                background: #FFF;
+            }
+        </style>
+        <p:dialog header="Refreshing Data ..." widgetVar="loadingDlg" modal="true" closable="false" resizable="false" height="50">
+            <br/>
+            <h:graphicImage  name="images/ajax-loader.gif"/>
+        </p:dialog> 
+        <p:ajaxStatus onstart="PF('loadingDlg').show()" onsuccess="PF('loadingDlg').hide()" />
+        <p:layout fullPage="true">
+            
+            <p:layoutUnit position="center" id="main">
+                <ui:insert name="body"/>
+            </p:layoutUnit>
+
+        </p:layout>
+
+    </h:body>
+
+    </f:view>
+</html>

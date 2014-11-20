@@ -5,7 +5,10 @@
       xmlns:ui="http://java.sun.com/jsf/facelets"
       xmlns:p="http://primefaces.org/ui" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
     
-    <ui:composition template="loginTemplate.xhtml">
+    <ui:composition template="/master_templates/reportTemplate.xhtml">
+        <ui:define name="filters">
+            <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" />
+        </ui:define>
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" />
@@ -16,13 +19,11 @@
             <p>CART is the Radiation Oncology <strong>C</strong>linical <strong>A</strong>ctivity <strong>R</strong>eporting <strong>T</strong>ool.
                 It is an application that allows you to mine operational data from the Radiation Oncology EMR systems.</p>
             <p>Please select a report type from the menu to the left to get started.</p>
-            <form method="POST" action="j_security_check">
-                Username: <input type="text" name="j_username" /><br/>
-                Password: <input type="password" name="j_password" />
-                <br />
-                <input type="submit" value="Login" />
-                <input type="reset" value="Reset" />
-            </form>
+            <!--h:form>
+                <p:commandButton value="Download" ajax="false" icon="ui-icon-arrowthick-1-s">
+                    <p:fileDownload value="#{pdfTest.file}" />
+                </p:commandButton>
+            </h:form-->
         </ui:define>
         
     </ui:composition>
