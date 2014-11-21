@@ -77,3 +77,13 @@ label.hdr {
 .ui-dialog .ui-dialog-content {
     background: #FFF;
 }
+
+#login-grid .ui-widget-content
+{
+    border-style: none !important;
+}
+
+#login-panel, #login-panel .ui-widget-content
+{
+    background: white;
+}

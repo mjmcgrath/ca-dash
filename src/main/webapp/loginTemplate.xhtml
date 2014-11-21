@@ -32,6 +32,22 @@
             <p:layoutUnit position="center" id="main">
                 <ui:insert name="body"/>
             </p:layoutUnit>
+            
+            <p:layoutUnit position="east" id="login">
+                <p:panel id="login-panel" header="Login" style="width:350px; float:right;">
+                    <form method="POST" action="j_security_check">
+                        <p:panelGrid columns="2" layout="grid" id="login-grid" style="border-style: none !important;">
+                            <h:outputLabel value="Username" /> 
+                            <input type="text" name="j_username" /><br/>
+                            <h:outputLabel value="Password" /> 
+                            <input type="password" name="j_password" />
+                        </p:panelGrid>
+                        <br />
+                        <input type="submit" value="Login" />
+                        <input type="reset" value="Reset" />
+                    </form>
+                </p:panel>
+            </p:layoutUnit>
 
         </p:layout>
 

@@ -9,16 +9,11 @@
 
         <ui:define name="body">
             <f:event type="preRenderComponent" listener="#{navigationController.setActiveTab(0)}" />
-            <h:graphicImage  name="images/um-pms.png" style="clear:both;"/>
+            <h:graphicImage  name="images/um-pms.png" style="clear:both;padding-left:5px;"/>
             <hr/>
             <h:graphicImage  name="images/cart-icon.png" style="float:left;padding-left: 30px; padding-right: 30px;"/>
-            <h1>Welcome to CART</h1>
-            <p>CART is the Radiation Oncology <strong>C</strong>linical <strong>A</strong>ctivity <strong>R</strong>eporting <strong>T</strong>ool.
-                It is an application that allows you to mine operational data from the Radiation Oncology EMR systems.</p>
-            <p>Please select a report type from the menu to the left to get started.</p>
-            <p:panel header="Login Error">
-                Login Failed. Please try again: <a href="#{facesContext.externalContext.requestContextPath}/" >Login</a>
-            </p:panel>
+            <h1>Login Error</h1>
+            <p>Login Failed. Please try again.</p>
         </ui:define>
     </ui:composition>
 </html>
