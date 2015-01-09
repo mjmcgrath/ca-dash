@@ -535,7 +535,9 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if (filter.contains("imrt")) {
-                filterString = filterString + "(cpt = '77418')";
+                filterString = filterString + "(cpt = '77418') " + 
+                "OR (cpt = '77385') " +
+                "OR (cpt = '77386') ";
             }
             else if (filter.contains("non")) {
                 filterString = filterString + "(cpt <> '77418' " +
@@ -555,6 +557,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 if (!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
+                filterString += " cpt = '77387' OR ";
                 if (filter.contains("xray")) {
                     filterString = filterString += "cpt = '77421'";
                 }
@@ -592,7 +595,9 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
         if (filter != null && !"".equals(filter)) {
             filterString += " AND (";
             if (filter.contains("imrt")) {
-                filterString = filterString + "(procedurecode = '77418')";
+                filterString = filterString + "(procedurecode = '77418') " + 
+                "OR (procedurecode = '77385') " +
+                "OR (procedurecode = '77386') ";
             }
             else if (filter.contains("non")) {
                 filterString = filterString + "(procedurecode <> '77418' " +
@@ -612,6 +617,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 if (!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
+                filterString += " procedurecode = '77387' OR ";
                 if (filter.contains("xray")) {
                     filterString = filterString += "procedurecode = '77421'";
                 }
