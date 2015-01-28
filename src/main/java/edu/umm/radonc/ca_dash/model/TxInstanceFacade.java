@@ -537,14 +537,16 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
             if (filter.contains("imrt")) {
                 filterString = filterString + "(cpt = '77418') " + 
                 "OR (cpt = '77385') " +
-                "OR (cpt = '77386') ";
+                "OR (cpt = '77386') " +
+                "OR (cpt = 'G6015') ";
             }
             else if (filter.contains("non")) {
                 filterString = filterString + "(cpt <> '77418' " +
                     "AND cpt LIKE '774%' " +
                     "AND cpt <> '77421' " +
                     "AND cpt <> '77417' " +
-                    "AND codetype = 'Technical') OR cpt LIKE 'G0%'";
+                    "AND codetype = 'Technical') OR cpt LIKE 'G0%' OR " +
+                    "(cpt  <> 'G6001' AND cpt  <> 'G6002' AND cpt  <> 'G6015' AND cpt <> 'G6017' AND cp LIKE 'G0%')";
             }
             else if (filter.contains("all-tx")) {
                 filterString = filterString +  " true ";  /*filterString + "(cpt LIKE '774%' " +
@@ -557,9 +559,9 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                 if (!(filterString.endsWith("("))) {
                     filterString += " OR ";
                 }
-                filterString += " cpt = '77387' OR ";
+                filterString += " cpt = '77387' OR cpt = 'G6001' OR ";
                 if (filter.contains("xray")) {
-                    filterString = filterString += "cpt = '77421'";
+                    filterString = filterString += "cpt = '77421' OR cpt = 'G6002'";
                 }
                 if( filter.contains("conebeam") ) {
                     if(filterString.endsWith("'")) {
@@ -607,10 +609,7 @@ public class TxInstanceFacade extends AbstractFacade<TxInstance> {
                     "AND codetype = 'Technical') OR procedurecode LIKE 'G0%'";
             }
             else if (filter.contains("all-tx")) {
-                filterString = filterString + "(procedurecode LIKE '774%' " +
-                    "AND procedurecode <> '77421' " +
-                    "AND procedurecode <> '77417' " +
-                    "AND codetype = 'Technical') OR procedurecode LIKE 'G0%'";
+                filterString = filterString + " true ";
             }
             
             else if (filter.contains("xray") || filter.contains("conebeam") || filter.contains("visionrt")) {
